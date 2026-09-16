@@ -1,0 +1,2 @@
+# Diretório reservado para o Processo Principal do Electron (Backend / Node.js)
+# Responsável pelo acesso ao SQLite e regras de negócio

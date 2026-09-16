@@ -1,0 +1,47 @@
+name: Validar Conventional Commits
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+  push:
+    branches:
+      - main
+      - master
+      - develop
+
+jobs:
+  lint-commits:
+    name: Validar Mensagens de Commit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do Código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Instalar dependências de validação
+        run: npm install --no-save @commitlint/cli @commitlint/config-conventional
+
+      - name: Validar commits com commitlint (Push)
+        if: github.event_name == 'push'
+        run: |
+          if [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
+            npx commitlint --last --verbose
+          else
+            npx commitlint --from=${{ github.event.before }} --to=${{ github.sha }} --verbose
+          fi
+
+      - name: Validar commits com commitlint (Pull Request)
+        if: github.event_name == 'pull_request'
+        run: |
+          npx commitlint --from=${{ github.event.pull_request.base.sha }} --to=${{ github.event.pull_request.head.sha }} --verbose
+
+      - name: Validar título do Pull Request
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "${{ github.event.pull_request.title }}" | npx commitlint --verbose

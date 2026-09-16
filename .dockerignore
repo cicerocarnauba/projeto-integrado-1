@@ -1,0 +1,16 @@
+node_modules
+frontend/node_modules
+.next
+frontend/.next
+out
+frontend/out
+target
+backend/target
+build
+.git
+.idea
+.vscode
+*.db
+*.sqlite
+*.sqlite3
+*.log

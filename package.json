@@ -1,0 +1,17 @@
+{
+  "name": "projeto-integrado-1",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Sistema de Gerenciamento de Acervo de Biblioteca Escolar - Creche Maria de Lourdes (Nextron + SQLite)",
+  "main": "main/background.ts",
+  "scripts": {
+    "dev": "nextron",
+    "build": "nextron build",
+    "lint:commit": "commitlint --from=HEAD~1",
+    "lint:commit:last": "commitlint --last"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.6.1",
+    "@commitlint/config-conventional": "^19.6.0"
+  }
+}

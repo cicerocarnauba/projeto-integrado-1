@@ -1,0 +1,27 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: dockerfile
+    container_name: biblioteca-desktop
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/renderer/.next
+      - sqlite-data:/app/data
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+    networks:
+      - biblioteca-net
+
+volumes:
+  sqlite-data:
+    driver: local
+
+networks:
+  biblioteca-net:
+    driver: bridge
