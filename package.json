@@ -2,16 +2,34 @@
   "name": "projeto-integrado-1",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "description": "Sistema de Gerenciamento de Acervo de Biblioteca Escolar - Creche Maria de Lourdes (Nextron + SQLite)",
   "main": "main/background.ts",
   "scripts": {
-    "dev": "nextron",
+    "dev": "cross-env NODE_OPTIONS=--experimental-transform-types nextron --startup-delay 5000",
     "build": "nextron build",
     "lint:commit": "commitlint --from=HEAD~1",
     "lint:commit:last": "commitlint --last"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.6.1",
-    "@commitlint/config-conventional": "^19.6.0"
+    "@commitlint/config-conventional": "^19.6.0",
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/node": "^24.13.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "autoprefixer": "^10.6.1",
+    "cross-env": "^10.1.0",
+    "electron": "^44.4.1",
+    "nextron": "^10.3.0",
+    "postcss": "^8.5.28",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "better-sqlite3": "^13.0.3",
+    "next": "^15.5.25",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
   }
 }
