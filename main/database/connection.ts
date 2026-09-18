@@ -31,6 +31,19 @@ export class DatabaseConnection {
         data_cadastro   TEXT NOT NULL,
         data_atualizacao TEXT NOT NULL
       );
+
+      CREATE TABLE IF NOT EXISTS turma (
+        id              INTEGER PRIMARY KEY AUTOINCREMENT,
+        nome            TEXT NOT NULL,
+        status          TEXT NOT NULL DEFAULT 'ATIVO'
+                        CHECK (status IN ('ATIVO', 'INATIVO')),
+        data_cadastro   TEXT NOT NULL,
+        data_atualizacao TEXT NOT NULL
+      );
+
+      -- RN07: nome único (case-insensitive, ignorando espaços nas pontas)
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_turma_nome_unique
+        ON turma(LOWER(TRIM(nome)));
     `);
   }
 }

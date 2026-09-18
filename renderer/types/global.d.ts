@@ -15,7 +15,33 @@ declare global {
         }>;
 
         consultar: (input?: {
-          termo?: string;
+          nome?: string;
+          email?: string;
+          incluirInativos?: boolean;
+        }) => Promise<{
+          success: boolean;
+          data?: any[];
+          error?: string;
+        }>;
+
+        buscarPorId: (id: number) => Promise<{
+          success: boolean;
+          data?: any;
+          error?: string;
+        }>;
+      };
+
+      turma: {
+        cadastrar: (input: {
+          nome: string;
+        }) => Promise<{
+          success: boolean;
+          data?: any;
+          error?: string;
+        }>;
+
+        consultar: (input?: {
+          nome?: string;
           incluirInativos?: boolean;
         }) => Promise<{
           success: boolean;

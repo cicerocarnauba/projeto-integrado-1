@@ -4,10 +4,12 @@ import { fileURLToPath } from 'url';
 import fs from 'fs';
 import { DatabaseConnection } from './database/connection.ts';
 import { ProfessorDAO } from './daos/ProfessorDAO.ts';
+import { TurmaDAO } from './daos/TurmaDAO.ts';
 import { ProfessorController } from './controllers/ProfessorController.ts';
+import { TurmaController } from './controllers/TurmaController.ts';
 import { registerProfessorHandlers } from './ipc/professorHandlers.ts';
+import { registerTurmaHandlers } from './ipc/turmaHandlers.ts';
 
-// ⚠️ Em ESM, __dirname/__filename NÃO existem — reconstrói ANTES de usar
 const __filename = fileURLToPath(import.meta.url);
 const __dirname  = path.dirname(__filename);
 
@@ -35,9 +37,16 @@ async function createWindow(): Promise<void> {
 
 function bootstrapBackend(): void {
   const db = DatabaseConnection.getInstance();
+
+  // Professor
   const professorDAO = new ProfessorDAO(db);
   const professorController = new ProfessorController(professorDAO);
   registerProfessorHandlers(professorController);
+
+  // Turma
+  const turmaDAO = new TurmaDAO(db);
+  const turmaController = new TurmaController(turmaDAO);
+  registerTurmaHandlers(turmaController);
 }
 
 app.whenReady().then(async () => {
