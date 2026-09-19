@@ -1,19 +1,6 @@
-import Sidebar from '../../components/Sidebar';
-import FormCadastroLivro from '../../components/livro/formCadastroLivro';
-
-// const livros = [
-//   { id: 1, titulo: 'O Pato e o Cachorro', editora: 'Editora', exemplares: 2, desativado: false },
-//   { id: 2, titulo: 'Titulo do Livro', editora: 'Editora', exemplares: 2, desativado: false },
-//   { id: 3, titulo: 'Titulo do Livro', editora: 'Editora', exemplares: 2, desativado: false },
-//   { id: 4, titulo: 'O Grande Morango Vermelho', editora: 'Editora', exemplares: 2, desativado: false },
-//   { id: 5, titulo: 'Titulo do Livro', editora: 'Editora', exemplares: 2, desativado: false },
-//   { id: 6, titulo: 'Titulo do Livro', editora: 'Editora', exemplares: 2, desativado: false },
-//   { id: 7, titulo: 'O Grande Morango Vermelho', editora: 'Editora', exemplares: 2, desativado: false },
-//   { id: 8, titulo: 'Titulo do Livro', editora: 'Editora', exemplares: 2, desativado: false },
-//   { id: 9, titulo: 'Titulo do Livro', editora: 'Editora', exemplares: 2, desativado: true },
-//   { id: 10, titulo: 'O Grande Morango Vermelho', editora: 'Editora', exemplares: 2, desativado: false },
-//   { id: 11, titulo: 'Titulo do Livro', editora: 'Editora', exemplares: 2, desativado: false },
-// ];
+import Sidebar from "../../components/Sidebar";
+import Link from "next/link";
+import FormCadastroLivro from "../../components/livro/formCadastroLivro";
 
 
 export default function GerenciarLivros() {
@@ -22,14 +9,23 @@ export default function GerenciarLivros() {
       <Sidebar />
 
       <main className="flex-1 p-8">
-        <p>Gerenciar livros</p>
-        <div>
-          <h1>Adicionar livro</h1>
-          <button><span>←</span>Voltar</button>
+        <p className="text-2xl font-bold text-gray-800 mb-6">
+          Gerenciar livros
+        </p>
+
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold text-gray-800">Adicionar livro</h1>
+
+          <Link
+            href="/livro"
+            className="flex items-center gap-1 bg-[#2e8b45] text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-[#236c35] transition-colors"
+          >
+            ← Voltar
+          </Link>
         </div>
 
-        <FormCadastroLivro/>
+        <FormCadastroLivro />
       </main>
-      </div>  
+    </div>
   );
 }
