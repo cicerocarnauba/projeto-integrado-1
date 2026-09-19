@@ -44,6 +44,22 @@ export class DatabaseConnection {
       -- RN07: nome único (case-insensitive, ignorando espaços nas pontas)
       CREATE UNIQUE INDEX IF NOT EXISTS idx_turma_nome_unique
         ON turma(LOWER(TRIM(nome)));
+
+      CREATE TABLE IF NOT EXISTS livro (
+        id                    INTEGER PRIMARY KEY AUTOINCREMENT,
+        titulo                TEXT NOT NULL,
+        editora               TEXT NOT NULL,
+        quantidade_total      INTEGER NOT NULL,
+        quantidade_emprestada INTEGER NOT NULL DEFAULT 0,
+        status                TEXT NOT NULL DEFAULT 'ATIVO'
+                              CHECK (status IN ('ATIVO', 'INATIVO')),
+        data_cadastro         TEXT NOT NULL,
+        data_atualizacao      TEXT NOT NULL
+      );
+
+      -- RN06: chave única de título + editora (case-insensitive, sem espaços nas extremidades)
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_livro_titulo_editora_unique
+        ON livro(LOWER(TRIM(titulo)), LOWER(TRIM(editora)));
     `);
   }
 }
