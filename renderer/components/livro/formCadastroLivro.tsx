@@ -1,9 +1,11 @@
+import { useRouter } from "next/router";
 import { useState } from "react";
 
 export default function FormCadastroLivro() {
-  const [titulo, setTitulo] = useState("");
-  const [editora, setEditora] = useState("");
-  const [quantidadeTotal, setQuantidadeTotal] = useState(0);
+    const [titulo, setTitulo] = useState("");
+    const [editora, setEditora] = useState("");
+    const [quantidadeTotal, setQuantidadeTotal] = useState(0);
+    const router = useRouter();
 
   function salvar() {
     const livro = {
@@ -13,6 +15,7 @@ export default function FormCadastroLivro() {
     };
 
     console.log(livro);
+    router.push('/livro?sucesso=1');
   }
 
   function cancelar() {
