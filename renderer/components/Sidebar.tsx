@@ -5,7 +5,7 @@ export default function Sidebar() {
     <aside className="w-80 bg-[#2e8b45] text-white p-6 flex flex-col justify-between rounded-tr-3xl rounded-br-3xl h-screen select-none shrink-0">
       <div>
         {/* Título Menu menor e mais discreto */}
-        <h2 className="text-lg font-semibold text-white/90 mb-6 tracking-wide">Menu</h2>
+        <h2 className="text-2xl font-semibold text-white/90 mb-6 tracking-wide">Menu</h2>
         
         {/* Opções de Navegação */}
         <nav className="flex flex-col gap-4 text-sm font-medium">
@@ -57,8 +57,8 @@ export default function Sidebar() {
       </div>
 
       {/* Nome do Sistema no rodapé */}
-      <div>
-        <h1 className="text-lg font-semibold text-white/90 tracking-tight">LivroPiqueT</h1>
+      <div className="text-center">
+        <h1 className="text-2xl font-semibold text-white/90 tracking-tight">LivroPiqueT</h1>
       </div>
     </aside>
   );

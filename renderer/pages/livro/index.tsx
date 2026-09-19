@@ -81,13 +81,13 @@ export default function GerenciarLivros() {
 
               <p
                 className={`text-xs mt-0.5 ${
-                  livro.ativo ? "text-gray-500" : "text-gray-400"
+                  livro.ativo ? "text-[#2e8b45]" : "text-gray-400"
                 }`}
               >
                 {livro.editora}
               </p>
 
-              <div className="flex items-center justify-between mt-auto">
+              <div className="flex items-center justify-between mt-3">
                 <span
                   className={`text-xs px-3 py-1 rounded-full font-medium ${
                     livro.ativo
