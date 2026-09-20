@@ -11,3 +11,10 @@ files:
 linux:
   target:
     - AppImage
+    - deb
+win:
+  target:
+    - nsis
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true

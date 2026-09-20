@@ -7,6 +7,8 @@
   "scripts": {
     "dev": "nextron",
     "build": "nextron build",
+    "build:linux": "nextron build --linux",
+    "build:win": "nextron build --win",
     "lint:commit": "commitlint --from=HEAD~1",
     "lint:commit:last": "commitlint --last",
     "prepare": "git config core.hooksPath .githooks"
