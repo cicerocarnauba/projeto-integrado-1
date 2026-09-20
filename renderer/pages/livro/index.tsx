@@ -3,36 +3,7 @@ import Sidebar from "../../components/Sidebar";
 import { Livro } from "../../types/livro";
 import { useRouter } from "next/router";
 
-const livros: Livro[] = [
-  {
-    id: 1,
-    titulo: "Harry Potter",
-    editora: "Quixadá",
-    quantidadeTotal: 2,
-    ativo: true,
-  },
-  {
-    id: 2,
-    titulo: "Chapeuzinho Vermelho",
-    editora: "Itpajé",
-    quantidadeTotal: 2,
-    ativo: true,
-  },
-  {
-    id: 3,
-    titulo: "Os três Porquinhos",
-    editora: "Piquet Carneiro",
-    quantidadeTotal: 2,
-    ativo: true,
-  },
-  {
-    id: 4,
-    titulo: "A Bela Adormecida",
-    editora: "Quixeramobim",
-    quantidadeTotal: 2,
-    ativo: false,
-  },
-];
+import { livros } from "../../data/livros-mock";
 
 export default function GerenciarLivros() {
   const router = useRouter();
@@ -115,13 +86,14 @@ export default function GerenciarLivros() {
                     </span>
                   )}
 
-                  <button
+                  <Link
+                    href={`/livro/${livro.id}`}
                     className={`text-xs font-semibold hover:underline ${
                       livro.ativo ? "text-[#2e8b45]" : "text-gray-500"
                     }`}
                   >
                     Ver detalhes &gt;
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>
