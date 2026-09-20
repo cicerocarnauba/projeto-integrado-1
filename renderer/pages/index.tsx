@@ -4,23 +4,23 @@ import CardModulo, { ModuloItem } from "../components/home/CardModulo";
 
 const modulos: ModuloItem[] = [
   {
+    titulo: "Gerenciar Empréstimos",
+    href: "/emprestimo",
+    icone: "swap_horiz",
+  },
+  {
     titulo: "Gerenciar Livros",
     href: "/livro",
     icone: "menu_book",
   },
   {
-    titulo: "Gerenciar Empréstimos",
-    href: "/emprestimos",
-    icone: "swap_horiz",
-  },
-  {
     titulo: "Gerenciar Professores",
-    href: "/professores",
+    href: "/professor",
     icone: "person",
   },
   {
     titulo: "Gerenciar Turmas",
-    href: "/turmas",
+    href: "/turma",
     icone: "groups",
   },
 ];

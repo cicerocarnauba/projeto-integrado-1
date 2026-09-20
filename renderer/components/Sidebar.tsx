@@ -27,7 +27,7 @@ export default function Sidebar() {
 
         <nav className="flex flex-col gap-4 text-sm font-medium">
           <Link 
-            href="/esmprestimo"
+            href="/emprestimo"
             className={`flex items-center justify-between py-3 px-4 rounded-2xl transition-colors ${
               emprestimoAtivo
                 ? 'bg-[#216331] font-semibold shadow-sm'
