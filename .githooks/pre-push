@@ -4,7 +4,6 @@ z40="0000000000000000000000000000000000000000"
 
 while read -r local_ref local_oid remote_ref remote_oid
 do
-    # Ignora deleção de branch remota
     if [ "$local_oid" = "$z40" ]; then
         continue
     fi
@@ -13,12 +12,12 @@ do
     if [ "$remote_ref" = "refs/heads/main" ]; then
         echo ""
         echo "======================================================================"
-        echo "❌ [BLOQUEADO] Pushes diretos para a branch 'main' estão proibidos!"
+        echo "[BLOQUEADO] Não faça pushes diretos para a branch 'main'"
         echo "======================================================================"
         echo "A partir de agora, a branch 'main' só pode ser modificada via Pull Request."
         echo ""
-        echo "👉 Por favor, envie suas alterações para a branch 'develop':"
-        echo "   git push origin develop"
+        echo " Por favor, envie suas alterações para a branch 'develop':"
+        echo "         git push origin develop"
         echo ""
         echo "Ou crie um Pull Request (PR) apontando para a 'main'."
         echo "======================================================================"
