@@ -1,11 +1,65 @@
+import Head from "next/head";
+import HeaderHome from "../components/home/HeaderHome";
+import CardModulo, { ModuloItem } from "../components/home/CardModulo";
 
-import Link from 'next/link';export default function Home() {
+const modulos: ModuloItem[] = [
+  {
+    titulo: "Gerenciar Livros",
+    href: "/livro",
+    icone: "menu_book",
+  },
+  {
+    titulo: "Gerenciar Empréstimos",
+    href: "/emprestimos",
+    icone: "swap_horiz",
+  },
+  {
+    titulo: "Gerenciar Professores",
+    href: "/professores",
+    icone: "person",
+  },
+  {
+    titulo: "Gerenciar Turmas",
+    href: "/turmas",
+    icone: "groups",
+  },
+];
+
+export default function Home() {
   return (
-    <div>
-      <h1>Biblioteca Maria de Lourdes</h1>
-      <p>Projeto funcionando!</p>
-      <Link href="/livro/cadastro_livro">Ir pra Cadastro de Livro</Link>
-    </div>
-    
+    <>
+      <Head>
+        <title>LivroPiqueT - Início</title>
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        />
+      </Head>
+
+      <div className="h-screen min-h-[600px] bg-[#2e8b45] text-white flex flex-col select-none px-8">
+        {/*Título*/}
+        <div className="flex-1 flex items-center justify-center">
+          <HeaderHome />
+        </div>
+
+        {/* Modulos de gerenciamento */}
+        <div className="w-full max-w-6xl mx-auto">
+          <main className="w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {modulos.map((modulo) => (
+                <CardModulo key={modulo.titulo} modulo={modulo} />
+              ))}
+            </div>
+          </main>
+        </div>
+
+        {/*rodapé*/}
+        <div className="flex-1 flex items-end justify-center pb-4">
+          <footer className="text-center text-white/75 text-xs">
+            <p>CEMEI Professora Maria de Lourdes Demasceno Marques • Piquet Carneiro</p>
+          </footer>
+        </div>
+      </div>
+    </>
   );
 }
