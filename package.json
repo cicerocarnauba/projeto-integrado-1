@@ -8,7 +8,8 @@
     "dev": "nextron",
     "build": "nextron build",
     "lint:commit": "commitlint --from=HEAD~1",
-    "lint:commit:last": "commitlint --last"
+    "lint:commit:last": "commitlint --last",
+    "prepare": "git config core.hooksPath .githooks"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.6.1",
