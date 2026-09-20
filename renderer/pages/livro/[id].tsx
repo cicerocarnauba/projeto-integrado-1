@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import Link from "next/link";
 import Sidebar from "../../components/Sidebar";
-import { livros } from "../../data/livros-mock";
+import { livros } from "../../mocks/livros-mock";
 
 export default function DetalhesLivro() {
   const router = useRouter();

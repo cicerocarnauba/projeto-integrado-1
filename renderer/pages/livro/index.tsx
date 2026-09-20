@@ -3,7 +3,7 @@ import Sidebar from "../../components/Sidebar";
 import { Livro } from "../../types/livro";
 import { useRouter } from "next/router";
 
-import { livros } from "../../data/livros-mock";
+import { livros } from "../../mocks/livros-mock";
 
 export default function GerenciarLivros() {
   const router = useRouter();
