@@ -19,6 +19,12 @@ export class LivroDAO {
 
   constructor(db: Database.Database) {
     this.db = db;
+    try {
+      // RNF04: Garante que o LOWER() do SQLite processe caracteres acentuados da língua portuguesa
+      this.db.function('lower', (str: unknown) => (typeof str === 'string' ? str.toLowerCase() : str));
+    } catch {
+      // Função já registrada na conexão
+    }
   }
 
   /**
@@ -65,6 +71,63 @@ export class LivroDAO {
       )
       .get(titulo, editora) as LivroRow | undefined;
     return row ? this.mapRowToEntity(row) : null;
+  }
+
+  /**
+   * RF04 — Consultar Livro
+   * - `titulo`: busca parcial em título.
+   * - `editora`: busca parcial em editora.
+   * - `termo`: busca parcial em título OU editora.
+   * - `incluirInativos`: por padrão `false` (retorna só ATIVOS); quando `true`, traz também INATIVOS (RN04).
+   * 
+   * Buscas por texto são case-insensitive e ignoram espaços nas extremidades (RNF04).
+   * Ordenação: primeiro os ATIVOS, depois INATIVOS; dentro de cada grupo, em ordem alfabética por título e editora.
+   */
+  public consultar(filtro: {
+    titulo?: string;
+    editora?: string;
+    termo?: string;
+    incluirInativos?: boolean;
+  }): Livro[] {
+    const incluirInativos = filtro.incluirInativos ?? false;
+    const titulo = (filtro.titulo ?? '').trim();
+    const editora = (filtro.editora ?? '').trim();
+    const termo = (filtro.termo ?? '').trim();
+
+    let sql = `SELECT * FROM livro WHERE 1 = 1`;
+    const params: string[] = [];
+
+    if (!incluirInativos) {
+      sql += ` AND status = 'ATIVO'`;
+    }
+
+    if (termo) {
+      sql += ` AND (
+        LOWER(TRIM(titulo))  LIKE LOWER(?) OR
+        LOWER(TRIM(editora)) LIKE LOWER(?)
+      )`;
+      const like = `%${termo}%`;
+      params.push(like, like);
+    }
+
+    if (titulo) {
+      sql += ` AND LOWER(TRIM(titulo)) LIKE LOWER(?)`;
+      params.push(`%${titulo}%`);
+    }
+
+    if (editora) {
+      sql += ` AND LOWER(TRIM(editora)) LIKE LOWER(?)`;
+      params.push(`%${editora}%`);
+    }
+
+    // Ordenação: primeiro ATIVOS, depois INATIVOS; em cada grupo, por título e editora
+    sql += ` ORDER BY
+      CASE status WHEN 'ATIVO' THEN 0 ELSE 1 END,
+      titulo ASC,
+      editora ASC`;
+
+    const rows = this.db.prepare(sql).all(...params) as LivroRow[];
+    return rows.map((row) => this.mapRowToEntity(row));
   }
 
   private mapRowToEntity(row: LivroRow): Livro {

@@ -7,6 +7,25 @@ export interface CadastrarLivroInput {
   quantidadeTotal: number;
 }
 
+export interface ConsultarLivroInput {
+  titulo?: string;
+  editora?: string;
+  termo?: string;
+  incluirInativos?: boolean;
+}
+
+export interface LivroConsultaDTO {
+  id: number | null;
+  titulo: string;
+  editora: string;
+  quantidadeTotal: number;
+  quantidadeEmprestada: number;
+  saldoDisponivel: number;
+  status: 'ATIVO' | 'INATIVO';
+  dataCadastro: Date;
+  dataAtualizacao: Date;
+}
+
 // GRASP Controller: ponto de entrada das operações de Livro
 // GRASP Creator: é quem cria instâncias de Livro
 export class LivroController {
@@ -51,5 +70,34 @@ export class LivroController {
       }
       throw error;
     }
+  }
+
+  /**
+   * RF04 — Consultar Livro
+   * - Retorna a listagem dos livros de acordo com os filtros informados (título, editora ou termo geral).
+   * - Por padrão retorna apenas livros ATIVOS. Se `incluirInativos: true`, inclui também INATIVOS (RN04).
+   * - Inclui o cálculo do saldo disponível em cada livro (RN03: saldo = quantidadeTotal - quantidadeEmprestada).
+   * - Buscas tratam equivalência ignorando caixa e espaços extras (RNF04).
+   */
+  public consultar(input?: ConsultarLivroInput): LivroConsultaDTO[] {
+    const filtro = input ?? {};
+    const livros = this.livroDAO.consultar({
+      titulo: filtro.titulo,
+      editora: filtro.editora,
+      termo: filtro.termo,
+      incluirInativos: filtro.incluirInativos,
+    });
+
+    return livros.map((livro) => ({
+      id: livro.id,
+      titulo: livro.titulo,
+      editora: livro.editora,
+      quantidadeTotal: livro.quantidadeTotal,
+      quantidadeEmprestada: livro.quantidadeEmprestada,
+      saldoDisponivel: livro.getSaldoDisponivel(),
+      status: livro.status,
+      dataCadastro: livro.dataCadastro,
+      dataAtualizacao: livro.dataAtualizacao,
+    }));
   }
 }
