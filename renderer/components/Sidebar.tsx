@@ -5,6 +5,19 @@ import { MdBarChart, MdMenuBook, MdPerson, MdGroups } from "react-icons/md";
 export default function Sidebar() {
   const router = useRouter();
 
+  const professoresAtivo =
+    router.pathname.startsWith('/professor');
+
+  const livroAtivo =
+    router.pathname.startsWith('/livro');
+
+  const turmaAtiva =
+    router.pathname.startsWith('/turma');
+
+  const emprestimoAtivo =
+    router.pathname.startsWith('/emprestimo');
+  
+    
   return (
     <aside className="w-80 bg-[#2e8b45] text-white p-6 flex flex-col justify-between rounded-tr-3xl rounded-br-3xl h-screen select-none shrink-0">
       <div>
@@ -13,12 +26,12 @@ export default function Sidebar() {
         </h2>
 
         <nav className="flex flex-col gap-4 text-sm font-medium">
-          <Link
-            href="/emprestimos"
+          <Link 
+            href="/esmprestimo"
             className={`flex items-center justify-between py-3 px-4 rounded-2xl transition-colors ${
-              router.pathname.startsWith("/emprestimos")
-                ? "bg-[#216331] font-semibold shadow-sm"
-                : "hover:bg-[#236c35]"
+              emprestimoAtivo
+                ? 'bg-[#216331] font-semibold shadow-sm'
+                : 'hover:bg-[#236c35]'
             }`}
           >
             <div className="flex items-center gap-3">
@@ -27,13 +40,13 @@ export default function Sidebar() {
             </div>
             <span className="text-xs">›</span>
           </Link>
-
-          <Link
-            href="/livro/cadastro_livro"
+          {/* Item Ativo */}
+          <Link 
+            href="/livro"
             className={`flex items-center justify-between py-3 px-4 rounded-2xl transition-colors ${
-              router.pathname.startsWith("/livro")
-                ? "bg-[#216331] font-semibold shadow-sm"
-                : "hover:bg-[#236c35]"
+              livroAtivo
+                ? 'bg-[#216331] font-semibold shadow-sm'
+                : 'hover:bg-[#236c35]'
             }`}
           >
             <div className="flex items-center gap-3">
@@ -43,12 +56,12 @@ export default function Sidebar() {
             <span className="text-xs">›</span>
           </Link>
 
-          <Link
-            href="/professores"
+          <Link 
+            href="/professor"
             className={`flex items-center justify-between py-3 px-4 rounded-2xl transition-colors ${
-              router.pathname.startsWith("/professores")
-                ? "bg-[#216331] font-semibold shadow-sm"
-                : "hover:bg-[#236c35]"
+              professoresAtivo
+                ? 'bg-[#216331] font-semibold shadow-sm'
+                : 'hover:bg-[#236c35]'
             }`}
           >
             <div className="flex items-center gap-3">
@@ -58,12 +71,12 @@ export default function Sidebar() {
             <span className="text-xs">›</span>
           </Link>
 
-          <Link
-            href="/turmas"
+          <Link 
+            href="/turma"
             className={`flex items-center justify-between py-3 px-4 rounded-2xl transition-colors ${
-              router.pathname.startsWith("/turmas")
-                ? "bg-[#216331] font-semibold shadow-sm"
-                : "hover:bg-[#236c35]"
+              turmaAtiva
+                ? 'bg-[#216331] font-semibold shadow-sm'
+                : 'hover:bg-[#236c35]'
             }`}
           >
             <div className="flex items-center gap-3">
