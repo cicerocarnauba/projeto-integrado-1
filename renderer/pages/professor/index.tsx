@@ -1,41 +1,47 @@
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 import Sidebar from "../../components/Sidebar";
 import SearchBar from "../../components/Searchbar";
 
-import { MdAdd } from "react-icons/md";
+import { MdAdd, MdPersonOutline } from "react-icons/md";
 
 export default function GerenciarProfessores() {
+  const router = useRouter();
+  const mostrarSucesso = router.query.sucesso === "1";
+
   return (
     <div className="flex min-h-screen bg-white">
       <Sidebar />
 
       <main className="flex-1 p-8">
-
-        <h1 className="text-2xl font-bold text-black mb-6">
+        <h1 className="text-2xl font-bold text-gray-800 mb-6">
           Gerenciar professores
         </h1>
 
-        <div className="flex items-center gap-12 mb-8 w-full">
+        {mostrarSucesso && (
+          <div className="bg-[#d8f3dc] text-[#2e8b45] px-4 py-3 rounded-xl mb-6 text-sm font-medium flex items-center gap-2">
+            ✓ Professor cadastrado com sucesso!
+          </div>
+        )}
 
+        <div className="flex items-center gap-4 mb-8 w-full">
           <SearchBar />
 
           <Link
             href="/professor/cadastro_professor"
-            className="h-10 px-5 flex items-center justify-center bg-[#2e8b45] text-white rounded-full font-medium text-sm hover:bg-[#236c35] transition-colors whitespace-nowrap gap-2"
+            className="h-11 px-6 flex items-center justify-center bg-[#2e8b45] text-white rounded-xl font-medium text-sm hover:bg-[#236c35] transition-all whitespace-nowrap gap-2 shadow-sm cursor-pointer"
           >
             <MdAdd size={20} />
             Adicionar professor
           </Link>
-
         </div>
 
-        <div className="border-2 border-[#2e8b45] rounded-[25px] p-6">
-          <p className="text-gray-500 text-lg">
+        <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
+          <p className="text-base font-medium">
             Nenhum professor cadastrado.
           </p>
         </div>
-
       </main>
     </div>
   );

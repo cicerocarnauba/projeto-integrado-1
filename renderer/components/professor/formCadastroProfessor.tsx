@@ -1,86 +1,99 @@
 import { useState } from "react";
-import { MdClear, MdCheck} from "react-icons/md";
+import { useRouter } from "next/router";
+import { MdClear, MdCheck } from "react-icons/md";
 
 export default function FormCadastroProfessor() {
-    const [nome, setNome] = useState("");
-    const [sobreNome, setSobreNome] = useState("");
-    const [email, setEmail] = useState("");
+  const router = useRouter();
+  const [nome, setNome] = useState("");
+  const [sobreNome, setSobreNome] = useState("");
+  const [email, setEmail] = useState("");
 
-  function salvar() {
+  function salvar(e: React.FormEvent) {
+    e.preventDefault();
     const professor = {
       nome,
       sobreNome,
       email,
     };
 
-    console.log(professor);
+    console.log("Professor cadastrado:", professor);
+    router.push("/professor?sucesso=1");
   }
 
   function cancelar() {
     setNome("");
     setSobreNome("");
     setEmail("");
+    router.push("/professor");
   }
 
-
   return (
-    <div className="border-2 border-[#2e8b45] rounded-[20px] p-3 max-w-full">
-      <div className="flex gap-10 mb-4">
-        <div className="flex-2 bg-[#F4F8FF] border border-[#D0E0FE] rounded-[15px] p-2">
-          <label className="text-xs text-[#A2ACBE] font-medium mb-2 block">
-            Primeiro nome
+    <form
+      onSubmit={salvar}
+      className="w-full bg-[#eef7f0] rounded-2xl p-8 shadow-xs"
+    >
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div>
+          <label className="text-sm font-semibold text-[#1e582d] mb-2 block">
+            Nome
           </label>
           <input
             type="text"
+            required
+            placeholder="Ex: Maria"
             value={nome}
             onChange={(e) => setNome(e.target.value)}
-            className="w-full bg-[#F8FFFC] border border-[#D0E0FE] rounded-lg px-3 py-2 text-sm text-gray-800 outline-none focus:border-[#A2ACBE]"
+            className="w-full bg-white border border-[#cde5d3] rounded-xl px-4 py-3 text-sm text-gray-800 placeholder:text-gray-400 outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20"
           />
         </div>
-          <div className="flex-4 bg-[#F4F8FF] border border-[#D0E0FE] rounded-[15px] p-2">
-          <label className="text-xs text-[#A2ACBE] font-medium mb-2 block">
+
+        <div>
+          <label className="text-sm font-semibold text-[#1e582d] mb-2 block">
             Sobrenome
           </label>
           <input
             type="text"
+            required
+            placeholder="Ex: Silva"
             value={sobreNome}
             onChange={(e) => setSobreNome(e.target.value)}
-            className="w-full bg-[#F8FFFC] border border-[#D0E0FE] rounded-lg px-3 py-2 text-sm text-gray-800 outline-none focus:border-[#A2ACBE]"
+            className="w-full bg-white border border-[#cde5d3] rounded-xl px-4 py-3 text-sm text-gray-800 placeholder:text-gray-400 outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20"
+          />
+        </div>
+
+        <div>
+          <label className="text-sm font-semibold text-[#1e582d] mb-2 block">
+            E-mail
+          </label>
+          <input
+            type="email"
+            required
+            placeholder="Ex: maria.silva@escola.ce.gov.br"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full bg-white border border-[#cde5d3] rounded-xl px-4 py-3 text-sm text-gray-800 placeholder:text-gray-400 outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20"
           />
         </div>
       </div>
 
-      <div className="flex gap-4 mb-6">
-        <div className="flex-1 bg-[#F4F8FF] border border-[#D0E0FE] rounded-[15px] p-2">
-          <label className="text-xs text-[#A2ACBE] font-medium mb-2 block">
-            Email
-          </label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full bg-gray-50 border border-[#D0E0FE] rounded-lg px-3 py-2 text-sm text-gray-800 outline-none focus:border-[#A2ACBE]"
-          />
-        </div>
-      </div>
-      
-      <div className="flex justify-end gap-3">
+      <div className="flex justify-end items-center gap-3">
         <button
+          type="button"
           onClick={cancelar}
-          className="flex items-center gap-1 bg-red-500 text-white px-5 py-2 rounded-full text-sm font-medium hover:bg-red-600 transition-colors"
+          className="flex items-center gap-1.5 px-6 py-2.5 rounded-xl text-sm font-medium text-white bg-red-500 hover:bg-red-600 transition-colors shadow-xs active:scale-95 cursor-pointer"
         >
-          <MdClear size={20}/>
+          <MdClear size={18} />
           Cancelar
         </button>
 
         <button
-          onClick={salvar}
-          className="flex items-center gap-1 bg-[#2e8b45] text-white px-5 py-2 rounded-full text-sm font-medium hover:bg-[#236c35] transition-colors"
+          type="submit"
+          className="flex items-center gap-1.5 bg-[#2e8b45] hover:bg-[#236c35] text-white px-7 py-2.5 rounded-xl text-sm font-medium transition-all shadow-sm active:scale-95 cursor-pointer"
         >
-          <MdCheck size={20}/>
+          <MdCheck size={18} />
           Confirmar
         </button>
       </div>
-    </div>
+    </form>
   );
 }

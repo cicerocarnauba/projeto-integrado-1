@@ -10,18 +10,16 @@ export default function GerenciarProfessores() {
       <Sidebar />
 
       <main className="flex-1 p-8">
-        <p className="text-2xl font-bold text-black mb-6">
-          Gerenciar professores
-        </p>
-
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-black">Adicionar professor</h1>
+        <div className="flex items-center justify-between mb-8 w-full">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-800">Adicionar professor</h1>
+          </div>
 
           <Link
             href="/professor"
-            className="flex items-center gap-1 bg-[#2e8b45] text-white px-4 py-2 rounded-4xl text-sm font-medium hover:bg-[#236c35] transition-colors"
+            className="flex items-center gap-1.5 bg-[#2e8b45] text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#236c35] transition-all shadow-sm cursor-pointer"
           >
-            <MdArrowBack size={20}/>
+            <MdArrowBack size={18} />
             Voltar
           </Link>
         </div>
