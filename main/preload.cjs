@@ -14,6 +14,7 @@ contextBridge.exposeInMainWorld('ipc', {
   },
   livro: {
     cadastrar: (input) => ipcRenderer.invoke('livro:cadastrar', input),
+    consultar: (input) => ipcRenderer.invoke('livro:consultar', input),
   },
 });
 
