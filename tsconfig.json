@@ -14,9 +14,10 @@
     "jsx": "react-jsx"
   },
   "include": [
+    "main/**/*.ts",
     "renderer/**/*.ts",
     "renderer/**/*.tsx",
     ".next/types/**/*.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "app", "dist"]
 }

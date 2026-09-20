@@ -1,0 +1,13 @@
+appId: com.crechemariadelourdes.biblioteca
+productName: LivroPiqueT
+directories:
+  output: dist
+  buildResources: resources
+files:
+  - from: .
+    filter:
+      - package.json
+      - app
+linux:
+  target:
+    - AppImage
