@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "cross-env NODE_OPTIONS=--experimental-transform-types nextron --startup-delay 5000",
     "build": "nextron build",
+    "test": "node --experimental-transform-types --test tests/*.test.ts",
     "lint:commit": "commitlint --from=HEAD~1",
     "lint:commit:last": "commitlint --last"
   },
