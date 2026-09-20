@@ -1,10 +1,11 @@
 import { app } from 'electron'
+import serve from 'electron-serve'
 import { createWindow } from './helpers'
 
 const isProd = process.env.NODE_ENV === 'production'
 
 if (isProd) {
-  app.setPath('userData', app.getPath('userData'))
+  serve({ directory: 'app' })
 } else {
   app.setPath('userData', `${app.getPath('appData')} (development)`)
 }
