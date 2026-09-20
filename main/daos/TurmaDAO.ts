@@ -16,6 +16,12 @@ export class TurmaDAO {
 
   constructor(db: Database.Database) {
     this.db = db;
+    try {
+      // RNF04: Garante que o LOWER() do SQLite processe caracteres acentuados da língua portuguesa
+      this.db.function('lower', (str: unknown) => (typeof str === 'string' ? str.toLowerCase() : str));
+    } catch {
+      // Função já registrada na conexão
+    }
   }
 
   public inserir(turma: Turma): Turma {
@@ -53,24 +59,24 @@ export class TurmaDAO {
   }
 
   /**
-   * Consulta com filtros (RF13).
-   * - `nome`: busca parcial em nome.
-   * - `incluirInativos`: por padrão `false` (retorna só ATIVAS).
-   * Buscas por texto são case-insensitive e ignoram espaços nas extremidades (RNF04).
-   *
-   * Ordenação (RF13): primeiro as ATIVAS, depois as INATIVAS; dentro de cada grupo, por nome.
+   * HU13 — Consultar Turma
+   * - `nome`: busca parcial em nome (case-insensitive e trim - RNF04).
+   * - `incluirInativos`: se explicitamente `false`, retorna apenas turmas com status ATIVO.
+   *   Por padrão (quando omitido ou `true`), a listagem/seleção de turmas traz todas as turmas,
+   *   ordenando primeiro as turmas com status "Ativa" e depois as com status "Inativa" (HU13).
+   * - Dentro de cada grupo de status, a ordenação é alfabética por nome.
    */
   public consultar(filtro: {
     nome?: string;
     incluirInativos?: boolean;
   }): Turma[] {
-    const incluirInativos = filtro.incluirInativos ?? false;
+    const apenasAtivas = filtro.incluirInativos === false;
     const nome = (filtro.nome ?? '').trim();
 
     let sql = `SELECT * FROM turma WHERE 1 = 1`;
     const params: string[] = [];
 
-    if (!incluirInativos) {
+    if (apenasAtivas) {
       sql += ` AND status = 'ATIVO'`;
     }
 
@@ -79,7 +85,7 @@ export class TurmaDAO {
       params.push(`%${nome}%`);
     }
 
-    // RF13 — Ativas primeiro, depois Inativas; em cada grupo, ordem alfabética
+    // HU13: Por padrão, a seleção mostra primeiro as turmas com status "Ativa" e depois as turmas com status "Inativa"
     sql += ` ORDER BY
       CASE status WHEN 'ATIVO' THEN 0 ELSE 1 END,
       nome ASC`;
