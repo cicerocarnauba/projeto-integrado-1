@@ -1,11 +1,12 @@
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { MdClose, MdCheck } from "react-icons/md";
 
 export default function FormCadastroLivro() {
-    const [titulo, setTitulo] = useState("");
-    const [editora, setEditora] = useState("");
-    const [quantidadeTotal, setQuantidadeTotal] = useState(0);
-    const router = useRouter();
+  const [titulo, setTitulo] = useState("");
+  const [editora, setEditora] = useState("");
+  const [quantidadeTotal, setQuantidadeTotal] = useState(0);
+  const router = useRouter();
 
   function salvar() {
     const livro = {
@@ -15,7 +16,7 @@ export default function FormCadastroLivro() {
     };
 
     console.log(livro);
-    router.push('/livro?sucesso=1');
+    router.push("/livro?sucesso=1");
   }
 
   function cancelar() {
@@ -87,14 +88,14 @@ export default function FormCadastroLivro() {
           onClick={cancelar}
           className="flex items-center gap-1 bg-red-500 text-white px-5 py-2 rounded-full text-sm font-medium hover:bg-red-600 transition-colors"
         >
-          ✕ Cancelar
+          <MdClose size={18} /> Cancelar
         </button>
 
         <button
           onClick={salvar}
           className="flex items-center gap-1 bg-[#2e8b45] text-white px-5 py-2 rounded-full text-sm font-medium hover:bg-[#236c35] transition-colors"
         >
-          ✓ Confirmar
+          <MdCheck size={18} /> Confirmar
         </button>
       </div>
     </div>

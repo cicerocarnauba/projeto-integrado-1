@@ -2,6 +2,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import Sidebar from "../../components/Sidebar";
 import { livros } from "../../mocks/livros-mock";
+import { MdDeleteOutline, MdRemoveCircleOutline, MdEdit } from "react-icons/md";
 
 export default function DetalhesLivro() {
   const router = useRouter();
@@ -91,13 +92,19 @@ export default function DetalhesLivro() {
                   : "bg-red-500 text-white hover:bg-red-600"
               }`}
             >
-              {livro.statusEmprestimo === "nunca_emprestado"
-                ? "🗑 Excluir livro"
-                : "⊖ Desativar livro"}
+              {livro.statusEmprestimo === "nunca_emprestado" ? (
+                <>
+                  <MdDeleteOutline size={18} /> Excluir livro
+                </>
+              ) : (
+                <>
+                  <MdRemoveCircleOutline size={18} /> Desativar livro
+                </>
+              )}
             </button>
 
             <button className="flex items-center gap-1 bg-[#2e8b45] text-white px-5 py-2 rounded-full text-sm font-medium hover:bg-[#236c35] transition-colors">
-              ✏ Editar livro
+              <MdEdit size={18} /> Editar livro
             </button>
           </div>
         </div>

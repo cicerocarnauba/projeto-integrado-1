@@ -4,6 +4,7 @@ import { Livro } from "../../types/livro";
 import { useRouter } from "next/router";
 
 import { livros } from "../../mocks/livros-mock";
+import { MdSearch, MdFilterList } from "react-icons/md";
 
 export default function GerenciarLivros() {
   const router = useRouter();
@@ -31,9 +32,12 @@ export default function GerenciarLivros() {
               placeholder="Barra de busca"
               className="bg-transparent placeholder-gray-400 text-gray-800 outline-none w-full text-sm"
             />
-            <span className="text-[#2e8b45]">🔍</span>
+            <MdSearch size={20} className="text-[#2e8b45]" />
           </div>
 
+          <button className="bg-[#2e8b45] p-2.5 rounded-full text-white hover:bg-[#236c35] transition-colors">
+            <MdFilterList size={20} />
+          </button>
           <Link
             href="/livro/cadastro_livro"
             className="bg-[#2e8b45] px-5 py-2.5 rounded-full text-white font-medium text-sm flex items-center gap-1 hover:bg-[#236c35] transition-colors"
