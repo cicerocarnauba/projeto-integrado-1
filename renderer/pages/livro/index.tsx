@@ -1,10 +1,11 @@
 import Link from "next/link";
 import Sidebar from "../../components/Sidebar";
+import SearchBar from "../../components/Searchbar";
 import { Livro } from "../../types/livro";
 import { useRouter } from "next/router";
 
 import { livros } from "../../mocks/livros-mock";
-import { MdSearch, MdFilterList } from "react-icons/md";
+import { MdAdd } from "react-icons/md";
 
 export default function GerenciarLivros() {
   const router = useRouter();
@@ -14,87 +15,76 @@ export default function GerenciarLivros() {
     <div className="flex min-h-screen bg-white">
       <Sidebar />
 
-      <main className="flex-1 p-8">
+      <main className="flex-1 p-8 animate-fade-in">
         <h1 className="text-2xl font-bold text-gray-800 mb-6">
           Gerenciar livros
         </h1>
 
         {mostrarSucesso && (
-          <div className="bg-[#d8f3dc] text-[#2e8b45] px-4 py-3 rounded-xl mb-6 text-sm font-medium">
+          <div className="bg-[#d8f3dc] text-[#2e8b45] px-4 py-3 rounded-xl mb-6 text-sm font-medium flex items-center gap-2">
             ✓ Livro cadastrado com sucesso!
           </div>
         )}
 
-        <div className="flex items-center gap-3 mb-8">
-          <div className="flex-1 bg-gray-50 border border-[#2e8b45] rounded-full px-5 py-2.5 flex items-center justify-between text-gray-700 shadow-sm">
-            <input
-              type="text"
-              placeholder="Barra de busca"
-              className="bg-transparent placeholder-gray-400 text-gray-800 outline-none w-full text-sm"
-            />
-            <MdSearch size={20} className="text-[#2e8b45]" />
-          </div>
+        {/* Barra de busca e botão de adicionar */}
+        <div className="flex items-center gap-4 mb-8 w-full">
+          <SearchBar placeholder="Pesquisar livro por título ou editora..." />
 
-          <button className="bg-[#2e8b45] p-2.5 rounded-full text-white hover:bg-[#236c35] transition-colors">
-            <MdFilterList size={20} />
-          </button>
           <Link
             href="/livro/cadastro_livro"
-            className="bg-[#2e8b45] px-5 py-2.5 rounded-full text-white font-medium text-sm flex items-center gap-1 hover:bg-[#236c35] transition-colors"
+            className="h-11 px-6 flex items-center justify-center bg-[#2e8b45] text-white rounded-xl font-medium text-sm hover:bg-[#236c35] transition-all whitespace-nowrap gap-2 shadow-sm cursor-pointer shrink-0 active:scale-95"
           >
-            + Adicionar Livro
+            <MdAdd size={20} />
+            Adicionar Livro
           </Link>
         </div>
 
-        <div className="grid grid-cols-3 gap-6">
+        {/* Lista de livros */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {livrosAtivos.map((livro) => (
             <div
-              className={`border-2 rounded-3xl p-5 shadow-sm hover:shadow-md transition-all ${
-                livro.ativo
-                  ? "border-[#2e8b45] bg-white hover:border-[#236c35]"
-                  : "border-gray-300 bg-gray-50 opacity-60"
-              }`}
               key={livro.id}
+              className={`rounded-2xl p-6 shadow-xs hover:shadow-sm transition-all flex flex-col justify-between ${
+                livro.ativo
+                  ? "bg-[#eef7f0] hover:bg-[#e5f3e7]"
+                  : "bg-gray-100 opacity-60"
+              }`}
             >
-              <h3
-                className={`font-bold text-base ${
-                  livro.ativo ? "text-[#2e8b45]" : "text-gray-600"
-                }`}
-              >
-                {livro.titulo}
-              </h3>
+              <div>
+                <h3
+                  className={`font-bold text-lg leading-snug ${
+                    livro.ativo ? "text-[#1e582d]" : "text-gray-600"
+                  }`}
+                >
+                  {livro.titulo}
+                </h3>
 
-              <p
-                className={`text-xs mt-0.5 ${
-                  livro.ativo ? "text-[#2e8b45]" : "text-gray-400"
-                }`}
-              >
-                {livro.editora}
-              </p>
+                <p className="text-xs text-[#2e8b45]/80 font-medium mt-1">
+                  Editora: {livro.editora}
+                </p>
+              </div>
 
-              <div className="flex items-center justify-between mt-3">
+              <div className="flex items-center justify-between mt-6 pt-4 border-t border-[#d8ecde]">
                 <span
-                  className={`text-xs px-3 py-1 rounded-full font-medium ${
+                  className={`text-xs px-3 py-1.5 rounded-full font-semibold ${
                     livro.ativo
-                      ? "bg-[#d8f3dc] text-[#2e8b45]"
-                      : "bg-gray-300 text-gray-700"
+                      ? "bg-white text-[#1e582d] shadow-2xs"
+                      : "bg-gray-200 text-gray-700"
                   }`}
                 >
                   {livro.quantidadeTotal} exemplares
                 </span>
 
-                <div className="text-right">
+                <div className="flex items-center">
                   {livro.ativo === false && (
-                    <span className="block text-[10px] bg-gray-400 text-white px-2 py-0.5 rounded-full mb-1">
+                    <span className="text-[10px] bg-gray-400 text-white px-2 py-0.5 rounded-full mr-2">
                       Desativado
                     </span>
                   )}
 
                   <Link
                     href={`/livro/${livro.id}`}
-                    className={`text-xs font-semibold hover:underline ${
-                      livro.ativo ? "text-[#2e8b45]" : "text-gray-500"
-                    }`}
+                    className="text-xs font-semibold text-[#2e8b45] hover:text-[#236c35] flex items-center gap-1 transition-colors hover:underline"
                   >
                     Ver detalhes &gt;
                   </Link>
