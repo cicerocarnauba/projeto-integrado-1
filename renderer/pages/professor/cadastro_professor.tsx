@@ -9,7 +9,8 @@ export default function GerenciarProfessores() {
     <div className="flex min-h-screen bg-white">
       <Sidebar />
 
-      <main className="flex-1 p-8">
+      <main className="flex-1 p-8 animate-fade-in">
+        {/* Cabeçalho e botão voltar */}
         <div className="flex items-center justify-between mb-8 w-full">
           <div>
             <h1 className="text-2xl font-bold text-gray-800">Adicionar professor</h1>
@@ -24,6 +25,7 @@ export default function GerenciarProfessores() {
           </Link>
         </div>
 
+        {/* Formulário de cadastro */}
         <FormCadastroProfessor />
       </main>
     </div>

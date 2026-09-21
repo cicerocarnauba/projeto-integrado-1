@@ -14,7 +14,7 @@ export default function GerenciarProfessores() {
     <div className="flex min-h-screen bg-white">
       <Sidebar />
 
-      <main className="flex-1 p-8">
+      <main className="flex-1 p-8 animate-fade-in">
         <h1 className="text-2xl font-bold text-gray-800 mb-6">
           Gerenciar professores
         </h1>
@@ -25,8 +25,9 @@ export default function GerenciarProfessores() {
           </div>
         )}
 
+        {/* Barra de busca e botão de adicionar */}
         <div className="flex items-center gap-4 mb-8 w-full">
-          <SearchBar />
+          <SearchBar placeholder="Pesquisar professor por nome ou e-mail..." />
 
           <Link
             href="/professor/cadastro_professor"
@@ -37,6 +38,7 @@ export default function GerenciarProfessores() {
           </Link>
         </div>
 
+        {/* Lista de professores */}
         <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
           <p className="text-base font-medium">
             Nenhum professor cadastrado.

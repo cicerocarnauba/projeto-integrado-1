@@ -2,24 +2,30 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { MdBarChart, MdMenuBook, MdPerson, MdGroups } from "react-icons/md";
 
-export default function Sidebar() {
+interface SidebarProps {
+  activePath?: string;
+  className?: string;
+}
+
+export default function Sidebar({ activePath, className = "" }: SidebarProps) {
   const router = useRouter();
+  const currentPath = activePath ?? router.pathname;
 
   const professoresAtivo =
-    router.pathname.startsWith('/professor');
+    currentPath.startsWith('/professor');
 
   const livroAtivo =
-    router.pathname.startsWith('/livro');
+    currentPath.startsWith('/livro');
 
   const turmaAtiva =
-    router.pathname.startsWith('/turma');
+    currentPath.startsWith('/turma');
 
   const emprestimoAtivo =
-    router.pathname.startsWith('/emprestimo');
+    currentPath.startsWith('/emprestimo');
   
     
   return (
-    <aside className="w-80 bg-[#2e8b45] text-white p-6 flex flex-col justify-between rounded-tr-3xl rounded-br-3xl h-screen select-none shrink-0">
+    <aside className={`w-80 bg-[#2e8b45] text-white p-6 flex flex-col justify-between rounded-tr-3xl rounded-br-3xl h-screen select-none shrink-0 ${className}`}>
       <div>
         <h2 className="text-2xl font-semibold text-white/90 mb-6 tracking-wide">
           Menu
@@ -40,7 +46,6 @@ export default function Sidebar() {
             </div>
             <span className="text-xs">›</span>
           </Link>
-          {/* Item Ativo */}
           <Link 
             href="/livro"
             className={`flex items-center justify-between py-3 px-4 rounded-2xl transition-colors ${
@@ -89,9 +94,15 @@ export default function Sidebar() {
       </div>
 
       <div className="text-center">
-        <h1 className="text-2xl font-semibold text-white/90 tracking-tight">
-          LivroPiqueT
-        </h1>
+        <Link
+          href="/?anim=expand"
+          className="inline-flex items-center justify-center py-2 px-4 rounded-2xl hover:bg-white/10 active:scale-95 transition-all cursor-pointer group"
+          title="Ir para a tela inicial"
+        >
+          <h1 className="text-2xl font-semibold text-white/90 group-hover:text-white tracking-tight transition-colors">
+            LivroPiqueT
+          </h1>
+        </Link>
       </div>
     </aside>
   );
