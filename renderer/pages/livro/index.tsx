@@ -34,7 +34,7 @@ export default function GerenciarLivros() {
             href="/livro/cadastro_livro"
             className="h-11 px-6 flex items-center justify-center bg-[#2e8b45] text-white rounded-xl font-medium text-sm hover:bg-[#236c35] transition-all whitespace-nowrap gap-2 shadow-sm cursor-pointer shrink-0 active:scale-95"
           >
-            <MdAdd size={20} />
+            <MdAdd size={18} />
             Adicionar Livro
           </Link>
         </div>
