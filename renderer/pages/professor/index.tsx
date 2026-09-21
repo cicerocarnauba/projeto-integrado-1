@@ -33,7 +33,7 @@ export default function GerenciarProfessores() {
             href="/professor/cadastro_professor"
             className="h-11 px-6 flex items-center justify-center bg-[#2e8b45] text-white rounded-xl font-medium text-sm hover:bg-[#236c35] transition-all whitespace-nowrap gap-2 shadow-sm cursor-pointer"
           >
-            <MdAdd size={20} />
+            <MdAdd size={18} />
             Adicionar professor
           </Link>
         </div>
