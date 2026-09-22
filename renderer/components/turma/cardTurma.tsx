@@ -44,18 +44,18 @@ export default function CardProfessor({turma}: CardTurmasProps) {
 
                 <button
                 type="button"
-                className="flex items-center gap-1.5 bg-red-500 text-white px-4 py-2 text-sm rounded-lg font-medium hover:bg-[#b9151b] transition-colors"
-                >
-                    <MdDelete size={15} />
-                    Excluir
-                </button>
-
-                <button
-                type="button"
                 className="flex items-center gap-1.5 bg-[#389348] text-white px-4 py-2 text-sm rounded-lg font-medium hover:bg-[#2e7d3d] transition-colors"
                 >
                     <MdEdit size={15} />
                     Editar
+                </button>
+                
+                <button
+                type="button"
+                className="flex items-center gap-1.5 bg-red-500 text-white px-4 py-2 text-sm rounded-lg font-medium hover:bg-[#b9151b] transition-colors"
+                >
+                    <MdDelete size={15} />
+                    Excluir
                 </button>
 
             </div>

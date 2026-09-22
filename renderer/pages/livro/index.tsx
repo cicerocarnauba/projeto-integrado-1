@@ -52,7 +52,7 @@ export default function GerenciarLivros() {
             >
               <div>
                 <h3
-                  className={`font-bold text-lg leading-snug ${
+                  className={`font-bold text-sm leading-snug ${
                     livro.ativo ? "text-[#1e582d]" : "text-gray-600"
                   }`}
                 >
