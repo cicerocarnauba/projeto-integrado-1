@@ -29,7 +29,8 @@ export function registerTurmaHandlers(controller: TurmaController): void {
 
       const turmas = controller.consultar({
         nome: typeof filtro.nome === 'string' ? filtro.nome : undefined,
-        incluirInativos: Boolean(filtro.incluirInativos),
+        incluirInativos:
+          typeof filtro.incluirInativos === 'boolean' ? filtro.incluirInativos : undefined,
       });
 
       return { success: true, data: turmas };
