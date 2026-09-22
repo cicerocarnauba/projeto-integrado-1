@@ -4,6 +4,9 @@ import { useRouter } from "next/router";
 import Sidebar from "../../components/Sidebar";
 import SearchBar from "../../components/Searchbar";
 
+import CardProfessor from "../../components/professor/cardProfessor";
+import { professoresMock } from "../../mocks/professores-mock";
+
 import { MdAdd, MdPersonOutline } from "react-icons/md";
 
 export default function GerenciarProfessores() {
@@ -39,11 +42,19 @@ export default function GerenciarProfessores() {
         </div>
 
         {/* Lista de professores */}
-        <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
-          <p className="text-base font-medium">
-            Nenhum professor cadastrado.
-          </p>
-        </div>
+          {/* <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
+            <p className="text-base font-medium">
+              Nenhum professor cadastrado.
+            </p>
+          </div> */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {professoresMock.map((professor) => (
+              <CardProfessor
+                key={professor.id}
+                professor={professor}
+              />
+            ))}
+          </div>
       </main>
     </div>
   );
