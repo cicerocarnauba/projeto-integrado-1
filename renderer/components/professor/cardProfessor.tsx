@@ -14,7 +14,7 @@ export default function CardProfessor({
   return (
     <div className="bg-[#eef7f0] rounded-2xl px-6 pt-6 pb-6 w-full h-full flex flex-col">
       <div className="flex items-start justify-between">
-        <h3 className="text-lg font-bold text-[#245B2F] line-clamp-1 pr-2">
+        <h3 className="text-sm font-bold text-[#245B2F] line-clamp-1 pr-2">
           {professor.primeiroNome} {professor.sobrenome}
         </h3>
 
@@ -45,6 +45,15 @@ export default function CardProfessor({
       <div className="border-t border-[#D3E8D6] mt-3 mb-3" />
 
       <div className="flex justify-end gap-3 mt-auto">
+        
+        <button
+          type="button"
+          className="flex items-center gap-1.5 bg-[#389348] text-white px-4 py-2 text-sm rounded-lg font-medium hover:bg-[#2e7d3d] transition-colors"
+        >
+          <MdEdit size={15} />
+          Editar
+        </button>
+
         <button
           type="button"
           className="flex items-center gap-1.5 bg-red-500 text-white px-4 py-2 text-sm rounded-lg font-medium hover:bg-[#b9151b] transition-colors"
@@ -53,13 +62,6 @@ export default function CardProfessor({
           Excluir
         </button>
 
-        <button
-          type="button"
-          className="flex items-center gap-1.5 bg-[#389348] text-white px-4 py-2 text-sm rounded-lg font-medium hover:bg-[#2e7d3d] transition-colors"
-        >
-          <MdEdit size={15} />
-          Editar
-        </button>
       </div>
     </div>
   );
