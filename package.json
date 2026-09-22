@@ -2,12 +2,13 @@
   "name": "projeto-integrado-1",
   "version": "1.0.0",
   "private": true,
-  "type": "module",
   "description": "Sistema de Gerenciamento de Acervo de Biblioteca Escolar - Creche Maria de Lourdes (Nextron + SQLite)",
   "main": "app/main.js",
   "scripts": {
-    "dev": "cross-env NODE_OPTIONS=--experimental-transform-types nextron --startup-delay 5000",
+    "dev": "cross-env NODE_OPTIONS=--experimental-transform-types nextron",
     "build": "nextron build",
+    "build:linux": "nextron build --linux",
+    "build:win": "nextron build --win",
     "test": "node --experimental-transform-types --test tests/*.test.ts",
     "lint:commit": "commitlint --from=HEAD~1",
     "lint:commit:last": "commitlint --last",
@@ -16,22 +17,29 @@
   "devDependencies": {
     "@commitlint/cli": "^19.6.1",
     "@commitlint/config-conventional": "^19.6.0",
+    "@tailwindcss/postcss": "^4.3.3",
     "@types/better-sqlite3": "^9.6.0",
     "@types/node": "^24.13.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "autoprefixer": "^10.6.1",
+    "commander": "^12.1.0",
     "cross-env": "^10.1.0",
     "electron": "^44.4.1",
+    "electron-builder": "^26.15.3",
     "nextron": "^10.3.0",
     "postcss": "^8.5.28",
+    "prettier": "^3.9.8",
     "tailwindcss": "^4.3.3",
-    "typescript": "^6.0.3"
+    "typescript": "^5.9.0"
   },
   "dependencies": {
     "better-sqlite3": "^13.0.3",
-    "next": "^15.5.25",
+    "electron-serve": "^3.0.1",
+    "electron-store": "^11.0.2",
+    "next": "^16.3.5",
     "react": "^19.3.0",
-    "react-dom": "^19.3.0"
+    "react-dom": "^19.3.0",
+    "react-icons": "^5.7.0"
   }
 }
