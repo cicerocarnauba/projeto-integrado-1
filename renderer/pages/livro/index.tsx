@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Sidebar from "../../components/Sidebar";
@@ -13,40 +12,40 @@ export default function GerenciarLivros() {
 
   const [listaLivros, setListaLivros] = useState<Livro[]>([]);
   const [carregando, setCarregando] = useState(true);
+  const [incluirInativos, setIncluirInativos] = useState<boolean>(false);
 
-useEffect(() => {
-  async function carregarLivros() {
-    try {
-      const resposta = await window.ipc.livro.consultar({});
+  useEffect(() => {
+    async function carregarLivros() {
+      try {
+        const resposta = await window.ipc.livro.consultar({});
 
-      if (resposta?.success && Array.isArray(resposta.data)) {
-        // Mapeia os dados do backend para satisfazer a interface Livro
-        const livrosFormatados: Livro[] = resposta.data.map((item) => ({
-          ...item,
-          ativo: item.status === "ATIVO",
-          statusEmprestimo: item.saldoDisponivel > 0 ? "DISPONIVEL" : "INDISPONIVEL",
-        })) as unknown as Livro[];
+        if (resposta?.success && Array.isArray(resposta.data)) {
+          // Mapeia os dados do backend para satisfazer a interface Livro
+          const livrosFormatados: Livro[] = resposta.data.map((item) => ({
+            ...item,
+            ativo: item.status === "ATIVO",
+            statusEmprestimo:
+              item.saldoDisponivel > 0 ? "DISPONIVEL" : "INDISPONIVEL",
+          })) as unknown as Livro[];
 
-        setListaLivros(livrosFormatados);
-      } else {
-        console.error("Erro ao consultar livros:", resposta?.error);
+          setListaLivros(livrosFormatados);
+        } else {
+          console.error("Erro ao consultar livros:", resposta?.error);
+          setListaLivros([]);
+        }
+      } catch (error) {
+        console.error("Erro ao chamar o IPC de livros:", error);
         setListaLivros([]);
+      } finally {
+        setCarregando(false);
       }
-    } catch (error) {
-      console.error("Erro ao chamar o IPC de livros:", error);
-      setListaLivros([]);
-    } finally {
-      setCarregando(false);
     }
-  }
 
-  carregarLivros();
-}, []);
+    carregarLivros();
+  }, []);
 
   // Considera tanto status: "ATIVO" do backend quanto a flag ativo: true do mock
-  const livrosAtivos = listaLivros.filter(
-    (livro) => livro.status === "ATIVO"
-  );
+  const livrosAtivos = listaLivros.filter((livro) => livro.status === "ATIVO");
 
   return (
     <div className="flex min-h-screen bg-white">
@@ -65,7 +64,13 @@ useEffect(() => {
 
         {/* Barra de busca e botão de adicionar */}
         <div className="flex items-center gap-4 mb-8 w-full">
-          <SearchBar placeholder="Pesquisar livro por título ou editora..." />
+          {/* <SearchBar placeholder="Pesquisar livro por título ou editora..." /> */}
+          <SearchBar
+            placeholder="Pesquisar livro por título ou editora..."
+            incluirInativos={incluirInativos}
+            onToggleInativos={setIncluirInativos}
+            labelCheckbox="Incluir inativos"
+          />
 
           <Link
             href="/livro/cadastro_livro"
@@ -80,11 +85,13 @@ useEffect(() => {
         {carregando ? (
           <p className="text-gray-500 text-sm">Carregando livros...</p>
         ) : livrosAtivos.length === 0 ? (
-          <p className="text-gray-500 text-sm">Nenhum livro cadastrado no momento.</p>
+          <p className="text-gray-500 text-sm">
+            Nenhum livro cadastrado no momento.
+          </p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {livrosAtivos.map((livro) => {
-              const isAtivo = livro.status === "ATIVO"
+              const isAtivo = livro.status === "ATIVO";
 
               return (
                 <div
