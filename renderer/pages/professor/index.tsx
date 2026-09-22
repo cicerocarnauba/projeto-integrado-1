@@ -1,17 +1,51 @@
 import Link from "next/link";
+
+import { useEffect, useState } from "react";
+
 import { useRouter } from "next/router";
 
 import Sidebar from "../../components/Sidebar";
 import SearchBar from "../../components/Searchbar";
 
 import CardProfessor from "../../components/professor/cardProfessor";
-import { professoresMock } from "../../mocks/professores-mock";
 
-import { MdAdd, MdPersonOutline } from "react-icons/md";
+import { MdAdd } from "react-icons/md";
 
 export default function GerenciarProfessores() {
   const router = useRouter();
   const mostrarSucesso = router.query.sucesso === "1";
+
+  const [professores, setPofessores] = useState<any[]>([]);
+  const [carregado, setCarregado] = useState(true);
+  const [erro, setErro] = useState("");
+
+  useEffect(() => {
+    async function carregarProfessores() {
+      try {
+        setErro("");
+
+        const resposta = await window.ipc.professor.consultar();
+
+        if (!resposta.success){
+          setErro(resposta.error);
+          return;
+        }
+
+        setPofessores(resposta.data);
+      } catch (error) {
+        const mensagem = 
+          error instanceof Error
+            ? error.message
+            : "Não foi possível carregar os professores."
+        
+        setErro(mensagem);
+      } finally {
+        setCarregado(false);
+      }
+    }
+
+    carregarProfessores();
+  }, [])
 
   return (
     <div className="flex min-h-screen bg-white">
@@ -41,20 +75,34 @@ export default function GerenciarProfessores() {
           </Link>
         </div>
 
-        {/* Lista de professores */}
-          {/* <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
+        {erro && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6 text-sm font-medium">
+            {erro}
+          </div>
+        )}
+
+        {carregado ? (
+          <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
+            <p className="text-base font-medium">
+              Carregando professores...
+            </p>
+          </div>
+        ) : professores.length === 0 ? (
+          <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
             <p className="text-base font-medium">
               Nenhum professor cadastrado.
             </p>
-          </div> */}
+          </div>
+        ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {professoresMock.map((professor) => (
+            {professores.map((professor) => (
               <CardProfessor
                 key={professor.id}
                 professor={professor}
               />
             ))}
           </div>
+        )}
       </main>
     </div>
   );
