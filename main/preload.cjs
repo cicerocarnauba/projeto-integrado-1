@@ -12,6 +12,10 @@ contextBridge.exposeInMainWorld('ipc', {
     consultar: (input) => ipcRenderer.invoke('turma:consultar', input),
     buscarPorId: (id) => ipcRenderer.invoke('turma:buscarPorId', id),
   },
+  livro: {
+    cadastrar: (input) => ipcRenderer.invoke('livro:cadastrar', input),
+    consultar: (input) => ipcRenderer.invoke('livro:consultar', input),
+  },
 });
 
-console.log('[preload] window.ipc exposto (professor + turma)');
+console.log('[preload] window.ipc exposto (professor + turma + livro)');

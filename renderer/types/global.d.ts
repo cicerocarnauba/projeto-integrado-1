@@ -55,6 +55,39 @@ declare global {
           error?: string;
         }>;
       };
+
+      livro: {
+        cadastrar: (input: {
+          titulo: string;
+          editora: string;
+          quantidadeTotal: number;
+        }) => Promise<{
+          success: boolean;
+          data?: any;
+          error?: string;
+        }>;
+
+        consultar: (input?: {
+          titulo?: string;
+          editora?: string;
+          termo?: string;
+          incluirInativos?: boolean;
+        }) => Promise<{
+          success: boolean;
+          data?: Array<{
+            id: number | null;
+            titulo: string;
+            editora: string;
+            quantidadeTotal: number;
+            quantidadeEmprestada: number;
+            saldoDisponivel: number;
+            status: 'ATIVO' | 'INATIVO';
+            dataCadastro: Date;
+            dataAtualizacao: Date;
+          }>;
+          error?: string;
+        }>;
+      };
     };
   }
 }

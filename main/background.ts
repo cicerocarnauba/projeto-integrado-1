@@ -7,8 +7,11 @@ import { ProfessorDAO } from './daos/ProfessorDAO.ts';
 import { TurmaDAO } from './daos/TurmaDAO.ts';
 import { ProfessorController } from './controllers/ProfessorController.ts';
 import { TurmaController } from './controllers/TurmaController.ts';
+import { LivroController } from './controllers/LivroController.ts';
+import { LivroDAO } from './daos/LivroDAO.ts';
 import { registerProfessorHandlers } from './ipc/professorHandlers.ts';
 import { registerTurmaHandlers } from './ipc/turmaHandlers.ts';
+import { registerLivroHandlers } from './ipc/livroHandlers.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname  = path.dirname(__filename);
@@ -47,6 +50,11 @@ function bootstrapBackend(): void {
   const turmaDAO = new TurmaDAO(db);
   const turmaController = new TurmaController(turmaDAO);
   registerTurmaHandlers(turmaController);
+
+  // Livro
+  const livroDAO = new LivroDAO(db);
+  const livroController = new LivroController(livroDAO);
+  registerLivroHandlers(livroController);
 }
 
 app.whenReady().then(async () => {

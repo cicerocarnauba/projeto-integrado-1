@@ -77,12 +77,52 @@ Se preferir rodar o ambiente de desenvolvimento isolado em contêiner:
 docker compose up -d
 ```
 
-### Gerando o Instalador Desktop (.exe)
-Para gerar o executável final de produção para o computador da creche:
-```bash
-npm run build
-```
-O instalador `.exe` será gerado automaticamente dentro da pasta `dist/`.
+### Gerando os Executáveis Desktop (.exe e .AppImage)
+
+Os arquivos compilados finais são gerados automaticamente dentro da pasta `dist/`.
+
+* **Gerar instalador para Windows (.exe):**
+  ```bash
+  npm run build:win
+  ```
+  Gera o instalador NSIS completo (`dist/LivroPiqueT Setup 1.0.0.exe`).
+
+* **Gerar executável para Linux (.AppImage):**
+  ```bash
+  npm run build:linux
+  ```
+  Gera o executável portátil (`dist/LivroPiqueT-1.0.0.AppImage`).
+
+* **Gerar todos os executáveis configurados:**
+  ```bash
+  npm run build
+  ```
+
+> [!NOTE]
+> **Atenção:** Os arquivos executáveis gerados na pasta `dist/` **não são e nem devem ser enviados para o Git** (já estão protegidos pelo `.gitignore`). O repositório armazena apenas o código-fonte. O executável para a creche deve ser distribuído diretamente aos usuários ou anexado na aba de **Releases** do GitHub.
+
+---
+
+## Fluxo de Branches e Proteção da `main`
+
+Para manter a estabilidade do projeto, adotamos o seguinte fluxo:
+
+1. **Branch `main` (Produção/Estável)**:
+   * **Bloqueada para push direto**. Qualquer tentativa de `git push origin main` será cancelada automaticamente por um Git hook local e pelas regras do GitHub.
+   * Modificações na `main` são feitas **exclusivamente através de Pull Requests (PR)** aprovados.
+
+2. **Branch `develop` (Integração)**:
+   * Branch padrão para envio de novas funcionalidades integradas e testes em conjunto.
+   * Permite push direto dos membros da equipe.
+
+3. **Branches de Funcionalidades (`feature/...`)**:
+   * Sempre crie uma nova branch a partir da `develop`:
+     ```bash
+     git checkout develop
+     git pull origin develop
+     git checkout -b feature/nome-da-sua-feature
+     ```
+   * Conclua sua funcionalidade, teste os commits e abra um Pull Request para a `develop`.
 
 ---
 
