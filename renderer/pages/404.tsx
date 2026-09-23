@@ -5,7 +5,7 @@ export default function Custom404() {
   return (
     <>
       <Head>
-        <title>Página não encontrada - LivroPiqueT</title>
+        <title>Página não encontrada - LivroCMEI</title>
         <link
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
