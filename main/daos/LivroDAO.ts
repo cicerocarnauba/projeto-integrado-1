@@ -101,23 +101,29 @@ export class LivroDAO {
       sql += ` AND status = 'ATIVO'`;
     }
 
+    const condicoes: string[] = [];
+
     if (termo) {
-      sql += ` AND (
+      condicoes.push(`(
         LOWER(TRIM(titulo))  LIKE LOWER(?) OR
         LOWER(TRIM(editora)) LIKE LOWER(?)
-      )`;
+      )`);
       const like = `%${termo}%`;
       params.push(like, like);
     }
 
     if (titulo) {
-      sql += ` AND LOWER(TRIM(titulo)) LIKE LOWER(?)`;
+      condicoes.push(`LOWER(TRIM(titulo)) LIKE LOWER(?)`);
       params.push(`%${titulo}%`);
     }
 
     if (editora) {
-      sql += ` AND LOWER(TRIM(editora)) LIKE LOWER(?)`;
+      condicoes.push(`LOWER(TRIM(editora)) LIKE LOWER(?)`);
       params.push(`%${editora}%`);
+    }
+
+    if (condicoes.length > 0) {
+      sql += ` AND (${condicoes.join(' OR ')})`;
     }
 
     // Ordenação: primeiro ATIVOS, depois INATIVOS; em cada grupo, por título e editora
