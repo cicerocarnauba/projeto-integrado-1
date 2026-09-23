@@ -100,7 +100,7 @@ export default function Sidebar({ activePath, className = "" }: SidebarProps) {
           title="Ir para a tela inicial"
         >
           <h1 className="text-2xl font-semibold text-white/90 group-hover:text-white tracking-tight transition-colors">
-            LivroPiqueT
+            LivroCMEI
           </h1>
         </Link>
       </div>
