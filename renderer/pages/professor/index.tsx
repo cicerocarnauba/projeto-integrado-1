@@ -19,12 +19,20 @@ export default function GerenciarProfessores() {
   const [carregado, setCarregado] = useState(true);
   const [erro, setErro] = useState("");
 
+  const [termoBusca, setTermoBusca] = useState("");
+  const [incluirInativos, setIncluirInativos] = useState<boolean>(false);
+
+
   useEffect(() => {
     async function carregarProfessores() {
       try {
         setErro("");
 
-        const resposta = await window.ipc.professor.consultar();
+        const resposta = await window.ipc.professor.consultar({
+          nome: termoBusca,
+          email: termoBusca,
+          incluirInativos: incluirInativos,
+        });
 
         if (!resposta.success){
           setErro(resposta.error);
@@ -45,7 +53,7 @@ export default function GerenciarProfessores() {
     }
 
     carregarProfessores();
-  }, [])
+  }, [termoBusca, incluirInativos]);
 
   return (
     <div className="flex min-h-screen bg-white">
@@ -64,7 +72,14 @@ export default function GerenciarProfessores() {
 
         {/* Barra de busca e botão de adicionar */}
         <div className="flex items-center gap-4 mb-8 w-full">
-          <SearchBar placeholder="Pesquisar professor por nome ou e-mail..." />
+          <SearchBar 
+            placeholder="Pesquisar professor por nome ou e-mail..."
+            valorBusca={termoBusca}
+            onChangeBusca={setTermoBusca}
+            incluirInativos={incluirInativos}
+            onToggleInativos={setIncluirInativos}
+            labelCheckbox="Incluir inativos"
+          />
 
           <Link
             href="/professor/cadastro_professor"
@@ -94,13 +109,18 @@ export default function GerenciarProfessores() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {professores.map((professor) => (
-              <CardProfessor
-                key={professor.id}
-                professor={professor}
-              />
+          <div
+            key={`${termoBusca}-${incluirInativos}`}
+            className="animate-fade-in duration-1000"
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {professores.map((professor) => (
+                <CardProfessor
+                  key={professor.id}
+                  professor={professor}
+            />
             ))}
+            </div>
           </div>
         )}
       </main>

@@ -12,12 +12,17 @@ export default function GerenciarLivros() {
 
   const [listaLivros, setListaLivros] = useState<Livro[]>([]);
   const [carregando, setCarregando] = useState(true);
+
+  const [termoBusca, setTermoBusca] = useState("");
   const [incluirInativos, setIncluirInativos] = useState<boolean>(false);
 
   useEffect(() => {
     async function carregarLivros() {
       try {
-        const resposta = await window.ipc.livro.consultar({});
+        const resposta = await window.ipc.livro.consultar({
+          termo: termoBusca,
+          incluirInativos: incluirInativos,
+        });
 
         if (resposta?.success && Array.isArray(resposta.data)) {
           // Mapeia os dados do backend para satisfazer a interface Livro
@@ -42,7 +47,7 @@ export default function GerenciarLivros() {
     }
 
     carregarLivros();
-  }, []);
+  }, [termoBusca, incluirInativos]);
 
   // Considera tanto status: "ATIVO" do backend quanto a flag ativo: true do mock
   const livrosAtivos = listaLivros.filter((livro) => livro.status === "ATIVO");
@@ -67,6 +72,8 @@ export default function GerenciarLivros() {
           {/* <SearchBar placeholder="Pesquisar livro por título ou editora..." /> */}
           <SearchBar
             placeholder="Pesquisar livro por título ou editora..."
+            valorBusca={termoBusca}
+            onChangeBusca={setTermoBusca}
             incluirInativos={incluirInativos}
             onToggleInativos={setIncluirInativos}
             labelCheckbox="Incluir inativos"
@@ -89,62 +96,67 @@ export default function GerenciarLivros() {
             Nenhum livro cadastrado no momento.
           </p>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {livrosAtivos.map((livro) => {
-              const isAtivo = livro.status === "ATIVO";
+          <div
+            key={`${termoBusca}-${incluirInativos}`}
+            className="animate-fade-in duration-1000">
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {livrosAtivos.map((livro) => {
+                const isAtivo = livro.status === "ATIVO";
 
               return (
-                <div
-                  key={livro.id}
-                  className={`rounded-2xl p-6 shadow-xs hover:shadow-sm transition-all flex flex-col justify-between ${
-                    isAtivo
-                      ? "bg-[#eef7f0] hover:bg-[#e5f3e7]"
-                      : "bg-gray-100 opacity-60"
-                  }`}
-                >
-                  <div>
-                    <h3
-                      className={`font-bold text-lg leading-snug ${
-                        isAtivo ? "text-[#1e582d]" : "text-gray-600"
-                      }`}
-                    >
-                      {livro.titulo}
-                    </h3>
-
-                    <p className="text-xs text-[#2e8b45]/80 font-medium mt-1">
-                      Editora: {livro.editora}
-                    </p>
-                  </div>
-
-                  <div className="flex items-center justify-between mt-6 pt-4 border-t border-[#d8ecde]">
-                    <span
-                      className={`text-xs px-3 py-1.5 rounded-full font-semibold ${
-                        isAtivo
-                          ? "bg-white text-[#1e582d] shadow-2xs"
-                          : "bg-gray-200 text-gray-700"
-                      }`}
-                    >
-                      {livro.quantidadeTotal} exemplares
-                    </span>
-
-                    <div className="flex items-center">
-                      {!isAtivo && (
-                        <span className="text-[10px] bg-gray-400 text-white px-2 py-0.5 rounded-full mr-2">
-                          Desativado
-                        </span>
-                      )}
-
-                      <Link
-                        href={`/livro/${livro.id}`}
-                        className="text-xs font-semibold text-[#2e8b45] hover:text-[#236c35] flex items-center gap-1 transition-colors hover:underline"
+                  <div
+                    key={livro.id}
+                    className={`rounded-2xl p-6 shadow-xs hover:shadow-sm transition-all flex flex-col justify-between ${
+                      isAtivo
+                        ? "bg-[#eef7f0] hover:bg-[#e5f3e7]"
+                        : "bg-gray-100 opacity-60"
+                    }`}
+                  >
+                    <div>
+                      <h3
+                        className={`font-bold text-lg leading-snug ${
+                          isAtivo ? "text-[#1e582d]" : "text-gray-600"
+                        }`}
                       >
-                        Ver detalhes &gt;
-                      </Link>
+                        {livro.titulo}
+                      </h3>
+
+                      <p className="text-xs text-[#2e8b45]/80 font-medium mt-1">
+                        Editora: {livro.editora}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center justify-between mt-6 pt-4 border-t border-[#d8ecde]">
+                      <span
+                        className={`text-xs px-3 py-1.5 rounded-full font-semibold ${
+                          isAtivo
+                            ? "bg-white text-[#1e582d] shadow-2xs"
+                            : "bg-gray-200 text-gray-700"
+                        }`}
+                      >
+                        {livro.quantidadeTotal} exemplares
+                      </span>
+
+                      <div className="flex items-center">
+                        {!isAtivo && (
+                          <span className="text-[10px] bg-gray-400 text-white px-2 py-0.5 rounded-full mr-2">
+                            Desativado
+                          </span>
+                        )}
+
+                        <Link
+                          href={`/livro/${livro.id}`}
+                          className="text-xs font-semibold text-[#2e8b45] hover:text-[#236c35] flex items-center gap-1 transition-colors hover:underline"
+                        >
+                          Ver detalhes &gt;
+                        </Link>
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         )}
       </main>
