@@ -71,7 +71,7 @@ export default function Home() {
         <div
           className={`h-screen bg-[#2e8b45] text-white flex flex-col relative shrink-0 overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
             isTransitioning
-              ? "w-80 rounded-tr-3xl rounded-br-3xl shadow-2xl"
+              ? "w-80 shadow-2xl"
               : "w-full rounded-none"
           }`}
         >
