@@ -59,11 +59,7 @@ export default function GerenciarLivros() {
     carregarLivros();
   }, [termoBusca, incluirInativos]);
 
-  const livrosFiltrados = incluirInativos
-    ? listaLivros
-    : listaLivros.filter((livro) => livro.status === "ATIVO");
-
-  const livrosExibidos = [...livrosFiltrados].sort((a, b) => {
+  const livrosExibidos = [...listaLivros].sort((a, b) => {
     if (a.status === "ATIVO" && b.status !== "ATIVO") return -1;
     if (a.status !== "ATIVO" && b.status === "ATIVO") return 1;
 
