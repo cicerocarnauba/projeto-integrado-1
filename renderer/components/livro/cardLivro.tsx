@@ -9,7 +9,7 @@ export default function CardLivro({ livro }: CardLivroProps) {
 
   return (
     <div
-      className={`rounded-2xl px-6 pt-6 pb-6 w-full h-full min-h-[157px] flex flex-col justify-between transition-all ${
+      className={`rounded-2xl px-6 py-5 w-full h-full min-h-[150px] flex flex-col justify-between transition-all ${
         ativo ? "bg-[#eef7f0]" : "bg-gray-100 opacity-60"
       }`}
     >
@@ -34,21 +34,23 @@ export default function CardLivro({ livro }: CardLivroProps) {
         </p>
       </div>
 
-      <div className="border-t border-[#D3E8D6] mt-3 mb-3" />
+      <div className="mt-auto">
+        <div className="border-t border-[#D3E8D6] my-3" />
 
-      <div className="flex items-center justify-between mt-auto">
-        <span className="bg-white text-[#1e582d] text-xs font-semibold px-3 py-1.5 rounded-lg border border-[#cde5d4] shadow-2xs">
-          {livro.quantidadeTotal}{" "}
-          {livro.quantidadeTotal === 1 ? "exemplar" : "exemplares"}
-        </span>
+        <div className="flex items-center justify-between">
+          <span className="bg-white text-[#1e582d] text-xs font-semibold px-3 py-1.5 rounded-lg border border-[#cde5d4] shadow-2xs">
+            {livro.quantidadeTotal}{" "}
+            {livro.quantidadeTotal === 1 ? "exemplar" : "exemplares"}
+          </span>
 
-        <button
-          type="button"
-          onClick={(e) => e.preventDefault()}
-          className="flex items-center gap-1.5 bg-[#389348] text-white px-4 py-2 text-sm rounded-lg font-medium hover:bg-[#2e7d3d] transition-colors cursor-pointer shadow-2xs"
-        >
-          Ver detalhes &gt;
-        </button>
+          <button
+            type="button"
+            onClick={(e) => e.preventDefault()}
+            className="flex items-center gap-1.5 bg-[#389348] text-white px-4 py-2 text-sm rounded-lg font-medium hover:bg-[#2e7d3d] transition-colors cursor-pointer shadow-2xs"
+          >
+            Ver detalhes &gt;
+          </button>
+        </div>
       </div>
     </div>
   );
