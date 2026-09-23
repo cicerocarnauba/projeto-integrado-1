@@ -162,7 +162,7 @@ export default function FormCadastroLivro() {
       });
 
       if (!resposta.success) {
-        setErro(resposta.error);
+        setErro(resposta.error || "Erro ao cadastrar livro.");
         return;
       }
 

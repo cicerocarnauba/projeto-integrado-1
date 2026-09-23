@@ -28,7 +28,7 @@ export default function FormCadastroProfessor() {
       });
 
       if (!resposta.success) { 
-        setErro(resposta.error); 
+        setErro(resposta.error || "Erro ao cadastrar professor."); 
         return; 
       }
 
