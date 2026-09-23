@@ -49,8 +49,9 @@ export default function GerenciarLivros() {
     carregarLivros();
   }, [termoBusca, incluirInativos]);
 
-  // Considera tanto status: "ATIVO" do backend quanto a flag ativo: true do mock
-  const livrosAtivos = listaLivros.filter((livro) => livro.status === "ATIVO");
+  const livrosExibidos = incluirInativos
+    ? listaLivros
+    : listaLivros.filter((livro) => livro.status === "ATIVO");
 
   return (
     <div className="flex min-h-screen bg-white">
@@ -90,18 +91,24 @@ export default function GerenciarLivros() {
 
         {/* Lista de livros ou mensagens de estado */}
         {carregando ? (
-          <p className="text-gray-500 text-sm">Carregando livros...</p>
-        ) : livrosAtivos.length === 0 ? (
-          <p className="text-gray-500 text-sm">
-            Nenhum livro cadastrado no momento.
-          </p>
+          <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
+            <p className="text-base font-medium">
+              Carregando livros...
+            </p>
+          </div>
+        ) : livrosExibidos.length === 0 ? (
+          <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
+            <p className="text-base font-medium">
+              Nenhum livro cadastrado.
+            </p>
+          </div>
         ) : (
           <div
             key={`${termoBusca}-${incluirInativos}`}
             className="animate-fade-in duration-1000">
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {livrosAtivos.map((livro) => {
+              {livrosExibidos.map((livro) => {
                 const isAtivo = livro.status === "ATIVO";
 
               return (
@@ -145,12 +152,13 @@ export default function GerenciarLivros() {
                           </span>
                         )}
 
-                        <Link
-                          href={`/livro/${livro.id}`}
-                          className="text-xs font-semibold text-[#2e8b45] hover:text-[#236c35] flex items-center gap-1 transition-colors hover:underline"
+                        <button
+                          type="button"
+                          onClick={(e) => e.preventDefault()}
+                          className="text-xs font-semibold text-[#2e8b45] hover:text-[#236c35] flex items-center gap-1 transition-colors cursor-pointer"
                         >
                           Ver detalhes &gt;
-                        </Link>
+                        </button>
                       </div>
                     </div>
                   </div>

@@ -54,19 +54,34 @@ function resolvePreloadPath(): string {
   return candidates[0];
 }
 
+function resolveIcon(): Electron.NativeImage | null {
+  const candidates = [
+    path.join(__dirname, 'icon.png'),
+    path.join(process.cwd(), 'resources/icon.png'),
+    path.join(__dirname, '../resources/icon.png'),
+    path.join(process.cwd(), 'renderer/public/icon.png'),
+  ];
+  for (const c of candidates) {
+    if (fs.existsSync(c)) {
+      const img = nativeImage.createFromPath(c);
+      if (!img.isEmpty()) return img;
+    }
+  }
+  return null;
+}
+
 ;(async () => {
   await app.whenReady();
 
   bootstrapBackend();
 
   const preloadPath = resolvePreloadPath();
-  const iconPath = path.join(process.cwd(), 'resources/icon.png');
-  const icon = fs.existsSync(iconPath) ? nativeImage.createFromPath(iconPath) : null;
+  const icon = resolveIcon();
 
   const mainWindow = createWindow('main', {
     width: 1200,
     height: 800,
-    icon: icon && !icon.isEmpty() ? icon : undefined,
+    icon: icon ?? undefined,
     webPreferences: {
       preload: preloadPath,
       contextIsolation: true,
@@ -74,7 +89,7 @@ function resolvePreloadPath(): string {
     },
   });
 
-  if (icon && !icon.isEmpty()) {
+  if (icon) {
     mainWindow.setIcon(icon);
   }
 
