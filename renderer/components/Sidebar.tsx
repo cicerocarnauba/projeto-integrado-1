@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { MdBarChart, MdMenuBook, MdPerson, MdGroups } from "react-icons/md";
+import { MdSwapHoriz, MdMenuBook, MdPerson, MdGroups } from "react-icons/md";
 
 interface SidebarProps {
   activePath?: string;
@@ -25,7 +25,7 @@ export default function Sidebar({ activePath, className = "" }: SidebarProps) {
   
     
   return (
-    <aside className={`w-80 bg-[#2e8b45] text-white p-6 flex flex-col justify-between rounded-tr-3xl rounded-br-3xl h-screen select-none shrink-0 ${className}`}>
+    <aside className={`w-80 bg-[#2e8b45] text-white p-6 flex flex-col justify-between h-screen select-none shrink-0 ${className}`}>
       <div>
         <h2 className="text-2xl font-semibold text-white/90 mb-6 tracking-wide">
           Menu
@@ -41,7 +41,7 @@ export default function Sidebar({ activePath, className = "" }: SidebarProps) {
             }`}
           >
             <div className="flex items-center gap-3">
-              <MdBarChart size={20} />
+              <MdSwapHoriz size={20} />
               <span>Gerenciar empréstimos</span>
             </div>
             <span className="text-xs">›</span>
