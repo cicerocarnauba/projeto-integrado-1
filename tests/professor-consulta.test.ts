@@ -32,16 +32,38 @@ describe('Testes Unitários - Consulta de Professor', () => {
       VALUES (?, ?, ?, ?, ?, ?)
     `);
 
+    stmt.run('Daniel', 'Andrade', 'daniel@ufc.br', 'ATIVO', now, now);
     stmt.run('Daniel', 'Silva', 'sonic@email.com', 'ATIVO', now, now);
     stmt.run('Ana', 'Souza', 'ana@email.com', 'ATIVO', now, now);
     stmt.run('Bruno', 'Costa', 'bruno@email.com', 'INATIVO', now, now);
   });
 
-  it('deve encontrar pelo nome mesmo quando o email nao contem o termo', () => {
+  it('deve encontrar os professores com o mesmo primeiro nome', () => {
     const professores = professorController.consultar({
       nome: 'Daniel',
-      email: 'sonic',
+      email: 'nao-encontrado',
     });
+
+    assert.strictEqual(professores.length, 2);
+    assert.ok(professores.every((professor) => professor.primeiroNome === 'Daniel'));
+  });
+
+  it('deve encontrar pelo nome completo', () => {
+    const professores = professorController.consultar({ nome: 'Daniel Silva' });
+
+    assert.strictEqual(professores.length, 1);
+    assert.strictEqual(professores[0].sobrenome, 'Silva');
+  });
+
+  it('deve encontrar pelo nome completo de forma parcial', () => {
+    const professores = professorController.consultar({ nome: 'Daniel A' });
+
+    assert.strictEqual(professores.length, 1);
+    assert.strictEqual(professores[0].sobrenome, 'Andrade');
+  });
+
+  it('deve encontrar pelo sobrenome e diferenciar homonimos', () => {
+    const professores = professorController.consultar({ nome: 'Silva' });
 
     assert.strictEqual(professores.length, 1);
     assert.strictEqual(professores[0].primeiroNome, 'Daniel');
@@ -57,16 +79,16 @@ describe('Testes Unitários - Consulta de Professor', () => {
   it('deve ignorar maiusculas e espacos nas extremidades', () => {
     const professores = professorController.consultar({ nome: '  DANIEL  ' });
 
-    assert.strictEqual(professores.length, 1);
-    assert.strictEqual(professores[0].primeiroNome, 'Daniel');
+    assert.strictEqual(professores.length, 2);
+    assert.ok(professores.every((professor) => professor.primeiroNome === 'Daniel'));
   });
 
   it('deve retornar apenas ativos por padrao e incluir inativos quando solicitado', () => {
     const ativos = professorController.consultar({});
     const todos = professorController.consultar({ incluirInativos: true });
 
-    assert.strictEqual(ativos.length, 2);
-    assert.strictEqual(todos.length, 3);
+    assert.strictEqual(ativos.length, 3);
+    assert.strictEqual(todos.length, 4);
     assert.ok(todos.some((professor) => professor.status === 'INATIVO'));
   });
 });
