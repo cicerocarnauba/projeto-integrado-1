@@ -19,12 +19,18 @@ export default function GerenciarTurmas() {
   const [carregada, setCarregada] = useState(true);
   const [erro, setErro] = useState("");
 
+  const [termoBusca, setTermoBusca] = useState("");
+  const [incluirInativos, setIncluirInativos] = useState<boolean>(false);
+
   useEffect(() => {
     async function carregarTurmas() {
       try {
         setErro("");
 
-        const resposta = await window.ipc.turma.consultar();
+        const resposta = await window.ipc.turma.consultar({
+          nome: termoBusca,
+          incluirInativos: incluirInativos,
+        });
 
         if (!resposta.success){
           setErro(resposta.error);
@@ -45,7 +51,7 @@ export default function GerenciarTurmas() {
     }
 
     carregarTurmas();
-  }, [])
+  }, [termoBusca, incluirInativos])
 
   return (
     <div className="flex min-h-screen bg-white">
@@ -64,7 +70,14 @@ export default function GerenciarTurmas() {
 
         {/* Barra de busca e botão de adicionar */}
         <div className="flex items-center gap-4 mb-8 w-full">
-          <SearchBar placeholder="Pesquisar turmas por nome." />
+          <SearchBar 
+            placeholder="Pesquisar turmas por nome." 
+            valorBusca={termoBusca}
+            onChangeBusca={setTermoBusca}
+            incluirInativos={incluirInativos}
+            onToggleInativos={setIncluirInativos}
+            labelCheckbox="Incluir inativos"
+          />
 
           <Link
             href="/turma/cadastro_turma"
@@ -94,13 +107,18 @@ export default function GerenciarTurmas() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {turmas.map((turma) => (
-              <CardTurma
-                key={turma.id}
-                turma={turma}
-              />
-            ))}
+          <div
+            key={`${termoBusca}-${incluirInativos}`}
+            className="animate-fade-in duration-1000">
+  
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {turmas.map((turma) => (
+                <CardTurma
+                  key={turma.id}
+                  turma={turma}
+                />
+              ))}
+            </div>
           </div>
         )}
       </main>
