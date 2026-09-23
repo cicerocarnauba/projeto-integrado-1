@@ -63,7 +63,7 @@ export class ProfessorDAO {
    * - `email`: busca parcial em e-mail.
    * - `incluirInativos`: por padrão `false` (retorna só ATIVOS).
    *
-   * Quando ambos os filtros são informados, eles são combinados com AND.
+   * Quando ambos os filtros são informados, basta um deles corresponder.
    * Buscas por texto são case-insensitive e ignoram espaços nas extremidades (RNF04).
    */
   public consultar(filtro: {
@@ -82,18 +82,24 @@ export class ProfessorDAO {
       sql += ` AND status = 'ATIVO'`;
     }
 
+    const condicoes: string[] = [];
+
     if (nome) {
-      sql += ` AND (
+      condicoes.push(`(
         LOWER(TRIM(primeiro_nome)) LIKE LOWER(?) OR
         LOWER(TRIM(sobrenome))     LIKE LOWER(?)
-      )`;
+      )`);
       const like = `%${nome}%`;
       params.push(like, like);
     }
 
     if (email) {
-      sql += ` AND LOWER(TRIM(email)) LIKE LOWER(?)`;
+      condicoes.push(`LOWER(TRIM(email)) LIKE LOWER(?)`);
       params.push(`%${email}%`);
+    }
+
+    if (condicoes.length > 0) {
+      sql += ` AND (${condicoes.join(' OR ')})`;
     }
 
     sql += ` ORDER BY primeiro_nome ASC, sobrenome ASC`;

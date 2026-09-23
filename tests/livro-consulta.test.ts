@@ -106,13 +106,12 @@ describe('Testes Unitários - HU04 Consultar Livro', () => {
       assert.ok(resultado.every((l) => l.editora === 'Ática'));
     });
 
-    it('deve combinar filtros de título e editora com operador AND', () => {
-      // Existe Dom Casmurro na Saraiva, mas não na Ática
-      const resultadoSaraiva = livroController.consultar({ titulo: 'Casmurro', editora: 'Saraiva' });
-      assert.strictEqual(resultadoSaraiva.length, 1);
+    it('deve combinar filtros de título e editora com operador OR', () => {
+      const resultado = livroController.consultar({ titulo: 'Casmurro', editora: 'Ática' });
 
-      const resultadoAtica = livroController.consultar({ titulo: 'Casmurro', editora: 'Ática' });
-      assert.strictEqual(resultadoAtica.length, 0);
+      assert.strictEqual(resultado.length, 3);
+      assert.ok(resultado.some((livro) => livro.titulo === 'Dom Casmurro'));
+      assert.ok(resultado.filter((livro) => livro.editora === 'Ática').length === 2);
     });
 
     it('deve filtrar por termo geral pesquisando tanto em título quanto em editora', () => {
