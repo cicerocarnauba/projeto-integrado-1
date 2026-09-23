@@ -87,10 +87,11 @@ export class ProfessorDAO {
     if (nome) {
       condicoes.push(`(
         LOWER(TRIM(primeiro_nome)) LIKE LOWER(?) OR
-        LOWER(TRIM(sobrenome))     LIKE LOWER(?)
+        LOWER(TRIM(sobrenome))     LIKE LOWER(?) OR
+        LOWER(TRIM(primeiro_nome) || ' ' || TRIM(sobrenome)) LIKE LOWER(?)
       )`);
       const like = `%${nome}%`;
-      params.push(like, like);
+      params.push(like, like, like);
     }
 
     if (email) {
