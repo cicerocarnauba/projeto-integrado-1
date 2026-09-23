@@ -8,6 +8,7 @@ import Sidebar from "../../components/Sidebar";
 import SearchBar from "../../components/Searchbar";
 
 import CardProfessor from "../../components/professor/cardProfessor";
+import Paginacao from "../../components/Paginacao";
 
 import { MdAdd } from "react-icons/md";
 
@@ -22,6 +23,12 @@ export default function GerenciarProfessores() {
   const [termoBusca, setTermoBusca] = useState("");
   const [incluirInativos, setIncluirInativos] = useState<boolean>(false);
 
+  const [paginaAtual, setPaginaAtual] = useState(1);
+  const ITENS_POR_PAGINA = 12; // 4 linhas x 3 colunas
+
+  useEffect(() => {
+    setPaginaAtual(1);
+  }, [termoBusca, incluirInativos]);
 
   useEffect(() => {
     async function carregarProfessores() {
@@ -54,6 +61,12 @@ export default function GerenciarProfessores() {
 
     carregarProfessores();
   }, [termoBusca, incluirInativos]);
+
+  const inicio = (paginaAtual - 1) * ITENS_POR_PAGINA;
+  const professoresPaginados = professores.slice(
+    inicio,
+    inicio + ITENS_POR_PAGINA
+  );
 
   return (
     <div className="flex min-h-screen bg-white">
@@ -110,17 +123,26 @@ export default function GerenciarProfessores() {
           </div>
         ) : (
           <div
-            key={`${termoBusca}-${incluirInativos}`}
-            className="animate-fade-in duration-1000"
+            key={`${termoBusca}-${incluirInativos}-${paginaAtual}`}
+            className="animate-fade-in duration-300"
           >
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {professores.map((professor) => (
+              {professoresPaginados.map((professor) => (
                 <CardProfessor
                   key={professor.id}
                   professor={professor}
-            />
-            ))}
+                />
+              ))}
             </div>
+
+            <Paginacao
+              paginaAtual={paginaAtual}
+              totalItens={professores.length}
+              itensPorPagina={ITENS_POR_PAGINA}
+              nomeEntidade="professores"
+              nomeEntidadeSingular="professor"
+              aoMudarPagina={setPaginaAtual}
+            />
           </div>
         )}
       </main>

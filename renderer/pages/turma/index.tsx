@@ -6,8 +6,8 @@ import { useRouter } from "next/router";
 
 import Sidebar from "../../components/Sidebar";
 import SearchBar from "../../components/Searchbar";
-import CardTurma from "../../components/turma/cardTurma"
-
+import CardTurma from "../../components/turma/cardTurma";
+import Paginacao from "../../components/Paginacao";
 
 import { MdAdd } from "react-icons/md";
 
@@ -22,15 +22,24 @@ export default function GerenciarTurmas() {
   const [termoBusca, setTermoBusca] = useState("");
   const [incluirInativos, setIncluirInativos] = useState<boolean>(false);
 
+  const [paginaAtual, setPaginaAtual] = useState(1);
+  const ITENS_POR_PAGINA = 12; // 4 linhas x 3 colunas
+
+  useEffect(() => {
+    setPaginaAtual(1);
+  }, [termoBusca, incluirInativos]);
+
   useEffect(() => {
     async function carregarTurmas() {
       try {
         setErro("");
 
-        const resposta = await window.ipc.turma.consultar({
+        const resposta = await window.ipc?.turma?.consultar({
           nome: termoBusca,
           incluirInativos: incluirInativos,
         });
+
+        if (!resposta) return;
 
         if (!resposta.success){
           setErro(resposta.error);
@@ -51,7 +60,13 @@ export default function GerenciarTurmas() {
     }
 
     carregarTurmas();
-  }, [termoBusca, incluirInativos])
+  }, [termoBusca, incluirInativos]);
+
+  const inicio = (paginaAtual - 1) * ITENS_POR_PAGINA;
+  const turmasPaginadas = turmas.slice(
+    inicio,
+    inicio + ITENS_POR_PAGINA
+  );
 
   return (
     <div className="flex min-h-screen bg-white">
@@ -108,17 +123,26 @@ export default function GerenciarTurmas() {
           </div>
         ) : (
           <div
-            key={`${termoBusca}-${incluirInativos}`}
-            className="animate-fade-in duration-1000">
-  
+            key={`${termoBusca}-${incluirInativos}-${paginaAtual}`}
+            className="animate-fade-in duration-300"
+          >
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {turmas.map((turma) => (
+              {turmasPaginadas.map((turma) => (
                 <CardTurma
                   key={turma.id}
                   turma={turma}
                 />
               ))}
             </div>
+
+            <Paginacao
+              paginaAtual={paginaAtual}
+              totalItens={turmas.length}
+              itensPorPagina={ITENS_POR_PAGINA}
+              nomeEntidade="turmas"
+              nomeEntidadeSingular="turma"
+              aoMudarPagina={setPaginaAtual}
+            />
           </div>
         )}
       </main>

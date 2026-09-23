@@ -12,7 +12,7 @@ export default function CardProfessor({
   const ativo = professor.status === "ATIVO";
 
   return (
-    <div className="bg-[#eef7f0] rounded-2xl px-6 pt-6 pb-6 w-full h-full flex flex-col">
+    <div className="bg-[#eef7f0] rounded-2xl px-6 pt-6 pb-6 w-full h-full min-h-[157px] flex flex-col justify-between">
       <div className="flex items-start justify-between">
         <h3 className="text-sm font-bold text-[#245B2F] line-clamp-1 pr-2">
           {professor.primeiroNome} {professor.sobrenome}
@@ -48,7 +48,7 @@ export default function CardProfessor({
         
         <button
           type="button"
-          className="flex items-center gap-1.5 bg-[#389348] text-white px-4 py-2 text-sm rounded-lg font-medium hover:bg-[#2e7d3d] transition-colors"
+          className="flex items-center gap-1.5 bg-[#389348] text-white px-4 py-2 text-sm rounded-lg font-medium hover:bg-[#2e7d3d] transition-colors cursor-pointer"
         >
           <MdEdit size={15} />
           Editar
@@ -56,7 +56,7 @@ export default function CardProfessor({
 
         <button
           type="button"
-          className="flex items-center gap-1.5 bg-red-500 text-white px-4 py-2 text-sm rounded-lg font-medium hover:bg-[#b9151b] transition-colors"
+          className="flex items-center gap-1.5 bg-red-500 text-white px-4 py-2 text-sm rounded-lg font-medium hover:bg-[#b9151b] transition-colors cursor-pointer"
         >
           <MdDelete size={15} />
           Excluir
