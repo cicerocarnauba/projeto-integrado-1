@@ -3,6 +3,8 @@ import Link from "next/link";
 import Sidebar from "../../components/Sidebar";
 import SearchBar from "../../components/Searchbar";
 import { Livro } from "../../types/livro";
+import CardLivro from "../../components/livro/cardLivro";
+import Paginacao from "../../components/Paginacao";
 import { useRouter } from "next/router";
 import { MdAdd } from "react-icons/md";
 
@@ -15,6 +17,13 @@ export default function GerenciarLivros() {
 
   const [termoBusca, setTermoBusca] = useState("");
   const [incluirInativos, setIncluirInativos] = useState<boolean>(false);
+
+  const [paginaAtual, setPaginaAtual] = useState(1);
+  const ITENS_POR_PAGINA = 12; // 4 linhas x 3 colunas
+
+  useEffect(() => {
+    setPaginaAtual(1);
+  }, [termoBusca, incluirInativos]);
 
   useEffect(() => {
     async function carregarLivros() {
@@ -53,6 +62,12 @@ export default function GerenciarLivros() {
     ? listaLivros
     : listaLivros.filter((livro) => livro.status === "ATIVO");
 
+  const inicio = (paginaAtual - 1) * ITENS_POR_PAGINA;
+  const livrosPaginados = livrosExibidos.slice(
+    inicio,
+    inicio + ITENS_POR_PAGINA
+  );
+
   return (
     <div className="flex min-h-screen bg-white">
       <Sidebar />
@@ -70,7 +85,6 @@ export default function GerenciarLivros() {
 
         {/* Barra de busca e botão de adicionar */}
         <div className="flex items-center gap-4 mb-8 w-full">
-          {/* <SearchBar placeholder="Pesquisar livro por título ou editora..." /> */}
           <SearchBar
             placeholder="Pesquisar livro por título ou editora..."
             valorBusca={termoBusca}
@@ -104,67 +118,23 @@ export default function GerenciarLivros() {
           </div>
         ) : (
           <div
-            key={`${termoBusca}-${incluirInativos}`}
-            className="animate-fade-in duration-1000">
-            
+            key={`${termoBusca}-${incluirInativos}-${paginaAtual}`}
+            className="animate-fade-in duration-300"
+          >
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {livrosExibidos.map((livro) => {
-                const isAtivo = livro.status === "ATIVO";
-
-              return (
-                  <div
-                    key={livro.id}
-                    className={`rounded-2xl p-6 shadow-xs hover:shadow-sm transition-all flex flex-col justify-between ${
-                      isAtivo
-                        ? "bg-[#eef7f0] hover:bg-[#e5f3e7]"
-                        : "bg-gray-100 opacity-60"
-                    }`}
-                  >
-                    <div>
-                      <h3
-                        className={`font-bold text-lg leading-snug ${
-                          isAtivo ? "text-[#1e582d]" : "text-gray-600"
-                        }`}
-                      >
-                        {livro.titulo}
-                      </h3>
-
-                      <p className="text-xs text-[#2e8b45]/80 font-medium mt-1">
-                        Editora: {livro.editora}
-                      </p>
-                    </div>
-
-                    <div className="flex items-center justify-between mt-6 pt-4 border-t border-[#d8ecde]">
-                      <span
-                        className={`text-xs px-3 py-1.5 rounded-full font-semibold ${
-                          isAtivo
-                            ? "bg-white text-[#1e582d] shadow-2xs"
-                            : "bg-gray-200 text-gray-700"
-                        }`}
-                      >
-                        {livro.quantidadeTotal} exemplares
-                      </span>
-
-                      <div className="flex items-center">
-                        {!isAtivo && (
-                          <span className="text-[10px] bg-gray-400 text-white px-2 py-0.5 rounded-full mr-2">
-                            Desativado
-                          </span>
-                        )}
-
-                        <button
-                          type="button"
-                          onClick={(e) => e.preventDefault()}
-                          className="text-xs font-semibold text-[#2e8b45] hover:text-[#236c35] flex items-center gap-1 transition-colors cursor-pointer"
-                        >
-                          Ver detalhes &gt;
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+              {livrosPaginados.map((livro) => (
+                <CardLivro key={livro.id} livro={livro} />
+              ))}
             </div>
+
+            <Paginacao
+              paginaAtual={paginaAtual}
+              totalItens={livrosExibidos.length}
+              itensPorPagina={ITENS_POR_PAGINA}
+              nomeEntidade="livros"
+              nomeEntidadeSingular="livro"
+              aoMudarPagina={setPaginaAtual}
+            />
           </div>
         )}
       </main>

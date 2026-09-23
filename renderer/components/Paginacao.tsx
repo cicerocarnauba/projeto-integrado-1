@@ -71,7 +71,7 @@ export default function Paginacao({
 
   return (
     <div
-      className={`flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pt-6 border-t border-[#d8ecde] ${className}`}
+      className={`flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 pt-4 border-t border-[#d8ecde] ${className}`}
     >
       {/* Indicador claro e amigável: Página X de Y • N entidades */}
       <div className="flex items-center gap-2.5">
