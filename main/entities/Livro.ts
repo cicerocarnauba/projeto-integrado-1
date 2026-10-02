@@ -130,4 +130,15 @@ export class Livro {
 
     this.dataAtualizacao = new Date();
   }
+
+  /**
+   * RN04 — Desativação lógica do livro:
+   * Altera o status para "INATIVO" e atualiza a data de modificação,
+   * preservando a rastreabilidade dos dados históricos.
+   */
+  public desativar(): void {
+    this.status = 'INATIVO';
+    this.dataAtualizacao = new Date();
+  }
 }
+

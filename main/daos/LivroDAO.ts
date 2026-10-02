@@ -89,6 +89,69 @@ export class LivroDAO {
   }
 
   /**
+   * RF03 / RN04 — Exclusão física definitiva do livro no SQLite.
+   * Só deve ser executada caso o livro não possua histórico de empréstimos.
+   */
+  public excluir(id: number): boolean {
+    const stmt = this.db.prepare(`DELETE FROM livro WHERE id = ?`);
+    const info = stmt.run(id);
+    return info.changes > 0;
+  }
+
+  /**
+   * RN04 — Verifica se o livro possui histórico de empréstimos.
+   * Critérios:
+   * 1. Exemplares atualmente emprestados (quantidade_emprestada > 0).
+   * 2. Registros associados nas tabelas de empréstimos (ex.: item_emprestimo ou emprestimo),
+   *    garantindo compatibilidade com o esquema atual e futuras expansões do banco.
+   */
+  public possuiHistoricoEmprestimos(id: number): boolean {
+    const livro = this.buscarPorId(id);
+    if (!livro) {
+      return false;
+    }
+
+    if (livro.quantidadeEmprestada > 0) {
+      return true;
+    }
+
+    // Consulta dinâmica caso as tabelas de empréstimos já tenham sido criadas no SQLite
+    try {
+      const temItemEmprestimo = this.db
+        .prepare(`SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'item_emprestimo'`)
+        .get();
+      if (temItemEmprestimo) {
+        const row = this.db
+          .prepare(`SELECT COUNT(*) as count FROM item_emprestimo WHERE livro_id = ?`)
+          .get(id) as { count: number } | undefined;
+        if (row && row.count > 0) {
+          return true;
+        }
+      }
+
+      const temEmprestimo = this.db
+        .prepare(`SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'emprestimo'`)
+        .get();
+      if (temEmprestimo) {
+        const cols = this.db.prepare(`PRAGMA table_info(emprestimo)`).all() as Array<{ name: string }>;
+        if (cols.some((c) => c.name === 'livro_id')) {
+          const row = this.db
+            .prepare(`SELECT COUNT(*) as count FROM emprestimo WHERE livro_id = ?`)
+            .get(id) as { count: number } | undefined;
+          if (row && row.count > 0) {
+            return true;
+          }
+        }
+      }
+    } catch {
+      // Caso ocorra alguma inconsistência na verificação das tabelas auxiliares, assume false
+    }
+
+    return false;
+  }
+
+
+  /**
    * RN06 — Chave única: combinação de Título e Editora.
    * Aplica LOWER(TRIM(...)) para garantir unicidade sem diferenciar
    * maiúsculas/minúsculas nem espaços nas extremidades (RNF04).
