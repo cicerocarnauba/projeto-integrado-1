@@ -5,6 +5,7 @@ export const LIVRO_CHANNELS = {
   CADASTRAR: 'livro:cadastrar',
   CONSULTAR: 'livro:consultar',
   EDITAR: 'livro:editar',
+  EXCLUIR: 'livro:excluir',
 } as const;
 
 export function registerLivroHandlers(controller: LivroController): void {
@@ -57,6 +58,20 @@ export function registerLivroHandlers(controller: LivroController): void {
       });
 
       return { success: true, data: livroAtualizado };
+    } catch (error) {
+      // RNF03 — Mensagem clara e amigável, sem exibir código técnico
+      return {
+        success: false,
+        error: (error as Error).message,
+      };
+    }
+  });
+
+  // RF03 — Excluir Livro (Equivalente ao Endpoint DELETE /livros/{id})
+  ipcMain.handle(LIVRO_CHANNELS.EXCLUIR, async (_event, id: any) => {
+    try {
+      const resultado = controller.excluir(Number(id));
+      return { success: true, data: resultado };
     } catch (error) {
       // RNF03 — Mensagem clara e amigável, sem exibir código técnico
       return {

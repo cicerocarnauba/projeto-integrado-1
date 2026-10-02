@@ -110,6 +110,27 @@ declare global {
           };
           error?: string;
         }>;
+
+        excluir: (id: number) => Promise<{
+          success: boolean;
+          data?: {
+            acao: 'EXCLUIDO' | 'DESATIVADO';
+            mensagem: string;
+            id: number;
+            livro?: {
+              id: number | null;
+              titulo: string;
+              editora: string;
+              quantidadeTotal: number;
+              quantidadeEmprestada: number;
+              saldoDisponivel: number;
+              status: 'ATIVO' | 'INATIVO';
+              dataCadastro: Date;
+              dataAtualizacao: Date;
+            };
+          };
+          error?: string;
+        }>;
       };
     };
   }

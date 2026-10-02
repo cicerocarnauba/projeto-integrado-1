@@ -21,6 +21,7 @@ contextBridge.exposeInMainWorld('ipc', {
       ipcRenderer.invoke('livro:consultar', input),
     editar: (id: number, input: { titulo: string; editora: string; quantidadeTotal: number }) =>
       ipcRenderer.invoke('livro:editar', id, input),
+    excluir: (id: number) => ipcRenderer.invoke('livro:excluir', id),
   },
 });
 
