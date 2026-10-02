@@ -14,6 +14,13 @@ export interface ConsultarLivroInput {
   incluirInativos?: boolean;
 }
 
+export interface EditarLivroInput {
+  id: number;
+  titulo: string;
+  editora: string;
+  quantidadeTotal: number;
+}
+
 export interface LivroConsultaDTO {
   id: number | null;
   titulo: string;
@@ -99,5 +106,76 @@ export class LivroController {
       dataCadastro: livro.dataCadastro,
       dataAtualizacao: livro.dataAtualizacao,
     }));
+  }
+
+  /**
+   * RF02 — Editar Livro
+   * Regras aplicadas:
+   *  - Só permite editar livro existente e com status "Ativo".
+   *  - Valida unicidade Título + Editora na edição (RN06) — não pode coincidir com outro livro ("Ativo" ou "Inativo").
+   *  - Valida regra: nova quantidade não pode ser inferior à quantidade emprestada no momento da edição (RN03).
+   *  - Valida regra: se a quantidade total for reduzida a exatamente zero, muda o status para "Inativo" automaticamente (RN03).
+   */
+  public editar(input: EditarLivroInput): LivroConsultaDTO {
+    if (!input.id || !Number.isInteger(input.id)) {
+      throw new Error('ID do livro inválido para edição.');
+    }
+
+    const livro = this.livroDAO.buscarPorId(input.id);
+    if (!livro) {
+      throw new Error('Livro não encontrado no acervo.');
+    }
+
+    // Regra: só permite editar livro com status "Ativo"
+    if (livro.status !== 'ATIVO') {
+      throw new Error(
+        'Apenas livros com status "Ativo" podem ser editados. Livros inativos precisam ser reativados primeiro.'
+      );
+    }
+
+    // Regra: unicidade Título + Editora na edição (RN06)
+    // Verifica se já existe outro livro cadastrado com o mesmo título e editora (ativo ou inativo),
+    // ignorando o próprio livro que está sendo editado.
+    const tituloNorm = (input.titulo ?? '').trim().toLowerCase();
+    const editoraNorm = (input.editora ?? '').trim().toLowerCase();
+    const livroExistente = this.livroDAO.buscarPorTituloEEditora(tituloNorm, editoraNorm);
+
+    if (livroExistente && livroExistente.id !== livro.id) {
+      throw new Error(
+        'Já existe outro livro cadastrado com este título e editora. Informe um título ou editora diferente.'
+      );
+    }
+
+    // Aplica alterações e validações na entidade (Information Expert)
+    livro.editar({
+      titulo: input.titulo,
+      editora: input.editora,
+      quantidadeTotal: input.quantidadeTotal,
+    });
+
+    // Rede de segurança contra race condition no SQLite (RNF03)
+    try {
+      this.livroDAO.atualizar(livro);
+    } catch (error) {
+      const msg = (error as Error).message ?? '';
+      if (msg.includes('UNIQUE constraint failed')) {
+        throw new Error(
+          'Já existe outro livro cadastrado com este título e editora. Informe um título ou editora diferente.'
+        );
+      }
+      throw error;
+    }
+
+    return {
+      id: livro.id,
+      titulo: livro.titulo,
+      editora: livro.editora,
+      quantidadeTotal: livro.quantidadeTotal,
+      quantidadeEmprestada: livro.quantidadeEmprestada,
+      saldoDisponivel: livro.getSaldoDisponivel(),
+      status: livro.status,
+      dataCadastro: livro.dataCadastro,
+      dataAtualizacao: livro.dataAtualizacao,
+    };
   }
 }

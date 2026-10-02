@@ -49,6 +49,38 @@ export class LivroDAO {
     return livro;
   }
 
+  /**
+   * RF02 — Atualizar dados de um livro existente no SQLite
+   */
+  public atualizar(livro: Livro): Livro {
+    if (livro.id === null || livro.id === undefined) {
+      throw new Error('Não é possível atualizar um livro sem ID.');
+    }
+
+    const stmt = this.db.prepare(`
+      UPDATE livro
+      SET titulo = ?,
+          editora = ?,
+          quantidade_total = ?,
+          quantidade_emprestada = ?,
+          status = ?,
+          data_atualizacao = ?
+      WHERE id = ?
+    `);
+
+    stmt.run(
+      livro.titulo,
+      livro.editora,
+      livro.quantidadeTotal,
+      livro.quantidadeEmprestada,
+      livro.status,
+      livro.dataAtualizacao.toISOString(),
+      livro.id
+    );
+
+    return livro;
+  }
+
   public buscarPorId(id: number): Livro | null {
     const row = this.db
       .prepare(`SELECT * FROM livro WHERE id = ?`)
