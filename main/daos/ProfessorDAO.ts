@@ -123,6 +123,26 @@ export class ProfessorDAO {
   }
 
   /**
+   * HU08 — Atualiza os dados editáveis do professor.
+   * Campos editáveis: primeiro_nome, sobrenome, email.
+   */
+  public atualizar(professor: Professor): void {
+    this.db
+      .prepare(
+        `UPDATE professor
+         SET primeiro_nome = ?, sobrenome = ?, email = ?, data_atualizacao = ?
+         WHERE id = ?`
+      )
+      .run(
+        professor.primeiroNome,
+        professor.sobrenome,
+        professor.email,
+        professor.dataAtualizacao.toISOString(),
+        professor.id
+      );
+  }
+
+  /**
    * HU10 — Verifica se o professor possui algum empréstimo pendente.
    *
    * IMPORTANTE: Quando o módulo de Empréstimos for criado, esta consulta

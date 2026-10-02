@@ -66,6 +66,20 @@ export class Professor {
     return !possuiEmprestimoPendente;
   }
 
+  // HU08 — Editar Professor
+  // Atualiza os campos editáveis (primeiro nome, sobrenome e e-mail).
+  // A validação de unicidade do e-mail é responsabilidade do Controller (RN05).
+  public atualizarDados(props: {
+    primeiroNome: string;
+    sobrenome: string;
+    email: string;
+  }): void {
+    this.primeiroNome = props.primeiroNome.trim();
+    this.sobrenome = props.sobrenome.trim();
+    this.email = props.email.trim().toLowerCase();
+    this.dataAtualizacao = new Date();
+  }
+
   // Comportamento de ciclo de vida
   public ativar(): void {
     this.status = 'ATIVO';
