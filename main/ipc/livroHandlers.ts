@@ -4,6 +4,7 @@ import { LivroController } from '../controllers/LivroController.ts';
 export const LIVRO_CHANNELS = {
   CADASTRAR: 'livro:cadastrar',
   CONSULTAR: 'livro:consultar',
+  EDITAR: 'livro:editar',
 } as const;
 
 export function registerLivroHandlers(controller: LivroController): void {
@@ -33,6 +34,31 @@ export function registerLivroHandlers(controller: LivroController): void {
       });
       return { success: true, data: livros };
     } catch (error) {
+      return {
+        success: false,
+        error: (error as Error).message,
+      };
+    }
+  });
+
+  // RF02 — Editar Livro (Equivalente ao Endpoint PUT /livros/{id})
+  ipcMain.handle(LIVRO_CHANNELS.EDITAR, async (_event, idOrInput: any, maybeInput?: any) => {
+    try {
+      const input =
+        maybeInput !== undefined
+          ? { id: Number(idOrInput), ...maybeInput }
+          : idOrInput;
+
+      const livroAtualizado = controller.editar({
+        id: Number(input.id),
+        titulo: input.titulo,
+        editora: input.editora,
+        quantidadeTotal: Number(input.quantidadeTotal),
+      });
+
+      return { success: true, data: livroAtualizado };
+    } catch (error) {
+      // RNF03 — Mensagem clara e amigável, sem exibir código técnico
       return {
         success: false,
         error: (error as Error).message,
