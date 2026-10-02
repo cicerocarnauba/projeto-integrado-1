@@ -7,6 +7,7 @@ export const TURMA_CHANNELS = {
   BUSCAR_POR_ID: 'turma:buscarPorId',
   ATIVAR: 'turma:ativar',
   EDITAR: 'turma:editar',
+  DESATIVAR: 'turma:desativar',
 } as const;
 
 export function registerTurmaHandlers(controller: TurmaController): void {
@@ -76,6 +77,19 @@ export function registerTurmaHandlers(controller: TurmaController): void {
       const turma = controller.editar(id, {
         nome: payload?.nome,
       });
+      return { success: true, data: turma };
+    } catch (error) {
+      return {
+        success: false,
+        error: (error as Error).message,
+      };
+    }
+  });
+
+  // HU17 — Desativar Turma
+  ipcMain.handle(TURMA_CHANNELS.DESATIVAR, async (_event, id: number) => {
+    try {
+      const turma = controller.desativar(id);
       return { success: true, data: turma };
     } catch (error) {
       return {

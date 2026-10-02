@@ -104,7 +104,6 @@ export class TurmaDAO {
 
   /**
    * HU14 — Atualiza o nome da turma.
-   * Campo editável: nome.
    */
   public atualizar(turma: Turma): void {
     this.db
@@ -118,6 +117,42 @@ export class TurmaDAO {
         turma.dataAtualizacao.toISOString(),
         turma.id
       );
+  }
+
+  /**
+   * HU17 — Verifica se a turma possui algum empréstimo pendente.
+   *
+   * IMPORTANTE: Quando o módulo de Empréstimos for criado, esta consulta
+   * deve ser substituída por uma query real na tabela `emprestimo`.
+   */
+  public possuiEmprestimoPendente(_turmaId: number): boolean {
+    // TODO: Substituir por consulta real quando a tabela `emprestimo` existir.
+    // Exemplo futuro:
+    // const row = this.db.prepare(
+    //   `SELECT 1 FROM emprestimo
+    //    WHERE turma_id = ? AND status = 'PENDENTE'
+    //    LIMIT 1`
+    // ).get(turmaId);
+    // return !!row;
+    return false;
+  }
+
+  /**
+   * HU17 — Verifica se a turma possui histórico de empréstimos.
+   *
+   * IMPORTANTE: Quando o módulo de Empréstimos for criado, esta consulta
+   * deve ser substituída por uma query real na tabela `emprestimo`.
+   */
+  public possuiHistoricoEmprestimos(_turmaId: number): boolean {
+    // TODO: Substituir por consulta real quando a tabela `emprestimo` existir.
+    // Exemplo futuro:
+    // const row = this.db.prepare(
+    //   `SELECT 1 FROM emprestimo
+    //    WHERE turma_id = ?
+    //    LIMIT 1`
+    // ).get(turmaId);
+    // return !!row;
+    return false;
   }
 
   private mapRowToEntity(row: TurmaRow): Turma {

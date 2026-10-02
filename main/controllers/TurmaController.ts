@@ -90,32 +90,19 @@ export class TurmaController {
 
   /**
    * HU14 — Editar Turma
-   *
-   * Regras de negócio:
-   * 1. A turma precisa existir.
-   * 2. Só é possível editar turma com status "ATIVO" (uma turma inativa
-   *    precisa passar pela ativação primeiro).
-   * 3. O nome é validado (não pode ser vazio).
-   * 4. O novo nome deve respeitar a unicidade (RN07): não pode coincidir
-   *    com o nome de outra turma (ativa ou inativa).
-   *
-   * Relações: [RF14], [RN07], [RNF03]
    */
   public editar(id: number, input: EditarTurmaInput): Turma {
-    // 1. Busca a turma
     const turma = this.turmaDAO.buscarPorId(id);
     if (!turma) {
       throw new Error('Turma não encontrada.');
     }
 
-    // 2. Só permite editar turma ATIVA
     if (turma.status !== 'ATIVO') {
       throw new Error(
         'Não é possível editar uma turma inativa. Ative o cadastro antes de editá-la.'
       );
     }
 
-    // 3. Valida os campos informados (reutiliza a entidade)
     const dadosAtualizados = new Turma({
       nome: input.nome,
       status: turma.status,
@@ -123,7 +110,6 @@ export class TurmaController {
     });
     dadosAtualizados.validarCamposObrigatorios();
 
-    // 4. Se o nome foi alterado, valida a unicidade (RN07)
     const nomeNormalizado = dadosAtualizados.getNomeNormalizado();
     if (nomeNormalizado !== turma.getNomeNormalizado()) {
       const turmaComMesmoNome = this.turmaDAO.buscarPorNome(input.nome);
@@ -134,7 +120,6 @@ export class TurmaController {
       }
     }
 
-    // 5. Atualiza o nome da entidade e persiste
     turma.atualizarNome(input.nome);
 
     try {
@@ -148,6 +133,55 @@ export class TurmaController {
       }
       throw error;
     }
+
+    return turma;
+  }
+
+  /**
+   * HU17 — Desativar Turma
+   *
+   * Regras de negócio:
+   * 1. A turma precisa existir.
+   * 2. Só faz sentido desativar uma turma com status "ATIVO".
+   * 3. A operação é bloqueada se houver empréstimo "Pendente" associado.
+   * 4. A desativação só é permitida se a turma possuir histórico de
+   *    empréstimos. Se NÃO possuir histórico, apenas a exclusão definitiva
+   *    é possível.
+   * 5. O status muda para "INATIVO" e a turma deixa de aparecer nas
+   *    operações do dia a dia, mas permanece visível no histórico.
+   *
+   * Relações: [RF17], [RN04], [RNF03]
+   */
+  public desativar(id: number): Turma {
+    // 1. Busca a turma
+    const turma = this.turmaDAO.buscarPorId(id);
+    if (!turma) {
+      throw new Error('Turma não encontrada.');
+    }
+
+    // 2. Só permite desativar quem está ATIVO
+    if (turma.status !== 'ATIVO') {
+      throw new Error('Esta turma já está inativa.');
+    }
+
+    // 3. Bloqueia se houver empréstimo pendente
+    if (this.turmaDAO.possuiEmprestimoPendente(id)) {
+      throw new Error(
+        'Não é possível desativar esta turma, pois ela possui empréstimos pendentes.'
+      );
+    }
+
+    // 4. Só permite desativar se houver histórico; caso contrário,
+    //    a operação correta é a exclusão definitiva.
+    if (!this.turmaDAO.possuiHistoricoEmprestimos(id)) {
+      throw new Error(
+        'Esta turma não possui histórico de empréstimos. Utilize a opção "Excluir" para removê-la definitivamente.'
+      );
+    }
+
+    // 5. Desativa
+    turma.inativar();
+    this.turmaDAO.atualizarStatus(id, 'INATIVO');
 
     return turma;
   }

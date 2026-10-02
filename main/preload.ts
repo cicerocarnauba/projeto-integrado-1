@@ -21,6 +21,7 @@ contextBridge.exposeInMainWorld('ipc', {
     ativar: (id: number) => ipcRenderer.invoke('turma:ativar', id),
     editar: (input: { id: number; nome: string }) =>
       ipcRenderer.invoke('turma:editar', input),
+    desativar: (id: number) => ipcRenderer.invoke('turma:desativar', id),
   },
   livro: {
     cadastrar: (input: { titulo: string; editora: string; quantidadeTotal: number }) =>
