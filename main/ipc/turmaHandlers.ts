@@ -5,6 +5,7 @@ export const TURMA_CHANNELS = {
   CADASTRAR: 'turma:cadastrar',
   CONSULTAR: 'turma:consultar',
   BUSCAR_POR_ID: 'turma:buscarPorId',
+  ATIVAR: 'turma:ativar',
 } as const;
 
 export function registerTurmaHandlers(controller: TurmaController): void {
@@ -14,7 +15,6 @@ export function registerTurmaHandlers(controller: TurmaController): void {
       const turma = controller.cadastrar(input);
       return { success: true, data: turma };
     } catch (error) {
-      // RNF03 — Mensagem clara, sem código técnico
       return {
         success: false,
         error: (error as Error).message,
@@ -49,6 +49,19 @@ export function registerTurmaHandlers(controller: TurmaController): void {
       return { success: true, data: turma };
     } catch (error) {
       return { success: false, error: (error as Error).message };
+    }
+  });
+
+  // HU18 — Ativar Turma
+  ipcMain.handle(TURMA_CHANNELS.ATIVAR, async (_event, id: number) => {
+    try {
+      const turma = controller.ativar(id);
+      return { success: true, data: turma };
+    } catch (error) {
+      return {
+        success: false,
+        error: (error as Error).message,
+      };
     }
   });
 }

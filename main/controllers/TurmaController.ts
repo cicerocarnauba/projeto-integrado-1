@@ -17,9 +17,6 @@ export class TurmaController {
 
   /**
    * RF12 — Cadastrar Turma
-   * Regras aplicadas:
-   *  - Campos obrigatórios (RNF03: mensagens claras)
-   *  - RN07: nome único (ativas ou inativas)
    */
   public cadastrar(input: CadastrarTurmaInput): Turma {
     const turma = new Turma({
@@ -28,14 +25,12 @@ export class TurmaController {
 
     turma.validarCamposObrigatorios();
 
-    // Checagem "amigável"
     if (this.turmaDAO.buscarPorNome(turma.nome)) {
       throw new Error(
         'Já existe uma turma cadastrada com esse nome. Informe um nome diferente.'
       );
     }
 
-    // Rede de segurança contra race condition (RNF03)
     try {
       return this.turmaDAO.inserir(turma);
     } catch (error) {
@@ -51,9 +46,6 @@ export class TurmaController {
 
   /**
    * RF13 — Consultar Turma
-   *  - Filtro por nome (parcial).
-   *  - Por padrão, retorna apenas ATIVAS.
-   *  - `incluirInativos = true` também traz INATIVAS (RNF04).
    */
   public consultar(input: ConsultarTurmaInput): Turma[] {
     return this.turmaDAO.consultar({
@@ -70,6 +62,36 @@ export class TurmaController {
     if (!turma) {
       throw new Error('Turma não encontrada.');
     }
+    return turma;
+  }
+
+  /**
+   * HU18 — Ativar Turma
+   *
+   * Regras de negócio:
+   * 1. A turma precisa existir.
+   * 2. Só faz sentido ativar uma turma com status "INATIVO".
+   * 3. A ativação não exige nenhuma informação adicional — os dados
+   *    permanecem os mesmos de antes da desativação.
+   *
+   * Relações: [RF18], [RN04], [RNF03]
+   */
+  public ativar(id: number): Turma {
+    // 1. Busca a turma
+    const turma = this.turmaDAO.buscarPorId(id);
+    if (!turma) {
+      throw new Error('Turma não encontrada.');
+    }
+
+    // 2. Só permite ativar quem está INATIVO
+    if (turma.status === 'ATIVO') {
+      throw new Error('Esta turma já está ativa.');
+    }
+
+    // 3. Ativa (a entidade já tem o método `ativar()`)
+    turma.ativar();
+    this.turmaDAO.atualizarStatus(id, 'ATIVO');
+
     return turma;
   }
 }

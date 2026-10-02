@@ -60,11 +60,6 @@ export class TurmaDAO {
 
   /**
    * HU13 — Consultar Turma
-   * - `nome`: busca parcial em nome (case-insensitive e trim - RNF04).
-   * - `incluirInativos`: se explicitamente `false`, retorna apenas turmas com status ATIVO.
-   *   Por padrão (quando omitido ou `true`), a listagem/seleção de turmas traz todas as turmas,
-   *   ordenando primeiro as turmas com status "Ativa" e depois as com status "Inativa" (HU13).
-   * - Dentro de cada grupo de status, a ordenação é alfabética por nome.
    */
   public consultar(filtro: {
     nome?: string;
@@ -85,13 +80,26 @@ export class TurmaDAO {
       params.push(`%${nome}%`);
     }
 
-    // HU13: Por padrão, a seleção mostra primeiro as turmas com status "Ativa" e depois as turmas com status "Inativa"
     sql += ` ORDER BY
       CASE status WHEN 'ATIVO' THEN 0 ELSE 1 END,
       nome ASC`;
 
     const rows = this.db.prepare(sql).all(...params) as TurmaRow[];
     return rows.map((row) => this.mapRowToEntity(row));
+  }
+
+  /**
+   * HU18 — Atualiza o status da turma (ATIVO/INATIVO).
+   * Usado para ativação e desativação lógica.
+   */
+  public atualizarStatus(id: number, status: StatusCadastro): void {
+    this.db
+      .prepare(
+        `UPDATE turma
+         SET status = ?, data_atualizacao = ?
+         WHERE id = ?`
+      )
+      .run(status, new Date().toISOString(), id);
   }
 
   private mapRowToEntity(row: TurmaRow): Turma {
