@@ -104,31 +104,19 @@ export class ProfessorController {
 
   /**
    * HU08 — Editar Professor
-   *
-   * Regras de negócio:
-   * 1. O professor precisa existir.
-   * 2. Só é possível editar professor com status "ATIVO".
-   * 3. Os campos (primeiro nome, sobrenome, e-mail) são validados.
-   * 4. Se o e-mail for alterado, a unicidade deve ser validada (RN05):
-   *    o novo e-mail não pode pertencer a outro registro (ativo ou inativo).
-   *
-   * Relações: [RF08], [RN05], [RNF03]
    */
   public editar(id: number, input: EditarProfessorInput): Professor {
-    // 1. Busca o professor
     const professor = this.professorDAO.buscarPorId(id);
     if (!professor) {
       throw new Error('Professor não encontrado.');
     }
 
-    // 2. Só permite editar professor ATIVO
     if (professor.status !== 'ATIVO') {
       throw new Error(
         'Não é possível editar um professor inativo. Reative o cadastro antes de editá-lo.'
       );
     }
 
-    // 3. Valida os campos informados (reutiliza a entidade)
     const dadosAtualizados = new Professor({
       primeiroNome: input.primeiroNome,
       sobrenome: input.sobrenome,
@@ -138,7 +126,6 @@ export class ProfessorController {
     });
     dadosAtualizados.validarCamposObrigatorios();
 
-    // 4. Se o e-mail foi alterado, valida a unicidade (RN05)
     const emailNormalizado = dadosAtualizados.email;
     if (emailNormalizado !== professor.email) {
       const professorComMesmoEmail =
@@ -150,7 +137,6 @@ export class ProfessorController {
       }
     }
 
-    // 5. Atualiza os dados da entidade e persiste
     professor.atualizarDados({
       primeiroNome: input.primeiroNome,
       sobrenome: input.sobrenome,
@@ -168,6 +154,38 @@ export class ProfessorController {
       }
       throw error;
     }
+
+    return professor;
+  }
+
+  /**
+   * HU12 — Reativar Professor
+   *
+   * Regras de negócio:
+   * 1. O professor precisa existir.
+   * 2. Só faz sentido reativar um professor com status "INATIVO".
+   * 3. A reativação não exige nenhuma informação adicional — os dados
+   *    permanecem os mesmos de antes da desativação.
+   * 4. O e-mail continua sendo chave única (RN05), mas como não é alterado
+   *    na reativação, não precisa ser revalidado.
+   *
+   * Relações: [RF12], [RN04], [RNF03]
+   */
+  public reativar(id: number): Professor {
+    // 1. Busca o professor
+    const professor = this.professorDAO.buscarPorId(id);
+    if (!professor) {
+      throw new Error('Professor não encontrado.');
+    }
+
+    // 2. Só permite reativar quem está INATIVO
+    if (professor.status === 'ATIVO') {
+      throw new Error('Este professor já está ativo.');
+    }
+
+    // 3. Reativa (a entidade já tem o método `ativar()`)
+    professor.ativar();
+    this.professorDAO.atualizarStatus(id, 'ATIVO');
 
     return professor;
   }

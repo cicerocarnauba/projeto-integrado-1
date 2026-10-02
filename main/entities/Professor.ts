@@ -67,8 +67,6 @@ export class Professor {
   }
 
   // HU08 — Editar Professor
-  // Atualiza os campos editáveis (primeiro nome, sobrenome e e-mail).
-  // A validação de unicidade do e-mail é responsabilidade do Controller (RN05).
   public atualizarDados(props: {
     primeiroNome: string;
     sobrenome: string;

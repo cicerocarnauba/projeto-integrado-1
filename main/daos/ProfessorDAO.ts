@@ -102,7 +102,6 @@ export class ProfessorDAO {
 
   /**
    * HU10 — Exclusão definitiva do banco de dados.
-   * Só deve ser chamada quando o professor NÃO possui histórico de empréstimos.
    */
   public excluir(id: number): void {
     this.db.prepare(`DELETE FROM professor WHERE id = ?`).run(id);
@@ -110,7 +109,6 @@ export class ProfessorDAO {
 
   /**
    * HU10 — Atualiza o status do professor (ATIVO/INATIVO).
-   * Usado para desativação lógica quando há histórico de empréstimos.
    */
   public atualizarStatus(id: number, status: StatusCadastro): void {
     this.db
@@ -124,7 +122,6 @@ export class ProfessorDAO {
 
   /**
    * HU08 — Atualiza os dados editáveis do professor.
-   * Campos editáveis: primeiro_nome, sobrenome, email.
    */
   public atualizar(professor: Professor): void {
     this.db
@@ -144,9 +141,6 @@ export class ProfessorDAO {
 
   /**
    * HU10 — Verifica se o professor possui algum empréstimo pendente.
-   *
-   * IMPORTANTE: Quando o módulo de Empréstimos for criado, esta consulta
-   * deve ser substituída por uma query real na tabela `emprestimo`.
    */
   public possuiEmprestimoPendente(_professorId: number): boolean {
     // TODO: Substituir por consulta real quando a tabela `emprestimo` existir.
@@ -155,9 +149,6 @@ export class ProfessorDAO {
 
   /**
    * HU10 — Verifica se o professor possui histórico de empréstimos.
-   *
-   * IMPORTANTE: Quando o módulo de Empréstimos for criado, esta consulta
-   * deve ser substituída por uma query real na tabela `emprestimo`.
    */
   public possuiHistoricoEmprestimos(_professorId: number): boolean {
     // TODO: Substituir por consulta real quando a tabela `emprestimo` existir.

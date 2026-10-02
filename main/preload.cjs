@@ -8,6 +8,7 @@ contextBridge.exposeInMainWorld('ipc', {
     buscarPorId: (id) => ipcRenderer.invoke('professor:buscarPorId', id),
     excluir: (id) => ipcRenderer.invoke('professor:excluir', id),
     editar: (input) => ipcRenderer.invoke('professor:editar', input),
+    reativar: (id) => ipcRenderer.invoke('professor:reativar', id),
   },
   turma: {
     cadastrar: (input) => ipcRenderer.invoke('turma:cadastrar', input),

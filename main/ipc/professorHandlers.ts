@@ -7,6 +7,7 @@ export const PROFESSOR_CHANNELS = {
   BUSCAR_POR_ID: 'professor:buscarPorId',
   EXCLUIR: 'professor:excluir',
   EDITAR: 'professor:editar',
+  REATIVAR: 'professor:reativar',
 } as const;
 
 export function registerProfessorHandlers(
@@ -80,6 +81,19 @@ export function registerProfessorHandlers(
         sobrenome: payload?.sobrenome,
         email: payload?.email,
       });
+      return { success: true, data: professor };
+    } catch (error) {
+      return {
+        success: false,
+        error: (error as Error).message,
+      };
+    }
+  });
+
+  // HU12 — Reativar Professor
+  ipcMain.handle(PROFESSOR_CHANNELS.REATIVAR, async (_event, id: number) => {
+    try {
+      const professor = controller.reativar(id);
       return { success: true, data: professor };
     } catch (error) {
       return {
