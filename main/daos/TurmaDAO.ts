@@ -102,6 +102,24 @@ export class TurmaDAO {
       .run(status, new Date().toISOString(), id);
   }
 
+  /**
+   * HU14 — Atualiza o nome da turma.
+   * Campo editável: nome.
+   */
+  public atualizar(turma: Turma): void {
+    this.db
+      .prepare(
+        `UPDATE turma
+         SET nome = ?, data_atualizacao = ?
+         WHERE id = ?`
+      )
+      .run(
+        turma.nome,
+        turma.dataAtualizacao.toISOString(),
+        turma.id
+      );
+  }
+
   private mapRowToEntity(row: TurmaRow): Turma {
     return new Turma({
       id: row.id,

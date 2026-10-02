@@ -19,6 +19,8 @@ contextBridge.exposeInMainWorld('ipc', {
       ipcRenderer.invoke('turma:consultar', input),
     buscarPorId: (id: number) => ipcRenderer.invoke('turma:buscarPorId', id),
     ativar: (id: number) => ipcRenderer.invoke('turma:ativar', id),
+    editar: (input: { id: number; nome: string }) =>
+      ipcRenderer.invoke('turma:editar', input),
   },
   livro: {
     cadastrar: (input: { titulo: string; editora: string; quantidadeTotal: number }) =>

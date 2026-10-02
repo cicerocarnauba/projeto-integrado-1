@@ -34,6 +34,14 @@ export class Turma {
     }
   }
 
+  // HU14 — Editar Turma
+  // Atualiza o nome da turma. A validação de unicidade é responsabilidade
+  // do Controller (RN07).
+  public atualizarNome(novoNome: string): void {
+    this.nome = novoNome.trim();
+    this.dataAtualizacao = new Date();
+  }
+
   // Comportamento de ciclo de vida
   public ativar(): void {
     this.status = 'ATIVO';

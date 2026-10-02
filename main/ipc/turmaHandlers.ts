@@ -6,6 +6,7 @@ export const TURMA_CHANNELS = {
   CONSULTAR: 'turma:consultar',
   BUSCAR_POR_ID: 'turma:buscarPorId',
   ATIVAR: 'turma:ativar',
+  EDITAR: 'turma:editar',
 } as const;
 
 export function registerTurmaHandlers(controller: TurmaController): void {
@@ -56,6 +57,25 @@ export function registerTurmaHandlers(controller: TurmaController): void {
   ipcMain.handle(TURMA_CHANNELS.ATIVAR, async (_event, id: number) => {
     try {
       const turma = controller.ativar(id);
+      return { success: true, data: turma };
+    } catch (error) {
+      return {
+        success: false,
+        error: (error as Error).message,
+      };
+    }
+  });
+
+  // HU14 — Editar Turma
+  ipcMain.handle(TURMA_CHANNELS.EDITAR, async (_event, payload) => {
+    try {
+      const id = Number(payload?.id);
+      if (!id || Number.isNaN(id)) {
+        throw new Error('ID da turma inválido.');
+      }
+      const turma = controller.editar(id, {
+        nome: payload?.nome,
+      });
       return { success: true, data: turma };
     } catch (error) {
       return {
