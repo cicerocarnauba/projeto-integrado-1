@@ -8,6 +8,7 @@ export const TURMA_CHANNELS = {
   ATIVAR: 'turma:ativar',
   EDITAR: 'turma:editar',
   DESATIVAR: 'turma:desativar',
+  EXCLUIR: 'turma:excluir',
 } as const;
 
 export function registerTurmaHandlers(controller: TurmaController): void {
@@ -91,6 +92,19 @@ export function registerTurmaHandlers(controller: TurmaController): void {
     try {
       const turma = controller.desativar(id);
       return { success: true, data: turma };
+    } catch (error) {
+      return {
+        success: false,
+        error: (error as Error).message,
+      };
+    }
+  });
+
+  // HU16 — Excluir Turma
+  ipcMain.handle(TURMA_CHANNELS.EXCLUIR, async (_event, id: number) => {
+    try {
+      const resultado = controller.excluir(id);
+      return { success: true, data: resultado };
     } catch (error) {
       return {
         success: false,

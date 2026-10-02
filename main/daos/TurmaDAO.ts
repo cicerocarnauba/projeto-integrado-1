@@ -90,7 +90,6 @@ export class TurmaDAO {
 
   /**
    * HU18 — Atualiza o status da turma (ATIVO/INATIVO).
-   * Usado para ativação e desativação lógica.
    */
   public atualizarStatus(id: number, status: StatusCadastro): void {
     this.db
@@ -120,6 +119,14 @@ export class TurmaDAO {
   }
 
   /**
+   * HU16 — Exclusão definitiva do banco de dados.
+   * Só deve ser chamada quando a turma NÃO possui histórico de empréstimos.
+   */
+  public excluir(id: number): void {
+    this.db.prepare(`DELETE FROM turma WHERE id = ?`).run(id);
+  }
+
+  /**
    * HU17 — Verifica se a turma possui algum empréstimo pendente.
    *
    * IMPORTANTE: Quando o módulo de Empréstimos for criado, esta consulta
@@ -127,13 +134,6 @@ export class TurmaDAO {
    */
   public possuiEmprestimoPendente(_turmaId: number): boolean {
     // TODO: Substituir por consulta real quando a tabela `emprestimo` existir.
-    // Exemplo futuro:
-    // const row = this.db.prepare(
-    //   `SELECT 1 FROM emprestimo
-    //    WHERE turma_id = ? AND status = 'PENDENTE'
-    //    LIMIT 1`
-    // ).get(turmaId);
-    // return !!row;
     return false;
   }
 
@@ -145,13 +145,6 @@ export class TurmaDAO {
    */
   public possuiHistoricoEmprestimos(_turmaId: number): boolean {
     // TODO: Substituir por consulta real quando a tabela `emprestimo` existir.
-    // Exemplo futuro:
-    // const row = this.db.prepare(
-    //   `SELECT 1 FROM emprestimo
-    //    WHERE turma_id = ?
-    //    LIMIT 1`
-    // ).get(turmaId);
-    // return !!row;
     return false;
   }
 
