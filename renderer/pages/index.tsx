@@ -61,13 +61,9 @@ export default function Home() {
     <>
       <Head>
         <title>LivroCMEI - Início</title>
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
-        />
       </Head>
 
-      <div className="h-screen w-screen bg-white flex overflow-hidden select-none relative">
+      <div className="h-screen w-full bg-white flex overflow-hidden select-none relative">
         <div
           className={`h-screen bg-[#2e8b45] text-white flex flex-col relative shrink-0 overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
             isTransitioning
@@ -76,21 +72,21 @@ export default function Home() {
           }`}
         >
           <div
-            className={`absolute inset-0 w-screen min-w-[1024px] h-full flex flex-col px-8 transition-all duration-200 ease-out ${
+            className={`absolute inset-0 w-full h-full flex flex-col justify-between px-4 sm:px-8 py-4 sm:py-6 transition-all duration-200 ease-out overflow-y-auto ${
               isTransitioning
                 ? "opacity-0 scale-95 pointer-events-none"
                 : "opacity-100"
             }`}
           >
             {/* Título */}
-            <div className="flex-1 flex items-center justify-center">
+            <div className="flex-1 flex items-center justify-center my-2 sm:my-4 min-h-[80px]">
               <HeaderHome />
             </div>
 
             {/* Módulos de gerenciamento */}
-            <div className="w-full max-w-6xl mx-auto">
+            <div className="w-full max-w-6xl mx-auto my-auto py-2">
               <main className="w-full">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 min-[480px]:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                   {modulos.map((modulo) => (
                     <CardModulo
                       key={modulo.titulo}
@@ -104,7 +100,7 @@ export default function Home() {
             </div>
 
             {/* Rodapé */}
-            <div className="flex-1 flex items-end justify-center pb-4">
+            <div className="flex-1 flex items-end justify-center pt-2 sm:pt-4 pb-2">
               <footer className="text-center text-white/75 text-xs">
                 <p>CEMEI Professora Maria de Lourdes Demasceno Marques • Piquet Carneiro</p>
               </footer>
