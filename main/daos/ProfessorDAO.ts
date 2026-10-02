@@ -46,8 +46,6 @@ export class ProfessorDAO {
   }
 
   public buscarPorEmail(email: string): Professor | null {
-    // TRIM aplicado dos DOIS lados — alinha com o padrão de `consultar`
-    // e blinda contra inserções via SQL direto que fujam da normalização da entity.
     const row = this.db
       .prepare(
         `SELECT * FROM professor
@@ -59,12 +57,6 @@ export class ProfessorDAO {
 
   /**
    * Consulta com filtros (RF09).
-   * - `nome`: busca parcial em primeiro nome OU sobrenome.
-   * - `email`: busca parcial em e-mail.
-   * - `incluirInativos`: por padrão `false` (retorna só ATIVOS).
-   *
-   * Quando ambos os filtros são informados, eles são combinados com AND.
-   * Buscas por texto são case-insensitive e ignoram espaços nas extremidades (RNF04).
    */
   public consultar(filtro: {
     nome?: string;
@@ -82,24 +74,74 @@ export class ProfessorDAO {
       sql += ` AND status = 'ATIVO'`;
     }
 
+    const condicoes: string[] = [];
+
     if (nome) {
-      sql += ` AND (
+      condicoes.push(`(
         LOWER(TRIM(primeiro_nome)) LIKE LOWER(?) OR
         LOWER(TRIM(sobrenome))     LIKE LOWER(?)
-      )`;
+      )`);
       const like = `%${nome}%`;
       params.push(like, like);
     }
 
     if (email) {
-      sql += ` AND LOWER(TRIM(email)) LIKE LOWER(?)`;
+      condicoes.push(`LOWER(TRIM(email)) LIKE LOWER(?)`);
       params.push(`%${email}%`);
+    }
+
+    if (condicoes.length > 0) {
+      sql += ` AND (${condicoes.join(' OR ')})`;
     }
 
     sql += ` ORDER BY primeiro_nome ASC, sobrenome ASC`;
 
     const rows = this.db.prepare(sql).all(...params) as ProfessorRow[];
     return rows.map((row) => this.mapRowToEntity(row));
+  }
+
+  /**
+   * HU10 — Exclusão definitiva do banco de dados.
+   * Só deve ser chamada quando o professor NÃO possui histórico de empréstimos.
+   */
+  public excluir(id: number): void {
+    this.db.prepare(`DELETE FROM professor WHERE id = ?`).run(id);
+  }
+
+  /**
+   * HU10 — Atualiza o status do professor (ATIVO/INATIVO).
+   * Usado para desativação lógica quando há histórico de empréstimos.
+   */
+  public atualizarStatus(id: number, status: StatusCadastro): void {
+    this.db
+      .prepare(
+        `UPDATE professor
+         SET status = ?, data_atualizacao = ?
+         WHERE id = ?`
+      )
+      .run(status, new Date().toISOString(), id);
+  }
+
+  /**
+   * HU10 — Verifica se o professor possui algum empréstimo pendente.
+   *
+   * IMPORTANTE: Quando o módulo de Empréstimos for criado, esta consulta
+   * deve ser substituída por uma query real na tabela `emprestimo`.
+   */
+  public possuiEmprestimoPendente(_professorId: number): boolean {
+    // TODO: Substituir por consulta real quando a tabela `emprestimo` existir.
+    return false;
+  }
+
+  /**
+   * HU10 — Verifica se o professor possui histórico de empréstimos.
+   *
+   * IMPORTANTE: Quando o módulo de Empréstimos for criado, esta consulta
+   * deve ser substituída por uma query real na tabela `emprestimo`.
+   */
+  public possuiHistoricoEmprestimos(_professorId: number): boolean {
+    // TODO: Substituir por consulta real quando a tabela `emprestimo` existir.
+    return false;
   }
 
   private mapRowToEntity(row: ProfessorRow): Professor {

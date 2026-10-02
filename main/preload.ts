@@ -7,6 +7,7 @@ contextBridge.exposeInMainWorld('ipc', {
     consultar: (input?: { nome?: string; email?: string; incluirInativos?: boolean }) =>
       ipcRenderer.invoke('professor:consultar', input),
     buscarPorId: (id: number) => ipcRenderer.invoke('professor:buscarPorId', id),
+    excluir: (id: number) => ipcRenderer.invoke('professor:excluir', id),
   },
   turma: {
     cadastrar: (input: { nome: string }) => ipcRenderer.invoke('turma:cadastrar', input),

@@ -75,13 +75,17 @@ export class LivroDAO {
 
   /**
    * RF04 — Consultar Livro
-   * - `titulo`: busca parcial em título.
-   * - `editora`: busca parcial em editora.
-   * - `termo`: busca parcial em título OU editora.
-   * - `incluirInativos`: por padrão `false` (retorna só ATIVOS); quando `true`, traz também INATIVOS (RN04).
-   * 
+   *
+   * Regras:
+   * - `incluirInativos`: por padrão `false` (retorna só ATIVOS);
+   *   quando `true`, traz também INATIVOS (RN04).
+   * - Os termos informados (`termo`, `titulo`, `editora`) são combinados com **OR**:
+   *   basta o termo bater em QUALQUER um dos campos
+   *   (título OR editora).
+   *
    * Buscas por texto são case-insensitive e ignoram espaços nas extremidades (RNF04).
-   * Ordenação: primeiro os ATIVOS, depois INATIVOS; dentro de cada grupo, em ordem alfabética por título e editora.
+   * Ordenação: primeiro os ATIVOS, depois INATIVOS; dentro de cada grupo,
+   * em ordem alfabética por título e editora.
    */
   public consultar(filtro: {
     titulo?: string;
@@ -101,23 +105,29 @@ export class LivroDAO {
       sql += ` AND status = 'ATIVO'`;
     }
 
+    const condicoes: string[] = [];
+
     if (termo) {
-      sql += ` AND (
+      condicoes.push(`(
         LOWER(TRIM(titulo))  LIKE LOWER(?) OR
         LOWER(TRIM(editora)) LIKE LOWER(?)
-      )`;
+      )`);
       const like = `%${termo}%`;
       params.push(like, like);
     }
 
     if (titulo) {
-      sql += ` AND LOWER(TRIM(titulo)) LIKE LOWER(?)`;
+      condicoes.push(`LOWER(TRIM(titulo)) LIKE LOWER(?)`);
       params.push(`%${titulo}%`);
     }
 
     if (editora) {
-      sql += ` AND LOWER(TRIM(editora)) LIKE LOWER(?)`;
+      condicoes.push(`LOWER(TRIM(editora)) LIKE LOWER(?)`);
       params.push(`%${editora}%`);
+    }
+
+    if (condicoes.length > 0) {
+      sql += ` AND (${condicoes.join(' OR ')})`;
     }
 
     // Ordenação: primeiro ATIVOS, depois INATIVOS; em cada grupo, por título e editora

@@ -57,6 +57,15 @@ export class Professor {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email);
   }
 
+  // HU10 — Bloqueio de exclusão/desativação se houver empréstimo pendente
+  public podeSerExcluido(possuiEmprestimoPendente: boolean): boolean {
+    return !possuiEmprestimoPendente;
+  }
+
+  public podeSerDesativado(possuiEmprestimoPendente: boolean): boolean {
+    return !possuiEmprestimoPendente;
+  }
+
   // Comportamento de ciclo de vida
   public ativar(): void {
     this.status = 'ATIVO';

@@ -20,9 +20,6 @@ export class ProfessorController {
 
   /**
    * RF07 — Cadastrar Professor
-   * Regras aplicadas:
-   *  - Campos obrigatórios (RNF03: mensagens claras)
-   *  - RN05: e-mail único (ativos ou inativos)
    */
   public cadastrar(input: CadastrarProfessorInput): Professor {
     const professor = new Professor({
@@ -31,18 +28,14 @@ export class ProfessorController {
       email: input.email,
     });
 
-    // Validação de campos obrigatórios e formato de e-mail
     professor.validarCamposObrigatorios();
 
-    // Checagem "amigável" (evita chegar no SQLite na maioria dos casos)
     if (this.professorDAO.buscarPorEmail(professor.email)) {
       throw new Error(
         'E-mail já cadastrado no sistema. Informe um e-mail diferente.'
       );
     }
 
-    // Rede de segurança contra race condition: mapeia o erro técnico do SQLite
-    // para uma mensagem amigável, mantendo o RNF03.
     try {
       return this.professorDAO.inserir(professor);
     } catch (error) {
@@ -58,9 +51,6 @@ export class ProfessorController {
 
   /**
    * RF09 — Consultar Professor
-   *  - Filtros independentes: nome (primeiro nome OU sobrenome), email.
-   *  - Por padrão, retorna apenas ATIVOS.
-   *  - `incluirInativos = true` também traz INATIVOS (RNF04).
    */
   public consultar(input: ConsultarProfessorInput): Professor[] {
     return this.professorDAO.consultar({
@@ -71,8 +61,7 @@ export class ProfessorController {
   }
 
   /**
-   * Apoio ao fluxo de Detalhes/Edição (não solicitado ainda,
-   * mas útil para o frontend futuramente).
+   * Apoio ao fluxo de Detalhes/Edição.
    */
   public buscarPorId(id: number): Professor {
     const professor = this.professorDAO.buscarPorId(id);
@@ -80,5 +69,38 @@ export class ProfessorController {
       throw new Error('Professor não encontrado.');
     }
     return professor;
+  }
+
+  /**
+   * HU10 — Excluir Professor
+   *
+   * Regra de negócio:
+   * 1. Se o professor NÃO existe → erro.
+   * 2. Se possui empréstimo PENDENTE → bloqueia a operação (RNF03).
+   * 3. Se possui histórico de empréstimos → desativação lógica (status = INATIVO).
+   * 4. Se NÃO possui histórico → exclusão física do banco de dados.
+   *
+   * Relações: [RF10], [RN04], [RNF03]
+   */
+  public excluir(id: number): { tipo: 'EXCLUSAO' | 'DESATIVACAO'; professor: Professor } {
+    const professor = this.professorDAO.buscarPorId(id);
+    if (!professor) {
+      throw new Error('Professor não encontrado.');
+    }
+
+    if (this.professorDAO.possuiEmprestimoPendente(id)) {
+      throw new Error(
+        'Não é possível excluir ou desativar este professor, pois ele possui empréstimos pendentes.'
+      );
+    }
+
+    if (this.professorDAO.possuiHistoricoEmprestimos(id)) {
+      professor.inativar();
+      this.professorDAO.atualizarStatus(id, 'INATIVO');
+      return { tipo: 'DESATIVACAO', professor };
+    }
+
+    this.professorDAO.excluir(id);
+    return { tipo: 'EXCLUSAO', professor };
   }
 }

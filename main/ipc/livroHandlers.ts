@@ -1,19 +1,22 @@
 import { ipcMain } from 'electron';
-import { LivroController } from '../controllers/LivroController.ts';
+import { ProfessorController } from '../controllers/ProfessorController.ts';
 
-export const LIVRO_CHANNELS = {
-  CADASTRAR: 'livro:cadastrar',
-  CONSULTAR: 'livro:consultar',
+export const PROFESSOR_CHANNELS = {
+  CADASTRAR: 'professor:cadastrar',
+  CONSULTAR: 'professor:consultar',
+  BUSCAR_POR_ID: 'professor:buscarPorId',
+  EXCLUIR: 'professor:excluir',
 } as const;
 
-export function registerLivroHandlers(controller: LivroController): void {
-  // RF01 — Cadastrar Livro (Equivalente ao Endpoint POST /livros)
-  ipcMain.handle(LIVRO_CHANNELS.CADASTRAR, async (_event, input) => {
+export function registerProfessorHandlers(
+  controller: ProfessorController
+): void {
+  // RF07 — Cadastrar Professor
+  ipcMain.handle(PROFESSOR_CHANNELS.CADASTRAR, async (_event, input) => {
     try {
-      const livro = controller.cadastrar(input);
-      return { success: true, data: livro };
+      const professor = controller.cadastrar(input);
+      return { success: true, data: professor };
     } catch (error) {
-      // RNF03 — Mensagem clara e amigável, sem exibir código técnico
       return {
         success: false,
         error: (error as Error).message,
@@ -21,17 +24,41 @@ export function registerLivroHandlers(controller: LivroController): void {
     }
   });
 
-  // RF04 — Consultar Livro (Equivalente ao Endpoint GET /livros)
-  ipcMain.handle(LIVRO_CHANNELS.CONSULTAR, async (_event, input) => {
+  // RF09 — Consultar Professor
+  ipcMain.handle(PROFESSOR_CHANNELS.CONSULTAR, async (_event, input) => {
     try {
       const filtro = input ?? {};
-      const livros = controller.consultar({
-        titulo: typeof filtro.titulo === 'string' ? filtro.titulo : undefined,
-        editora: typeof filtro.editora === 'string' ? filtro.editora : undefined,
-        termo: typeof filtro.termo === 'string' ? filtro.termo : undefined,
+
+      const professores = controller.consultar({
+        nome: typeof filtro.nome === 'string' ? filtro.nome : undefined,
+        email: typeof filtro.email === 'string' ? filtro.email : undefined,
         incluirInativos: Boolean(filtro.incluirInativos),
       });
-      return { success: true, data: livros };
+
+      return { success: true, data: professores };
+    } catch (error) {
+      return {
+        success: false,
+        error: (error as Error).message,
+      };
+    }
+  });
+
+  // Apoio — Buscar por ID
+  ipcMain.handle(PROFESSOR_CHANNELS.BUSCAR_POR_ID, async (_event, id: number) => {
+    try {
+      const professor = controller.buscarPorId(id);
+      return { success: true, data: professor };
+    } catch (error) {
+      return { success: false, error: (error as Error).message };
+    }
+  });
+
+  // HU10 — Excluir Professor
+  ipcMain.handle(PROFESSOR_CHANNELS.EXCLUIR, async (_event, id: number) => {
+    try {
+      const resultado = controller.excluir(id);
+      return { success: true, data: resultado };
     } catch (error) {
       return {
         success: false,
