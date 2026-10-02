@@ -33,7 +33,15 @@ export interface LivroConsultaDTO {
   dataAtualizacao: Date;
 }
 
+export interface ResultadoExclusaoLivroDTO {
+  acao: 'EXCLUIDO' | 'DESATIVADO';
+  mensagem: string;
+  id: number;
+  livro?: LivroConsultaDTO;
+}
+
 // GRASP Controller: ponto de entrada das operações de Livro
+
 // GRASP Creator: é quem cria instâncias de Livro
 export class LivroController {
   constructor(private livroDAO: LivroDAO) {}
@@ -178,4 +186,59 @@ export class LivroController {
       dataAtualizacao: livro.dataAtualizacao,
     };
   }
+
+  /**
+   * RF03 / RN04 — Excluir Livro
+   * Regras aplicadas:
+   *  - A bibliotecária pede para excluir um livro; a regra de negócio decide sozinha entre Exclusão e Desativação.
+   *  - Se a entidade NÃO possui histórico de empréstimos, a desativação não é permitida,
+   *    devendo ser realizada a exclusão definitiva do banco de dados (DELETE).
+   *  - Se JÁ EXISTE histórico de empréstimos, o sistema realiza a desativação (status muda para "Inativo")
+   *    em vez de excluir, para preservar a rastreabilidade dos empréstimos antigos.
+   *  - Caso o livro não seja encontrado, rejeita com mensagem clara (RNF03).
+   */
+  public excluir(id: number): ResultadoExclusaoLivroDTO {
+    if (!id || !Number.isInteger(id)) {
+      throw new Error('ID do livro inválido para exclusão.');
+    }
+
+    const livro = this.livroDAO.buscarPorId(id);
+    if (!livro) {
+      throw new Error('Livro não encontrado no acervo.');
+    }
+
+    const temHistorico = this.livroDAO.possuiHistoricoEmprestimos(id);
+
+    if (!temHistorico) {
+      // Sem histórico de empréstimos: exclusão definitiva obrigatória (DELETE)
+      this.livroDAO.excluir(id);
+      return {
+        acao: 'EXCLUIDO',
+        mensagem: 'Livro excluído com sucesso do acervo.',
+        id,
+      };
+    }
+
+    // Com histórico de empréstimos: desativação lógica (status = 'INATIVO')
+    livro.desativar();
+    this.livroDAO.atualizar(livro);
+
+    return {
+      acao: 'DESATIVADO',
+      mensagem: 'Livro possui histórico de empréstimos e foi desativado para preservar os registros.',
+      id,
+      livro: {
+        id: livro.id,
+        titulo: livro.titulo,
+        editora: livro.editora,
+        quantidadeTotal: livro.quantidadeTotal,
+        quantidadeEmprestada: livro.quantidadeEmprestada,
+        saldoDisponivel: livro.getSaldoDisponivel(),
+        status: livro.status,
+        dataCadastro: livro.dataCadastro,
+        dataAtualizacao: livro.dataAtualizacao,
+      },
+    };
+  }
 }
+
