@@ -31,7 +31,7 @@ export default function CardLivro({
 
   return (
     <div
-      className={`rounded-2xl px-6 py-5 w-full h-full min-h-[150px] flex flex-col justify-between transition-all ${
+      className={`rounded-2xl p-5 w-full h-full min-h-[150px] flex flex-col justify-between transition-all ${
         ativo ? "bg-[#eef7f0]" : "bg-[#f8faf9] border border-gray-200"
       }`}
     >
@@ -67,9 +67,9 @@ export default function CardLivro({
       <div className="mt-auto">
         <div className="border-t border-[#D3E8D6] my-3" />
 
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center justify-between gap-2 flex-wrap">
           <span
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-semibold text-xs shrink-0 transition-colors ${
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-semibold text-xs shrink-0 transition-colors ${
               ativo
                 ? "bg-[#d8f3dc] text-[#1e582d] border border-[#c1e7c9]"
                 : "bg-gray-200/80 text-gray-600 border border-gray-300"
@@ -83,24 +83,24 @@ export default function CardLivro({
             {ativo ? "Ativo" : "Inativo"}
           </span>
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2 shrink-0 ml-auto">
             {ativo ? (
               <>
                 <button
                   type="button"
                   onClick={() => onEditar?.(livro)}
-                  className="flex items-center gap-1.5 bg-[#389348] text-white px-4 py-2 text-sm rounded-lg font-medium hover:bg-[#2e7d3d] transition-colors cursor-pointer"
+                  className="flex items-center gap-1.5 bg-[#389348] text-white px-3 py-1.5 text-xs rounded-lg font-medium hover:bg-[#2e7d3d] transition-colors cursor-pointer shrink-0"
                 >
-                  <MdEdit size={15} />
+                  <MdEdit size={14} />
                   Editar
                 </button>
 
                 <button
                   type="button"
                   onClick={handleDesativar}
-                  className="flex items-center gap-1.5 bg-[#cf4a4a] text-white px-4 py-2 text-sm rounded-lg font-medium hover:bg-[#b83a3a] transition-colors cursor-pointer"
+                  className="flex items-center gap-1.5 bg-[#cf4a4a] text-white px-3 py-1.5 text-xs rounded-lg font-medium hover:bg-[#b83a3a] transition-colors cursor-pointer shrink-0"
                 >
-                  <MdRemoveCircleOutline size={15} />
+                  <MdRemoveCircleOutline size={14} />
                   Desativar
                 </button>
               </>
@@ -110,18 +110,18 @@ export default function CardLivro({
                   type="button"
                   disabled
                   title="Livro desativado não pode ser editado"
-                  className="flex items-center gap-1.5 bg-gray-200 text-gray-400 px-4 py-2 text-sm rounded-lg font-medium cursor-not-allowed"
+                  className="flex items-center gap-1.5 bg-gray-200 text-gray-400 px-3 py-1.5 text-xs rounded-lg font-medium cursor-not-allowed shrink-0"
                 >
-                  <MdEdit size={15} />
+                  <MdEdit size={14} />
                   Editar
                 </button>
 
                 <button
                   type="button"
                   onClick={handleAtivar}
-                  className="flex items-center gap-1.5 bg-[#2e8b45] text-white px-4 py-2 text-sm rounded-lg font-medium hover:bg-[#236c35] transition-colors cursor-pointer"
+                  className="flex items-center gap-1.5 bg-[#2e8b45] text-white px-3 py-1.5 text-xs rounded-lg font-medium hover:bg-[#236c35] transition-colors cursor-pointer shrink-0"
                 >
-                  <MdCheckCircleOutline size={15} />
+                  <MdCheckCircleOutline size={14} />
                   Ativar
                 </button>
               </>
