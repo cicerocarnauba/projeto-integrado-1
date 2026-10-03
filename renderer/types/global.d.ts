@@ -29,6 +29,35 @@ declare global {
           data?: any;
           error?: string;
         }>;
+
+        excluir: (id: number) => Promise<{
+          success: boolean;
+          data?: any;
+          error?: string;
+        }>;
+
+        editar: (input: {
+          id: number;
+          primeiroNome: string;
+          sobrenome: string;
+          email: string;
+        }) => Promise<{
+          success: boolean;
+          data?: any;
+          error?: string;
+        }>;
+
+        reativar: (id: number) => Promise<{
+          success: boolean;
+          data?: any;
+          error?: string;
+        }>;
+
+        desativar: (id: number) => Promise<{
+          success: boolean;
+          data?: any;
+          error?: string;
+        }>;
       };
 
       turma: {
@@ -50,6 +79,33 @@ declare global {
         }>;
 
         buscarPorId: (id: number) => Promise<{
+          success: boolean;
+          data?: any;
+          error?: string;
+        }>;
+
+        ativar: (id: number) => Promise<{
+          success: boolean;
+          data?: any;
+          error?: string;
+        }>;
+
+        editar: (input: {
+          id: number;
+          nome: string;
+        }) => Promise<{
+          success: boolean;
+          data?: any;
+          error?: string;
+        }>;
+
+        desativar: (id: number) => Promise<{
+          success: boolean;
+          data?: any;
+          error?: string;
+        }>;
+
+        excluir: (id: number) => Promise<{
           success: boolean;
           data?: any;
           error?: string;
@@ -129,6 +185,18 @@ declare global {
               dataAtualizacao: Date;
             };
           };
+          error?: string;
+        }>;
+      };
+
+      emprestimo: {
+        realizar: (input: {
+          professorId: number;
+          turmaId: number;
+          itens: Array<{ livroId: number; quantidade: number }>;
+        }) => Promise<{
+          success: boolean;
+          data?: any;
           error?: string;
         }>;
       };
