@@ -78,7 +78,8 @@ export default function DetalhesLivro() {
                 Total de exemplares
               </label>
               <div className="px-3 py-2 rounded-lg text-sm font-semibold text-center bg-gray-50 border border-gray-200 text-[#2e8b45]">
-                {livro.quantidadeTotal} exemplares
+                {livro.quantidadeTotal}{" "}
+                {livro.quantidadeTotal === 1 ? "exemplar" : "exemplares"}
               </div>
             </div>
           </div>

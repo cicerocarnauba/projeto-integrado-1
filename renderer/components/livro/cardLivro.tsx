@@ -3,26 +3,26 @@ import {
   MdEdit,
   MdRemoveCircleOutline,
 } from "react-icons/md";
-import { Turma } from "../../types/turma";
+import { Livro } from "../../types/livro";
 
-interface CardTurmasProps {
-  turma: Turma;
-  onEditar?: (turma: Turma) => void;
-  onDesativar?: (turma: Turma) => void;
-  onAtivar?: (turma: Turma) => void;
+interface CardLivroProps {
+  livro: Livro;
+  onEditar?: (livro: Livro) => void;
+  onDesativar?: (livro: Livro) => void;
+  onAtivar?: (livro: Livro) => void;
 }
 
-export default function CardTurma({
-  turma,
+export default function CardLivro({
+  livro,
   onEditar,
   onDesativar,
   onAtivar,
-}: CardTurmasProps) {
-  const ativo = turma.status === "ATIVO";
+}: CardLivroProps) {
+  const ativo = livro.status === "ATIVO" || livro.ativo === true;
 
   const handleDesativar = (e: React.MouseEvent) => {
     e.preventDefault();
-    onDesativar?.(turma);
+    onDesativar?.(livro);
   };
 
   const handleAtivar = (e: React.MouseEvent) => {
@@ -36,15 +36,32 @@ export default function CardTurma({
       }`}
     >
       <div>
-        <div className="h-7 flex items-center">
+        <div className="h-7 flex items-center justify-between gap-2">
           <h3
-            className={`text-sm font-bold line-clamp-1 ${
+            title={livro.titulo}
+            className={`text-sm font-bold line-clamp-1 pr-1 ${
               ativo ? "text-[#245B2F]" : "text-gray-700"
             }`}
           >
-            {turma.nome}
+            {livro.titulo}
           </h3>
+
+          <span className="bg-white text-[#1e582d] text-xs font-semibold px-2.5 py-1 rounded-lg border border-[#cde5d4] shadow-2xs shrink-0">
+            {livro.quantidadeTotal}{" "}
+            {livro.quantidadeTotal === 1 ? "exemplar" : "exemplares"}
+          </span>
         </div>
+
+        <p
+          className={`text-xs mt-2 line-clamp-1 ${
+            ativo ? "text-[#5AA365]" : "text-gray-500"
+          }`}
+        >
+          Editora:{" "}
+          <span className={ativo ? "text-[#245B2F] font-medium" : "text-gray-600"}>
+            {livro.editora}
+          </span>
+        </p>
       </div>
 
       <div className="mt-auto">
@@ -71,7 +88,7 @@ export default function CardTurma({
               <>
                 <button
                   type="button"
-                  onClick={() => onEditar?.(turma)}
+                  onClick={() => onEditar?.(livro)}
                   className="flex items-center gap-1.5 bg-[#389348] text-white px-3 py-1.5 text-xs rounded-lg font-medium hover:bg-[#2e7d3d] transition-colors cursor-pointer shrink-0"
                 >
                   <MdEdit size={14} />
@@ -92,7 +109,7 @@ export default function CardTurma({
                 <button
                   type="button"
                   disabled
-                  title="Turma desativada não pode ser editada"
+                  title="Livro desativado não pode ser editado"
                   className="flex items-center gap-1.5 bg-gray-200 text-gray-400 px-3 py-1.5 text-xs rounded-lg font-medium cursor-not-allowed shrink-0"
                 >
                   <MdEdit size={14} />

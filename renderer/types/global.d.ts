@@ -87,6 +87,50 @@ declare global {
           }>;
           error?: string;
         }>;
+
+        editar: (
+          id: number,
+          input: {
+            titulo: string;
+            editora: string;
+            quantidadeTotal: number;
+          }
+        ) => Promise<{
+          success: boolean;
+          data?: {
+            id: number | null;
+            titulo: string;
+            editora: string;
+            quantidadeTotal: number;
+            quantidadeEmprestada: number;
+            saldoDisponivel: number;
+            status: 'ATIVO' | 'INATIVO';
+            dataCadastro: Date;
+            dataAtualizacao: Date;
+          };
+          error?: string;
+        }>;
+
+        excluir: (id: number) => Promise<{
+          success: boolean;
+          data?: {
+            acao: 'EXCLUIDO' | 'DESATIVADO';
+            mensagem: string;
+            id: number;
+            livro?: {
+              id: number | null;
+              titulo: string;
+              editora: string;
+              quantidadeTotal: number;
+              quantidadeEmprestada: number;
+              saldoDisponivel: number;
+              status: 'ATIVO' | 'INATIVO';
+              dataCadastro: Date;
+              dataAtualizacao: Date;
+            };
+          };
+          error?: string;
+        }>;
       };
     };
   }

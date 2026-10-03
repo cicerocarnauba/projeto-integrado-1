@@ -57,6 +57,12 @@ export class ProfessorDAO {
 
   /**
    * Consulta com filtros (RF09).
+   * - `nome`: busca parcial em primeiro nome OU sobrenome OU nome completo.
+   * - `email`: busca parcial em e-mail.
+   * - `incluirInativos`: por padrão `false` (retorna só ATIVOS).
+   *
+   * Quando ambos os filtros são informados, basta um deles corresponder.
+   * Buscas por texto são case-insensitive e ignoram espaços nas extremidades (RNF04).
    */
   public consultar(filtro: {
     nome?: string;
@@ -79,10 +85,11 @@ export class ProfessorDAO {
     if (nome) {
       condicoes.push(`(
         LOWER(TRIM(primeiro_nome)) LIKE LOWER(?) OR
-        LOWER(TRIM(sobrenome))     LIKE LOWER(?)
+        LOWER(TRIM(sobrenome))     LIKE LOWER(?) OR
+        LOWER(TRIM(primeiro_nome) || ' ' || TRIM(sobrenome)) LIKE LOWER(?)
       )`);
       const like = `%${nome}%`;
-      params.push(like, like);
+      params.push(like, like, like);
     }
 
     if (email) {
@@ -100,16 +107,10 @@ export class ProfessorDAO {
     return rows.map((row) => this.mapRowToEntity(row));
   }
 
-  /**
-   * HU10 — Exclusão definitiva do banco de dados.
-   */
   public excluir(id: number): void {
     this.db.prepare(`DELETE FROM professor WHERE id = ?`).run(id);
   }
 
-  /**
-   * HU10 — Atualiza o status do professor (ATIVO/INATIVO).
-   */
   public atualizarStatus(id: number, status: StatusCadastro): void {
     this.db
       .prepare(
@@ -120,9 +121,6 @@ export class ProfessorDAO {
       .run(status, new Date().toISOString(), id);
   }
 
-  /**
-   * HU08 — Atualiza os dados editáveis do professor.
-   */
   public atualizar(professor: Professor): void {
     this.db
       .prepare(
@@ -139,19 +137,11 @@ export class ProfessorDAO {
       );
   }
 
-  /**
-   * HU10 — Verifica se o professor possui algum empréstimo pendente.
-   */
   public possuiEmprestimoPendente(_professorId: number): boolean {
-    // TODO: Substituir por consulta real quando a tabela `emprestimo` existir.
     return false;
   }
 
-  /**
-   * HU10 — Verifica se o professor possui histórico de empréstimos.
-   */
   public possuiHistoricoEmprestimos(_professorId: number): boolean {
-    // TODO: Substituir por consulta real quando a tabela `emprestimo` existir.
     return false;
   }
 

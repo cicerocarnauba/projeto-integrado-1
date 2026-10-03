@@ -1,5 +1,5 @@
 appId: com.crechemariadelourdes.biblioteca
-productName: LivroPiqueT
+productName: LivroCMEI
 directories:
   output: dist
   buildResources: resources

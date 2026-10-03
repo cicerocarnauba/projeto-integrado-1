@@ -26,17 +26,17 @@ export default function CardModulo({ modulo, onSelect, disabled }: CardModuloPro
     <Link
       href={modulo.href}
       onClick={handleClick}
-      className={`group bg-white border-2 border-[#2e8b45] rounded-3xl p-8 min-h-[190px] shadow-md hover:shadow-xl hover:border-[#236c35] transition-all duration-300 transform hover:-translate-y-2 flex flex-col items-center justify-center text-center cursor-pointer ${
+      className={`group bg-white border-2 border-[#2e8b45] rounded-2xl sm:rounded-3xl p-4 sm:p-7 min-h-[135px] sm:min-h-[180px] shadow-md hover:shadow-xl hover:border-[#236c35] transition-all duration-300 transform hover:-translate-y-1.5 flex flex-col items-center justify-center text-center cursor-pointer ${
         disabled ? "pointer-events-none opacity-80" : ""
       }`}
     >
-      <div className="w-16 h-16 rounded-2xl bg-[#d8f3dc] flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-        <span className="material-symbols-outlined text-4xl text-[#2e8b45]">
+      <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-[#d8f3dc] flex items-center justify-center mb-2.5 sm:mb-4 group-hover:scale-110 transition-transform duration-300">
+        <span className="material-symbols-outlined text-2xl sm:text-4xl text-[#2e8b45]">
           {modulo.icone}
         </span>
       </div>
 
-      <h3 className="text-xl font-bold text-[#2e8b45] group-hover:text-[#236c35] transition-colors leading-snug">
+      <h3 className="text-sm sm:text-xl font-bold text-[#2e8b45] group-hover:text-[#236c35] transition-colors leading-snug">
         {modulo.titulo}
       </h3>
     </Link>

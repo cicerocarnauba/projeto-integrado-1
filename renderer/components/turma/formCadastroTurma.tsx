@@ -22,7 +22,7 @@ export default function FormCadastroTurma() {
       })
 
       if (!resposta.success){
-        setErro(resposta.error);
+        setErro(resposta.error || "Não foi possível cadastrar turma.");
         return;
       }
       

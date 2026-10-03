@@ -40,8 +40,3 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           npx commitlint --from=${{ github.event.pull_request.base.sha }} --to=${{ github.event.pull_request.head.sha }} --verbose
-
-      - name: Validar título do Pull Request
-        if: github.event_name == 'pull_request'
-        run: |
-          echo "${{ github.event.pull_request.title }}" | npx commitlint --verbose

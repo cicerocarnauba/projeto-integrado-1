@@ -74,4 +74,71 @@ export class Livro {
       throw new Error('A quantidade de cópias emprestadas deve ser um número inteiro entre 0 e a quantidade total.');
     }
   }
+
+  /**
+   * RF02 / RN03 — Regras de Edição de Livro (Information Expert):
+   * - Só é possível editar um livro com status "Ativo"; livros "Inativos" precisam passar pela reativação primeiro.
+   * - Título e Editora são obrigatórios.
+   * - A nova quantidade total não pode ser negativa e deve ser um número inteiro.
+   * - A nova quantidade não pode ser inferior à quantidade de cópias já emprestadas no momento da edição.
+   * - Se a quantidade total for reduzida a exatamente zero, o sistema muda o status para "Inativo" automaticamente.
+   */
+  public editar(props: {
+    titulo: string;
+    editora: string;
+    quantidadeTotal: number;
+  }): void {
+    if (this.status !== 'ATIVO') {
+      throw new Error(
+        'Apenas livros com status "Ativo" podem ser editados. Livros inativos precisam ser reativados primeiro.'
+      );
+    }
+
+    const novoTitulo = props.titulo ? props.titulo.trim() : '';
+    const novaEditora = props.editora ? props.editora.trim() : '';
+
+    if (!novoTitulo) {
+      throw new Error('O campo "Título" é obrigatório.');
+    }
+    if (!novaEditora) {
+      throw new Error('O campo "Editora" é obrigatório.');
+    }
+
+    if (
+      props.quantidadeTotal === undefined ||
+      props.quantidadeTotal === null ||
+      !Number.isInteger(props.quantidadeTotal) ||
+      props.quantidadeTotal < 0
+    ) {
+      throw new Error('A "Quantidade Total de Cópias" deve ser um número inteiro maior ou igual a zero.');
+    }
+
+    if (props.quantidadeTotal < this.quantidadeEmprestada) {
+      throw new Error(
+        `A nova quantidade total (${props.quantidadeTotal}) não pode ser inferior à quantidade de cópias já emprestadas (${this.quantidadeEmprestada}).`
+      );
+    }
+
+    this.titulo = novoTitulo;
+    this.editora = novaEditora;
+    this.quantidadeTotal = props.quantidadeTotal;
+
+    // RN03: Caso o valor editado resulte em exatamente zero, o sistema deve inativar automaticamente o livro.
+    if (this.quantidadeTotal === 0) {
+      this.status = 'INATIVO';
+    }
+
+    this.dataAtualizacao = new Date();
+  }
+
+  /**
+   * RN04 — Desativação lógica do livro:
+   * Altera o status para "INATIVO" e atualiza a data de modificação,
+   * preservando a rastreabilidade dos dados históricos.
+   */
+  public desativar(): void {
+    this.status = 'INATIVO';
+    this.dataAtualizacao = new Date();
+  }
 }
+

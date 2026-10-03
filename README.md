@@ -85,13 +85,13 @@ Os arquivos compilados finais são gerados automaticamente dentro da pasta `dist
   ```bash
   npm run build:win
   ```
-  Gera o instalador NSIS completo (`dist/LivroPiqueT Setup 1.0.0.exe`).
+  Gera o instalador NSIS completo (`dist/LivroCMEI Setup 1.0.0.exe`).
 
 * **Gerar executável para Linux (.AppImage):**
   ```bash
   npm run build:linux
   ```
-  Gera o executável portátil (`dist/LivroPiqueT-1.0.0.AppImage`).
+  Gera o executável portátil (`dist/LivroCMEI-1.0.0.AppImage`).
 
 * **Gerar todos os executáveis configurados:**
   ```bash
