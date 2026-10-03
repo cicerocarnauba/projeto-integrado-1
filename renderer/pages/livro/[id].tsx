@@ -171,7 +171,7 @@ export default function EditarLivro() {
         setErro(
           error instanceof Error
             ? error.message
-            : "Não foi possível carregar o livro."
+            : "Não foi possível carregar o livro.",
         );
       } finally {
         setCarregando(false);
@@ -207,17 +207,17 @@ export default function EditarLivro() {
           </button>
         </div>
 
-        <div className="flex-1 flex items-center justify-center pb-16">
+        <div>
           {carregando ? (
-            <div className="w-full max-w-2xl bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
+            <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
               <p className="text-base font-medium">Carregando livro...</p>
             </div>
           ) : erro ? (
-            <div className="w-full max-w-2xl rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <div className="w-full rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
               {erro}
             </div>
           ) : inativo ? (
-            <div className="w-full max-w-2xl rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <div className="w-full rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
               Apenas livros com status "Ativo" podem ser editados. Reative o
               livro antes de editar.
             </div>
