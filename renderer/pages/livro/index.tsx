@@ -7,7 +7,7 @@ import CardLivro from "../../components/livro/cardLivro";
 import Paginacao from "../../components/Paginacao";
 import { useRouter } from "next/router";
 import { MdAdd } from "react-icons/md";
-import ModalConfirmarExclusao from "../../components/ModalConfirmarExclusao";
+import ModalConfirmacao from "../../components/ModalConfirmacao";
 
 export default function GerenciarLivros() {
   const router = useRouter();
@@ -103,6 +103,10 @@ export default function GerenciarLivros() {
     inicio,
     inicio + ITENS_POR_PAGINA,
   );
+
+  const possuiHistorico =
+  Boolean(livroParaExcluir?.statusEmprestimo) &&
+  livroParaExcluir?.statusEmprestimo !== "nunca_emprestado";
 
   async function confirmarExclusao() {
     if (!livroParaExcluir) return;
@@ -235,8 +239,10 @@ export default function GerenciarLivros() {
             />
           </div>
         )}
-        <ModalConfirmarExclusao
+
+        <ModalConfirmacao
           isOpen={livroParaExcluir !== null}
+          acao={possuiHistorico ? "desativar" : "excluir"}
           carregando={excluindo}
           onConfirmar={confirmarExclusao}
           onCancelar={() => setLivroParaExcluir(null)}
@@ -245,3 +251,4 @@ export default function GerenciarLivros() {
     </div>
   );
 }
+
