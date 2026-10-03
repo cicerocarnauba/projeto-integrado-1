@@ -8,8 +8,13 @@ import Sidebar from "../../components/Sidebar";
 import SearchBar, { TipoOrdenacao } from "../../components/Searchbar";
 import CardTurma from "../../components/turma/cardTurma";
 import Paginacao from "../../components/Paginacao";
+import ModalExcluir from "../../components/modal/modalExcluir";
+
 
 import { MdAdd } from "react-icons/md";
+
+import { Turma } from "../../types/turma"
+import { event } from "next/dist/build/output/log";
 
 export default function GerenciarTurmas() {
   const router = useRouter();
@@ -18,10 +23,13 @@ export default function GerenciarTurmas() {
   const [turmas, setTurma] = useState<any[]>([]);
   const [carregada, setCarregada] = useState(true);
   const [erro, setErro] = useState("");
-
+  
   const [termoBusca, setTermoBusca] = useState("");
   const [incluirInativos, setIncluirInativos] = useState<boolean>(false);
   const [ordenacao, setOrdenacao] = useState<TipoOrdenacao>("alfabetica");
+  
+  const [turmaParaExcluir, setTurmaParaExcluir] = useState<Turma | null>(null);
+  const [turmaExcluindo, setTurmaExcluindo] = useState<number | null>(null);
 
   const [paginaAtual, setPaginaAtual] = useState(1);
   const ITENS_POR_PAGINA = 12; // 4 linhas x 3 colunas
@@ -90,6 +98,80 @@ export default function GerenciarTurmas() {
     inicio + ITENS_POR_PAGINA
   );
 
+    const handleExcluir = async (turma: Turma) => {
+    try {
+      const resposta = await window.ipc?.turma?.excluir(turma.id);
+
+      if (!resposta?.success) {
+       setErro(resposta?.error || "Erro ao excluir turma.");
+       return; 
+      }
+
+      setTurma((turmasAtuais) =>
+        turmasAtuais.filter((item) => item.id !== turma.id)
+      );
+
+    } catch (error) {
+      setErro(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível excluir a turma."
+      )
+    }
+  };
+  
+  const handleDesativar = async (turma: Turma) => {
+    try {
+      const resposta = await window.ipc?.turma?.desativar(turma.id);
+
+      if (!resposta?.success) {
+       setErro(resposta?.error || "Erro ao desativar turma.");
+       return; 
+      }
+
+      const atualizada = await window.ipc?.turma?.consultar({
+        nome: termoBusca,
+        incluirInativos: incluirInativos,
+      });
+
+      if (atualizada?.success){
+        setTurma(atualizada.data || []);
+      }
+    } catch (error) {
+      setErro(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível desativar a turma."
+      )
+    }
+  };
+
+    const handleAtivar = async (turma: Turma) => {
+    try {
+      const resposta = await window.ipc?.turma?.ativar(turma.id);
+
+      if (!resposta?.success) {
+       setErro(resposta?.error || "Erro ao ativar turma.");
+       return; 
+      }
+
+      const atualizada = await window.ipc?.turma?.consultar({
+        nome: termoBusca,
+        incluirInativos: incluirInativos,
+      });
+
+      if (atualizada?.success){
+        setTurma(atualizada.data || []);
+      }
+    } catch (error) {
+      setErro(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível ativar a turma."
+      )
+    }
+  };
+
   return (
     <div className="flex min-h-screen bg-white">
       <Sidebar />
@@ -148,14 +230,29 @@ export default function GerenciarTurmas() {
         ) : (
           <div
             key={`${termoBusca}-${incluirInativos}-${ordenacao}-${paginaAtual}`}
-            className="animate-fade-in duration-300"
+            className="animate-fade-in duration-500"
           >
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
               {turmasPaginadas.map((turma) => (
-                <CardTurma
+                <div
                   key={turma.id}
-                  turma={turma}
-                />
+                  className={`
+                    transition-transform duration-200 ease-in-out
+                    ${
+                      turmaExcluindo === turma.id
+                        ? "scale-0 opacity-0"
+                        : "scale-100 opacity-100"
+                    }
+                  `}
+                >
+
+                  <CardTurma
+                    turma={turma}
+                    onDesativar={handleDesativar}
+                    onAtivar={handleAtivar}
+                    onExcluir={(turma) => setTurmaParaExcluir(turma)}
+                  />
+                </div>
               ))}
             </div>
 
@@ -169,6 +266,39 @@ export default function GerenciarTurmas() {
             />
           </div>
         )}
+
+        <ModalExcluir
+          aberto={turmaParaExcluir !== null}
+          mensagem={
+            turmaParaExcluir ? (
+              <>
+                Tem certeza que deseja excluir a turma{" "}
+                <span className="font-bold text-[#2e8b45]">
+                  {turmaParaExcluir.nome}
+                </span>
+              </>
+            ) : (
+              ""
+            )
+
+          }
+          onCancelar={() => setTurmaParaExcluir(null)}
+          onConfirmar={async () => {
+            if (!turmaParaExcluir) return;
+
+            const turma = turmaParaExcluir;
+
+            setTurmaExcluindo(turmaParaExcluir.id);
+            setTurmaParaExcluir(null);
+
+            setTimeout(async () => {
+              await handleExcluir(turma);
+              setTurmaExcluindo(null);
+            }, 200);
+          }}
+        
+        />
+
       </main>
     </div>
   );
