@@ -8,20 +8,46 @@ import Sidebar from "../../components/Sidebar";
 import SearchBar, { TipoOrdenacao } from "../../components/Searchbar";
 import CardTurma from "../../components/turma/cardTurma";
 import Paginacao from "../../components/Paginacao";
+import ModalExcluir from "../../components/modal/modalExcluir";
+
 
 import { MdAdd } from "react-icons/md";
 
+import { Turma } from "../../types/turma"
+import { event } from "next/dist/build/output/log";
+
 export default function GerenciarTurmas() {
   const router = useRouter();
-  const mostrarSucesso = router.query.sucesso === "1";
+  // const mostrarSucesso = router.query.sucesso === "1";
 
   const [turmas, setTurma] = useState<any[]>([]);
   const [carregada, setCarregada] = useState(true);
   const [erro, setErro] = useState("");
-
+  
   const [termoBusca, setTermoBusca] = useState("");
   const [incluirInativos, setIncluirInativos] = useState<boolean>(false);
   const [ordenacao, setOrdenacao] = useState<TipoOrdenacao>("alfabetica");
+  
+  const [turmaParaExcluir, setTurmaParaExcluir] = useState<Turma | null>(null);
+  const [turmaExcluindo, setTurmaExcluindo] = useState<number | null>(null);
+
+  const [feedback, setFeedback] = useState("");
+
+  useEffect(() => {
+    if (!feedback) return;
+
+    const timer = setTimeout(() => {
+      setFeedback("");
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, [feedback]);
+
+  useEffect(() => {
+    if (router.query.sucesso === "1") {
+      setFeedback("Turma cadastrada com sucesso!");
+    }
+  }, [router.query.successo]);
 
   const [paginaAtual, setPaginaAtual] = useState(1);
   const ITENS_POR_PAGINA = 12; // 4 linhas x 3 colunas
@@ -77,7 +103,7 @@ export default function GerenciarTurmas() {
     1,
     Math.ceil(turmasExibidas.length / ITENS_POR_PAGINA)
   );
-
+  
   useEffect(() => {
     if (paginaAtual > totalPaginas) {
       setPaginaAtual(totalPaginas);
@@ -90,6 +116,89 @@ export default function GerenciarTurmas() {
     inicio + ITENS_POR_PAGINA
   );
 
+    const handleExcluir = async (turma: Turma) => {
+    try {
+      const resposta = await window.ipc?.turma?.excluir(turma.id);
+
+      if (!resposta?.success) {
+       setErro(resposta?.error || "Erro ao excluir turma.");
+       return; 
+      }
+
+      setTurma((turmasAtuais) =>
+        turmasAtuais.filter((item) => item.id !== turma.id)
+      );
+
+      setFeedback("Turma excluída com successo!")
+
+    } catch (error) {
+      setErro(
+        error instanceof Error
+        ? error.message
+        : "Não foi possível excluir a turma."
+      )
+    }
+  };
+  
+
+  const handleDesativar = async (turma: Turma) => {
+    try {
+      const resposta = await window.ipc?.turma?.desativar(turma.id);
+
+      if (!resposta?.success) {
+       setErro(resposta?.error || "Erro ao desativar turma.");
+       return; 
+      }
+      
+      const atualizada = await window.ipc?.turma?.consultar({
+        nome: termoBusca,
+        incluirInativos: incluirInativos,
+      });
+
+      if (atualizada?.success){
+        setTurma(atualizada.data || []);
+      }
+
+      setFeedback("Turma deastivada com successo!")
+
+    } catch (error) {
+      setErro(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível desativar a turma."
+      )
+    }
+  };
+
+    const handleAtivar = async (turma: Turma) => {
+    try {
+      const resposta = await window.ipc?.turma?.ativar(turma.id);
+
+      if (!resposta?.success) {
+       setErro(resposta?.error || "Erro ao ativar turma.");
+       return; 
+      }
+
+      const atualizada = await window.ipc?.turma?.consultar({
+        nome: termoBusca,
+        incluirInativos: incluirInativos,
+      });
+
+      if (atualizada?.success){
+        setTurma(atualizada.data || []);
+      }
+
+      setFeedback("Turma ativada com successo!")
+      
+    } catch (error) {
+      setErro(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível ativar a turma."
+      )
+    }
+  };
+
   return (
     <div className="flex min-h-screen bg-white">
       <Sidebar />
@@ -99,11 +208,6 @@ export default function GerenciarTurmas() {
           Gerenciar turmas
         </h1>
 
-        {mostrarSucesso && (
-          <div className="bg-[#d8f3dc] text-[#2e8b45] px-4 py-2.5 rounded-xl mb-4 text-sm font-medium flex items-center gap-2">
-            ✓ Turma cadastrada com sucesso!
-          </div>
-        )}
 
         {/* Barra de busca e botão de adicionar */}
         <div className="flex items-start gap-4 mb-5 w-full">
@@ -116,7 +220,7 @@ export default function GerenciarTurmas() {
             incluirInativos={incluirInativos}
             onToggleInativos={setIncluirInativos}
             labelCheckbox="Incluir inativos"
-          />
+            />
 
           <Link
             href="/turma/cadastro_turma"
@@ -126,6 +230,12 @@ export default function GerenciarTurmas() {
             Adicionar turma
           </Link>
         </div>
+
+        {feedback && (
+          <div className="fixed top-31.5 left-45 z-50 bg-[#d8f3dc] text-[#2e8b45] px-4 py-2.5 rounded-xl mb-4 text-sm font-medium flex items-center gap-2 animate-fade-in">
+            ✓ {feedback}
+          </div>
+        )}
 
         {erro && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2.5 rounded-xl mb-4 text-xs font-medium">
@@ -148,14 +258,29 @@ export default function GerenciarTurmas() {
         ) : (
           <div
             key={`${termoBusca}-${incluirInativos}-${ordenacao}-${paginaAtual}`}
-            className="animate-fade-in duration-300"
+            className="animate-fade-in duration-500"
           >
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
               {turmasPaginadas.map((turma) => (
-                <CardTurma
+                <div
                   key={turma.id}
-                  turma={turma}
-                />
+                  className={`
+                    transition-transform duration-200 ease-in-out
+                    ${
+                      turmaExcluindo === turma.id
+                        ? "scale-0 opacity-0"
+                        : "scale-100 opacity-100"
+                    }
+                  `}
+                >
+
+                  <CardTurma
+                    turma={turma}
+                    onDesativar={handleDesativar}
+                    onAtivar={handleAtivar}
+                    onExcluir={(turma) => setTurmaParaExcluir(turma)}
+                  />
+                </div>
               ))}
             </div>
 
@@ -169,6 +294,39 @@ export default function GerenciarTurmas() {
             />
           </div>
         )}
+
+        <ModalExcluir
+          aberto={turmaParaExcluir !== null}
+          mensagem={
+            turmaParaExcluir ? (
+              <>
+                Tem certeza que deseja excluir a turma{" "}
+                <span className="font-bold text-[#2e8b45]">
+                  {turmaParaExcluir.nome}
+                </span>
+              </>
+            ) : (
+              ""
+            )
+
+          }
+          onCancelar={() => setTurmaParaExcluir(null)}
+          onConfirmar={async () => {
+            if (!turmaParaExcluir) return;
+
+            const turma = turmaParaExcluir;
+
+            setTurmaExcluindo(turmaParaExcluir.id);
+            setTurmaParaExcluir(null);
+
+            setTimeout(async () => {
+              await handleExcluir(turma);
+              setTurmaExcluindo(null);
+            }, 200);
+          }}
+        
+        />
+
       </main>
     </div>
   );

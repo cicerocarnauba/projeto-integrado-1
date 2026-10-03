@@ -7,12 +7,14 @@ import {
 import { Turma } from "../../types/turma";
 import DesativarButton from "../DesativarButton";
 import AtivarButton from "../AtivarButton";
+import ExcluirButton from "../ExcluirButton";
 
 interface CardTurmasProps {
   turma: Turma;
   onEditar?: (turma: Turma) => void;
   onDesativar?: (turma: Turma) => void;
   onAtivar?: (turma: Turma) => void;
+  onExcluir?: (turma: Turma) => void;
 }
 
 export default function CardTurma({
@@ -20,8 +22,10 @@ export default function CardTurma({
   onEditar,
   onDesativar,
   onAtivar,
+  onExcluir,
 }: CardTurmasProps) {
   const ativo = turma.status === "ATIVO";
+  const historico: boolean = false
 
   return (
     <div
@@ -71,10 +75,20 @@ export default function CardTurma({
                   <MdEdit size={14} />
                   Editar
                 </button>
-
-                <DesativarButton 
+                
+                {historico ? (
+                  <>
+                    <DesativarButton 
                     onClick={() => onDesativar?.(turma)}
-                />
+                    />
+                  </>
+                ) : (
+                  <>
+                    <ExcluirButton
+                      onClick={() => onExcluir?.(turma)}/>
+                  </>
+                )}
+                
               </>
             ) : (
               <>
