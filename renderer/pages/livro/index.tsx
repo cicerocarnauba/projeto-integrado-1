@@ -104,9 +104,11 @@ export default function GerenciarLivros() {
     inicio + ITENS_POR_PAGINA,
   );
 
-  const possuiHistorico =
-  Boolean(livroParaExcluir?.statusEmprestimo) &&
-  livroParaExcluir?.statusEmprestimo !== "nunca_emprestado";
+  // Mesma regra do card: Desativar quando o livro tem histórico de empréstimos
+  const livroTemHistorico = livroParaExcluir
+    ? (livroParaExcluir.possuiHistorico ??
+      (livroParaExcluir.quantidadeEmprestada ?? 0) > 0)
+    : false;
 
   async function confirmarExclusao() {
     if (!livroParaExcluir) return;
@@ -242,7 +244,7 @@ export default function GerenciarLivros() {
 
         <ModalConfirmacao
           isOpen={livroParaExcluir !== null}
-          acao={possuiHistorico ? "desativar" : "excluir"}
+          acao={livroTemHistorico ? "desativar" : "excluir"}
           carregando={excluindo}
           onConfirmar={confirmarExclusao}
           onCancelar={() => setLivroParaExcluir(null)}
@@ -251,4 +253,3 @@ export default function GerenciarLivros() {
     </div>
   );
 }
-
