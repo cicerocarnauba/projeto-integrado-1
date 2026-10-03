@@ -189,4 +189,49 @@ export class ProfessorController {
 
     return professor;
   }
+    /**
+   * HU11 — Desativar Professor
+   *
+   * Regras de negócio:
+   * 1. O professor precisa existir.
+   * 2. Só faz sentido desativar um professor com status "ATIVO".
+   * 3. A operação é bloqueada se houver empréstimo "Pendente" associado.
+   * 4. A desativação só é permitida se o professor possuir histórico de
+   *    empréstimos. Se NÃO possuir histórico, deve ser realizada a exclusão.
+   * 5. O status muda para "INATIVO".
+   *
+   * Relações: [RF11], [RN04], [RNF03]
+   */
+  public desativar(id: number): Professor {
+    // 1. Busca o professor
+    const professor = this.professorDAO.buscarPorId(id);
+    if (!professor) {
+      throw new Error('Professor não encontrado.');
+    }
+
+    // 2. Só permite desativar quem está ATIVO
+    if (professor.status !== 'ATIVO') {
+      throw new Error('Este professor já está inativo.');
+    }
+
+    // 3. Bloqueia se houver empréstimo pendente
+    if (this.professorDAO.possuiEmprestimoPendente(id)) {
+      throw new Error(
+        'Não é possível desativar este professor, pois ele possui empréstimos pendentes.'
+      );
+    }
+
+    // 4. Só permite desativar se houver histórico
+    if (!this.professorDAO.possuiHistoricoEmprestimos(id)) {
+      throw new Error(
+        'Este professor não possui histórico de empréstimos. Utilize a opção "Excluir" para removê-lo definitivamente.'
+      );
+    }
+
+    // 5. Desativa
+    professor.inativar();
+    this.professorDAO.atualizarStatus(id, 'INATIVO');
+
+    return professor;
+  }
 }

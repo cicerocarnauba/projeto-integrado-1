@@ -8,6 +8,7 @@ export const PROFESSOR_CHANNELS = {
   EXCLUIR: 'professor:excluir',
   EDITAR: 'professor:editar',
   REATIVAR: 'professor:reativar',
+  DESATIVAR: 'professor:desativar', 
 } as const;
 
 export function registerProfessorHandlers(
