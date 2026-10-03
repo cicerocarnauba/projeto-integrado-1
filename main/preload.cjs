@@ -26,6 +26,9 @@ contextBridge.exposeInMainWorld('ipc', {
     editar: (id, input) => ipcRenderer.invoke('livro:editar', id, input),
     excluir: (id) => ipcRenderer.invoke('livro:excluir', id),
   },
+   emprestimo: {
+    realizar: (input) => ipcRenderer.invoke('emprestimo:realizar', input),
+  },
 });
 
 console.log('[preload] window.ipc exposto (professor + turma + livro)');
