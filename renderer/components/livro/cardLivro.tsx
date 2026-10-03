@@ -1,5 +1,6 @@
 import {
   MdCheckCircleOutline,
+  MdDeleteOutline,
   MdEdit,
   MdRemoveCircleOutline,
 } from "react-icons/md";
@@ -8,25 +9,32 @@ import { Livro } from "../../types/livro";
 interface CardLivroProps {
   livro: Livro;
   onEditar?: (livro: Livro) => void;
-  onDesativar?: (livro: Livro) => void;
+  onExcluir?: (livro: Livro) => void;
   onAtivar?: (livro: Livro) => void;
 }
 
 export default function CardLivro({
   livro,
   onEditar,
-  onDesativar,
+  onExcluir,
   onAtivar,
 }: CardLivroProps) {
   const ativo = livro.status === "ATIVO" || livro.ativo === true;
 
-  const handleDesativar = (e: React.MouseEvent) => {
+  // Excluir é o padrão. Só vira Desativar quando o livro tem histórico de
+  // empréstimos. Usa o campo possuiHistorico quando o backend enviar; até lá,
+  // considera apenas exemplares emprestados agora.
+  const temHistorico =
+    livro.possuiHistorico ?? (livro.quantidadeEmprestada ?? 0) > 0;
+
+  const handleExcluir = (e: React.MouseEvent) => {
     e.preventDefault();
-    onDesativar?.(livro);
+    onExcluir?.(livro);
   };
 
   const handleAtivar = (e: React.MouseEvent) => {
     e.preventDefault();
+    onAtivar?.(livro);
   };
 
   return (
@@ -97,11 +105,20 @@ export default function CardLivro({
 
                 <button
                   type="button"
-                  onClick={handleDesativar}
+                  onClick={handleExcluir}
                   className="flex items-center gap-1.5 bg-[#cf4a4a] text-white px-3 py-1.5 text-xs rounded-lg font-medium hover:bg-[#b83a3a] transition-colors cursor-pointer shrink-0"
                 >
-                  <MdRemoveCircleOutline size={14} />
-                  Desativar
+                  {temHistorico ? (
+                    <>
+                      <MdRemoveCircleOutline size={14} />
+                      Desativar
+                    </>
+                  ) : (
+                    <>
+                      <MdDeleteOutline size={14} />
+                      Excluir
+                    </>
+                  )}
                 </button>
               </>
             ) : (

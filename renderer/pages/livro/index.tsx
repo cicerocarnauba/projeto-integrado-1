@@ -7,6 +7,7 @@ import CardLivro from "../../components/livro/cardLivro";
 import Paginacao from "../../components/Paginacao";
 import { useRouter } from "next/router";
 import { MdAdd } from "react-icons/md";
+import ModalConfirmarExclusao from "../../components/ModalConfirmarExclusao";
 
 export default function GerenciarLivros() {
   const router = useRouter();
@@ -29,6 +30,7 @@ export default function GerenciarLivros() {
   const [ordenacao, setOrdenacao] = useState<TipoOrdenacao>("alfabetica");
 
   const [paginaAtual, setPaginaAtual] = useState(1);
+  const [livroParaExcluir, setLivroParaExcluir] = useState<Livro | null>(null);
   const ITENS_POR_PAGINA = 12; // 4 linhas x 3 colunas
 
   useEffect(() => {
@@ -152,6 +154,7 @@ export default function GerenciarLivros() {
                   key={livro.id}
                   livro={livro}
                   onEditar={(l) => router.push(`/livro/${l.id}`)}
+                  onExcluir={(l) => setLivroParaExcluir(l)}
                 />
               ))}
             </div>
@@ -166,6 +169,11 @@ export default function GerenciarLivros() {
             />
           </div>
         )}
+        <ModalConfirmarExclusao
+          isOpen={livroParaExcluir !== null}
+          onConfirmar={() => setLivroParaExcluir(null)} // subtarefa 3: chamar o backend aqui
+          onCancelar={() => setLivroParaExcluir(null)}
+        />
       </main>
     </div>
   );
