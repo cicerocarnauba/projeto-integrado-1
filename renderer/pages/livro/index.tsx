@@ -71,7 +71,7 @@ export default function GerenciarLivros() {
 
   const totalPaginas = Math.max(
     1,
-    Math.ceil(livrosExibidos.length / ITENS_POR_PAGINA)
+    Math.ceil(livrosExibidos.length / ITENS_POR_PAGINA),
   );
 
   useEffect(() => {
@@ -83,7 +83,7 @@ export default function GerenciarLivros() {
   const inicio = (paginaAtual - 1) * ITENS_POR_PAGINA;
   const livrosPaginados = livrosExibidos.slice(
     inicio,
-    inicio + ITENS_POR_PAGINA
+    inicio + ITENS_POR_PAGINA,
   );
 
   return (
@@ -126,15 +126,11 @@ export default function GerenciarLivros() {
         {/* Lista de livros ou mensagens de estado */}
         {carregando ? (
           <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
-            <p className="text-base font-medium">
-              Carregando livros...
-            </p>
+            <p className="text-base font-medium">Carregando livros...</p>
           </div>
         ) : livrosExibidos.length === 0 ? (
           <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
-            <p className="text-base font-medium">
-              Nenhum livro cadastrado.
-            </p>
+            <p className="text-base font-medium">Nenhum livro cadastrado.</p>
           </div>
         ) : (
           <div
@@ -143,7 +139,13 @@ export default function GerenciarLivros() {
           >
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
               {livrosPaginados.map((livro) => (
-                <CardLivro key={livro.id} livro={livro} />
+                <CardLivro
+                  key={livro.id}
+                  livro={livro}
+                  onEditar={(l) =>
+                    router.push(`/livro/${l.id}`)
+                  }
+                />
               ))}
             </div>
 
