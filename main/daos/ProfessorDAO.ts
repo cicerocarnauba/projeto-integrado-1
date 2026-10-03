@@ -46,8 +46,6 @@ export class ProfessorDAO {
   }
 
   public buscarPorEmail(email: string): Professor | null {
-    // TRIM aplicado dos DOIS lados — alinha com o padrão de `consultar`
-    // e blinda contra inserções via SQL direto que fujam da normalização da entity.
     const row = this.db
       .prepare(
         `SELECT * FROM professor
@@ -59,7 +57,7 @@ export class ProfessorDAO {
 
   /**
    * Consulta com filtros (RF09).
-   * - `nome`: busca parcial em primeiro nome OU sobrenome.
+   * - `nome`: busca parcial em primeiro nome OU sobrenome OU nome completo.
    * - `email`: busca parcial em e-mail.
    * - `incluirInativos`: por padrão `false` (retorna só ATIVOS).
    *
@@ -107,6 +105,44 @@ export class ProfessorDAO {
 
     const rows = this.db.prepare(sql).all(...params) as ProfessorRow[];
     return rows.map((row) => this.mapRowToEntity(row));
+  }
+
+  public excluir(id: number): void {
+    this.db.prepare(`DELETE FROM professor WHERE id = ?`).run(id);
+  }
+
+  public atualizarStatus(id: number, status: StatusCadastro): void {
+    this.db
+      .prepare(
+        `UPDATE professor
+         SET status = ?, data_atualizacao = ?
+         WHERE id = ?`
+      )
+      .run(status, new Date().toISOString(), id);
+  }
+
+  public atualizar(professor: Professor): void {
+    this.db
+      .prepare(
+        `UPDATE professor
+         SET primeiro_nome = ?, sobrenome = ?, email = ?, data_atualizacao = ?
+         WHERE id = ?`
+      )
+      .run(
+        professor.primeiroNome,
+        professor.sobrenome,
+        professor.email,
+        professor.dataAtualizacao.toISOString(),
+        professor.id
+      );
+  }
+
+  public possuiEmprestimoPendente(_professorId: number): boolean {
+    return false;
+  }
+
+  public possuiHistoricoEmprestimos(_professorId: number): boolean {
+    return false;
   }
 
   private mapRowToEntity(row: ProfessorRow): Professor {

@@ -57,6 +57,27 @@ export class Professor {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email);
   }
 
+  // HU10 — Bloqueio de exclusão/desativação se houver empréstimo pendente
+  public podeSerExcluido(possuiEmprestimoPendente: boolean): boolean {
+    return !possuiEmprestimoPendente;
+  }
+
+  public podeSerDesativado(possuiEmprestimoPendente: boolean): boolean {
+    return !possuiEmprestimoPendente;
+  }
+
+  // HU08 — Editar Professor
+  public atualizarDados(props: {
+    primeiroNome: string;
+    sobrenome: string;
+    email: string;
+  }): void {
+    this.primeiroNome = props.primeiroNome.trim();
+    this.sobrenome = props.sobrenome.trim();
+    this.email = props.email.trim().toLowerCase();
+    this.dataAtualizacao = new Date();
+  }
+
   // Comportamento de ciclo de vida
   public ativar(): void {
     this.status = 'ATIVO';
