@@ -234,6 +234,20 @@ export class LivroDAO {
     const rows = this.db.prepare(sql).all(...params) as LivroRow[];
     return rows.map((row) => this.mapRowToEntity(row));
   }
+    /**
+   * HU19 — Incrementa a quantidade emprestada de um livro.
+   * Usado ao registrar um novo empréstimo.
+   */
+  public incrementarEmprestada(livroId: number, quantidade: number): void {
+    this.db
+      .prepare(
+        `UPDATE livro
+         SET quantidade_emprestada = quantidade_emprestada + ?,
+             data_atualizacao = ?
+         WHERE id = ?`
+      )
+      .run(quantidade, new Date().toISOString(), livroId);
+  }
 
   private mapRowToEntity(row: LivroRow): Livro {
     return new Livro({
