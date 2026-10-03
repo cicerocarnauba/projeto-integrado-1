@@ -215,6 +215,30 @@ describe('Testes Unitários - CRUD Professor (HU08, HU10, HU11, HU12)', () => {
       );
     });
   });
+    // ============================================================
+  // Buscar por ID (apoio ao fluxo de Detalhes/Edição)
+  // ============================================================
+  describe('Buscar por ID', () => {
+    it('deve retornar o professor quando o ID existe', () => {
+      const professor = professorController.cadastrar({
+        primeiroNome: 'Maria',
+        sobrenome: 'Silva',
+        email: 'maria@escola.com',
+      });
+
+      const encontrado = professorController.buscarPorId(professor.id!);
+
+      assert.strictEqual(encontrado.id, professor.id);
+      assert.strictEqual(encontrado.email, 'maria@escola.com');
+    });
+
+    it('deve lançar erro quando o ID não existe', () => {
+      assert.throws(
+        () => professorController.buscarPorId(99999),
+        /Professor não encontrado/
+      );
+    });
+  });
 
   // ============================================================
   // Consultar Professor (RF09)
