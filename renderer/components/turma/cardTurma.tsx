@@ -3,7 +3,10 @@ import {
   MdEdit,
   MdRemoveCircleOutline,
 } from "react-icons/md";
+
 import { Turma } from "../../types/turma";
+import DesativarButton from "../DesativarButton";
+import AtivarButton from "../AtivarButton";
 
 interface CardTurmasProps {
   turma: Turma;
@@ -19,15 +22,6 @@ export default function CardTurma({
   onAtivar,
 }: CardTurmasProps) {
   const ativo = turma.status === "ATIVO";
-
-  const handleDesativar = (e: React.MouseEvent) => {
-    e.preventDefault();
-    onDesativar?.(turma);
-  };
-
-  const handleAtivar = (e: React.MouseEvent) => {
-    e.preventDefault();
-  };
 
   return (
     <div
@@ -78,14 +72,9 @@ export default function CardTurma({
                   Editar
                 </button>
 
-                <button
-                  type="button"
-                  onClick={handleDesativar}
-                  className="flex items-center gap-1.5 bg-[#cf4a4a] text-white px-3 py-1.5 text-xs rounded-lg font-medium hover:bg-[#b83a3a] transition-colors cursor-pointer shrink-0"
-                >
-                  <MdRemoveCircleOutline size={14} />
-                  Desativar
-                </button>
+                <DesativarButton 
+                    onClick={() => onDesativar?.(turma)}
+                />
               </>
             ) : (
               <>
@@ -99,14 +88,9 @@ export default function CardTurma({
                   Editar
                 </button>
 
-                <button
-                  type="button"
-                  onClick={handleAtivar}
-                  className="flex items-center gap-1.5 bg-[#2e8b45] text-white px-3 py-1.5 text-xs rounded-lg font-medium hover:bg-[#236c35] transition-colors cursor-pointer shrink-0"
-                >
-                  <MdCheckCircleOutline size={14} />
-                  Ativar
-                </button>
+                <AtivarButton 
+                  onClick={() => onAtivar?.(turma)}
+                />
               </>
             )}
           </div>
