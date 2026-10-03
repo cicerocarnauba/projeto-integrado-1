@@ -10,7 +10,16 @@ import { MdAdd } from "react-icons/md";
 
 export default function GerenciarLivros() {
   const router = useRouter();
-  const mostrarSucesso = router.query.sucesso === "1";
+  // const mostrarSucesso = router.query.sucesso === "1";
+  const sucesso = router.query.sucesso;
+  const mensagemSucesso =
+    sucesso === "1"
+      ? "Livro cadastrado com sucesso!"
+      : sucesso === "editado"
+        ? "Livro editado com sucesso!"
+        : sucesso === "editado_inativo"
+          ? "Livro editado com sucesso. Com 0 exemplares, ele foi desativado."
+          : null;
 
   const [listaLivros, setListaLivros] = useState<Livro[]>([]);
   const [carregando, setCarregando] = useState(true);
@@ -95,9 +104,9 @@ export default function GerenciarLivros() {
           Gerenciar livros
         </h1>
 
-        {mostrarSucesso && (
+        {mensagemSucesso && (
           <div className="bg-[#d8f3dc] text-[#2e8b45] px-4 py-2.5 rounded-xl mb-4 text-sm font-medium flex items-center gap-2">
-            ✓ Livro cadastrado com sucesso!
+            ✓ {mensagemSucesso}
           </div>
         )}
 
@@ -142,9 +151,7 @@ export default function GerenciarLivros() {
                 <CardLivro
                   key={livro.id}
                   livro={livro}
-                  onEditar={(l) =>
-                    router.push(`/livro/${l.id}`)
-                  }
+                  onEditar={(l) => router.push(`/livro/${l.id}`)}
                 />
               ))}
             </div>
