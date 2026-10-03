@@ -1,12 +1,12 @@
 import { MdCheckCircleOutline } from "react-icons/md"
 
-interface DesativarButtonProps {
+interface AtivarButtonProps {
   onClick: () => void;
 }
 
-export default function DesativarButton({
+export default function AtivarButton({
   onClick,
-}: DesativarButtonProps) {
+}: AtivarButtonProps) {
   return (
     <button
       type="button"
