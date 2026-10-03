@@ -1,33 +1,30 @@
-import {
-  MdCheckCircleOutline,
-  MdEdit,
-  MdRemoveCircleOutline,
-} from "react-icons/md";
+import { MdEdit } from "react-icons/md";
 import { Livro } from "../../types/livro";
+// Ajuste os três caminhos para a pasta onde estão os botões (Ctrl + P e busque "ExcluirButton")
+import ExcluirButton from "../ExcluirButton";
+import DesativarButton from "../DesativarButton";
+import AtivarButton from "../AtivarButton";
 
 interface CardLivroProps {
   livro: Livro;
   onEditar?: (livro: Livro) => void;
-  onDesativar?: (livro: Livro) => void;
+  onExcluir?: (livro: Livro) => void;
   onAtivar?: (livro: Livro) => void;
 }
 
 export default function CardLivro({
   livro,
   onEditar,
-  onDesativar,
+  onExcluir,
   onAtivar,
 }: CardLivroProps) {
   const ativo = livro.status === "ATIVO" || livro.ativo === true;
 
-  const handleDesativar = (e: React.MouseEvent) => {
-    e.preventDefault();
-    onDesativar?.(livro);
-  };
-
-  const handleAtivar = (e: React.MouseEvent) => {
-    e.preventDefault();
-  };
+  // Excluir é o padrão. Só vira Desativar quando o livro tem histórico de
+  // empréstimos. Usa o campo possuiHistorico quando o backend enviar; até lá,
+  // considera apenas exemplares emprestados agora.
+  const temHistorico =
+    livro.possuiHistorico ?? (livro.quantidadeEmprestada ?? 0) > 0;
 
   return (
     <div
@@ -95,14 +92,11 @@ export default function CardLivro({
                   Editar
                 </button>
 
-                <button
-                  type="button"
-                  onClick={handleDesativar}
-                  className="flex items-center gap-1.5 bg-[#cf4a4a] text-white px-3 py-1.5 text-xs rounded-lg font-medium hover:bg-[#b83a3a] transition-colors cursor-pointer shrink-0"
-                >
-                  <MdRemoveCircleOutline size={14} />
-                  Desativar
-                </button>
+                {temHistorico ? (
+                  <DesativarButton onClick={() => onExcluir?.(livro)} />
+                ) : (
+                  <ExcluirButton onClick={() => onExcluir?.(livro)} />
+                )}
               </>
             ) : (
               <>
@@ -116,14 +110,7 @@ export default function CardLivro({
                   Editar
                 </button>
 
-                <button
-                  type="button"
-                  onClick={handleAtivar}
-                  className="flex items-center gap-1.5 bg-[#2e8b45] text-white px-3 py-1.5 text-xs rounded-lg font-medium hover:bg-[#236c35] transition-colors cursor-pointer shrink-0"
-                >
-                  <MdCheckCircleOutline size={14} />
-                  Ativar
-                </button>
+                <AtivarButton onClick={() => onAtivar?.(livro)} />
               </>
             )}
           </div>
