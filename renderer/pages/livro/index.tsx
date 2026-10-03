@@ -33,6 +33,13 @@ export default function GerenciarLivros() {
   const [livroParaExcluir, setLivroParaExcluir] = useState<Livro | null>(null);
   const ITENS_POR_PAGINA = 12; // 4 linhas x 3 colunas
 
+  const [excluindo, setExcluindo] = useState(false);
+  const [recarregar, setRecarregar] = useState(0);
+  const [feedback, setFeedback] = useState<{
+    tipo: "sucesso" | "erro";
+    texto: string;
+  } | null>(null);
+
   useEffect(() => {
     setPaginaAtual(1);
   }, [termoBusca]);
@@ -68,7 +75,7 @@ export default function GerenciarLivros() {
     }
 
     carregarLivros();
-  }, [termoBusca, incluirInativos]);
+  }, [termoBusca, incluirInativos, recarregar]);
 
   const livrosExibidos = [...listaLivros].sort((a, b) => {
     if (a.status === "ATIVO" && b.status !== "ATIVO") return -1;
@@ -97,6 +104,53 @@ export default function GerenciarLivros() {
     inicio + ITENS_POR_PAGINA,
   );
 
+  async function confirmarExclusao() {
+    if (!livroParaExcluir) return;
+
+    setExcluindo(true);
+    setFeedback(null);
+
+    try {
+      const resposta = await window.ipc.livro.excluir(livroParaExcluir.id);
+
+      if (!resposta.success) {
+        setFeedback({
+          tipo: "erro",
+          texto: resposta.error || "Não foi possível excluir o livro.",
+        });
+        return;
+      }
+
+      // O backend decide sozinho entre excluir e desativar, e já manda a mensagem pronta
+      setFeedback({
+        tipo: "sucesso",
+        texto:
+          resposta.data?.mensagem ||
+          (resposta.data?.acao === "DESATIVADO"
+            ? "Livro desativado com sucesso."
+            : "Livro excluído com sucesso."),
+      });
+      setRecarregar((n) => n + 1);
+    } catch (error) {
+      setFeedback({
+        tipo: "erro",
+        texto:
+          error instanceof Error
+            ? error.message
+            : "Não foi possível excluir o livro.",
+      });
+    } finally {
+      setExcluindo(false);
+      setLivroParaExcluir(null);
+    }
+  }
+
+  useEffect(() => {
+    if (feedback?.tipo !== "sucesso") return;
+    const timer = setTimeout(() => setFeedback(null), 6000);
+    return () => clearTimeout(timer);
+  }, [feedback]);
+
   return (
     <div className="flex min-h-screen bg-white">
       <Sidebar />
@@ -106,9 +160,21 @@ export default function GerenciarLivros() {
           Gerenciar livros
         </h1>
 
-        {mensagemSucesso && (
+        {!feedback && mensagemSucesso && (
           <div className="bg-[#d8f3dc] text-[#2e8b45] px-4 py-2.5 rounded-xl mb-4 text-sm font-medium flex items-center gap-2">
             ✓ {mensagemSucesso}
+          </div>
+        )}
+
+        {feedback && (
+          <div
+            className={`px-4 py-2.5 rounded-xl mb-4 text-sm font-medium flex items-center gap-2 ${
+              feedback.tipo === "sucesso"
+                ? "bg-[#d8f3dc] text-[#2e8b45]"
+                : "bg-red-50 text-red-700 border border-red-200"
+            }`}
+          >
+            {feedback.tipo === "sucesso" ? "✓" : "✕"} {feedback.texto}
           </div>
         )}
 
@@ -171,7 +237,8 @@ export default function GerenciarLivros() {
         )}
         <ModalConfirmarExclusao
           isOpen={livroParaExcluir !== null}
-          onConfirmar={() => setLivroParaExcluir(null)} // subtarefa 3: chamar o backend aqui
+          carregando={excluindo}
+          onConfirmar={confirmarExclusao}
           onCancelar={() => setLivroParaExcluir(null)}
         />
       </main>
