@@ -10,7 +10,16 @@ import { MdAdd } from "react-icons/md";
 
 export default function GerenciarLivros() {
   const router = useRouter();
-  const mostrarSucesso = router.query.sucesso === "1";
+  // const mostrarSucesso = router.query.sucesso === "1";
+  const sucesso = router.query.sucesso;
+  const mensagemSucesso =
+    sucesso === "1"
+      ? "Livro cadastrado com sucesso!"
+      : sucesso === "editado"
+        ? "Livro editado com sucesso!"
+        : sucesso === "editado_inativo"
+          ? "Livro editado com sucesso. Com 0 exemplares, ele foi desativado."
+          : null;
 
   const [listaLivros, setListaLivros] = useState<Livro[]>([]);
   const [carregando, setCarregando] = useState(true);
@@ -71,7 +80,7 @@ export default function GerenciarLivros() {
 
   const totalPaginas = Math.max(
     1,
-    Math.ceil(livrosExibidos.length / ITENS_POR_PAGINA)
+    Math.ceil(livrosExibidos.length / ITENS_POR_PAGINA),
   );
 
   useEffect(() => {
@@ -83,7 +92,7 @@ export default function GerenciarLivros() {
   const inicio = (paginaAtual - 1) * ITENS_POR_PAGINA;
   const livrosPaginados = livrosExibidos.slice(
     inicio,
-    inicio + ITENS_POR_PAGINA
+    inicio + ITENS_POR_PAGINA,
   );
 
   return (
@@ -95,9 +104,9 @@ export default function GerenciarLivros() {
           Gerenciar livros
         </h1>
 
-        {mostrarSucesso && (
+        {mensagemSucesso && (
           <div className="bg-[#d8f3dc] text-[#2e8b45] px-4 py-2.5 rounded-xl mb-4 text-sm font-medium flex items-center gap-2">
-            ✓ Livro cadastrado com sucesso!
+            ✓ {mensagemSucesso}
           </div>
         )}
 
@@ -126,15 +135,11 @@ export default function GerenciarLivros() {
         {/* Lista de livros ou mensagens de estado */}
         {carregando ? (
           <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
-            <p className="text-base font-medium">
-              Carregando livros...
-            </p>
+            <p className="text-base font-medium">Carregando livros...</p>
           </div>
         ) : livrosExibidos.length === 0 ? (
           <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
-            <p className="text-base font-medium">
-              Nenhum livro cadastrado.
-            </p>
+            <p className="text-base font-medium">Nenhum livro cadastrado.</p>
           </div>
         ) : (
           <div
@@ -143,7 +148,11 @@ export default function GerenciarLivros() {
           >
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
               {livrosPaginados.map((livro) => (
-                <CardLivro key={livro.id} livro={livro} />
+                <CardLivro
+                  key={livro.id}
+                  livro={livro}
+                  onEditar={(l) => router.push(`/livro/${l.id}`)}
+                />
               ))}
             </div>
 

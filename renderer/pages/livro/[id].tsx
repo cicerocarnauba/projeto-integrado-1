@@ -1,113 +1,229 @@
+// import { useEffect, useState } from "react";
+// import { useRouter } from "next/router";
+// import Sidebar from "../../components/Sidebar";
+// import { Livro } from "../../types/livro";
+// import { MdArrowBack } from "react-icons/md";
+
+// export default function EditarLivro() {
+//   const router = useRouter();
+
+//   const [livro, setLivro] = useState<Livro | null>(null);
+//   const [carregando, setCarregando] = useState(true);
+//   const [erro, setErro] = useState("");
+
+//   useEffect(() => {
+//     if (!router.isReady) return;
+
+//     const id = Number(router.query.id);
+
+//     if (!Number.isInteger(id) || id <= 0) {
+//       setErro("Livro não identificado.");
+//       setCarregando(false);
+//       return;
+//     }
+
+//     async function carregarLivro() {
+//       try {
+//         // Não existe canal livro:buscarPorId, então consulta incluindo inativos e filtra pelo id
+//         const resposta = await window.ipc.livro.consultar({
+//           incluirInativos: true,
+//         });
+
+//         if (!resposta?.success || !Array.isArray(resposta.data)) {
+//           setErro(resposta?.error || "Não foi possível carregar o livro.");
+//           return;
+//         }
+
+//         const encontrado = resposta.data.find((item) => item.id === id);
+
+//         if (!encontrado) {
+//           setErro("Livro não encontrado no acervo.");
+//           return;
+//         }
+
+//         setLivro({
+//           ...encontrado,
+//           id,
+//           ativo: encontrado.status === "ATIVO",
+//         });
+//       } catch (error) {
+//         setErro(
+//           error instanceof Error
+//             ? error.message
+//             : "Não foi possível carregar o livro."
+//         );
+//       } finally {
+//         setCarregando(false);
+//       }
+//     }
+
+//     carregarLivro();
+//   }, [router.isReady, router.query.id]);
+
+//   const inativo = livro !== null && livro.status !== "ATIVO";
+
+//   return (
+//     <div className="flex min-h-screen bg-white">
+//       <Sidebar />
+
+//       <main className="flex-1 p-8 animate-fade-in">
+//         <p className="text-2xl font-bold text-gray-800 mb-6">
+//           Gerenciar livros
+//         </p>
+
+//         <div className="flex items-center justify-between mb-6">
+//           <h1 className="text-2xl font-bold text-gray-800">
+//             Editar detalhes do livro
+//           </h1>
+
+//           <button
+//             type="button"
+//             onClick={() => router.back()}
+//             className="flex items-center gap-1.5 bg-[#2e8b45] text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#236c35] transition-all shadow-sm cursor-pointer"
+//           >
+//             <MdArrowBack size={18} />
+//             Voltar
+//           </button>
+//         </div>
+
+//         {carregando ? (
+//           <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
+//             <p className="text-base font-medium">Carregando livro...</p>
+//           </div>
+//         ) : erro ? (
+//           <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 max-w-3xl">
+//             {erro}
+//           </div>
+//         ) : inativo ? (
+//           <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 max-w-3xl">
+//             Apenas livros com status "Ativo" podem ser editados. Reative o livro
+//             antes de editar.
+//           </div>
+//         ) : (
+//           livro && (
+//             <div className="border-2 border-[#2e8b45] rounded-3xl p-6 max-w-3xl">
+//               {/* TEMPORÁRIO: confere se os dados do livro estão chegando.*/}
+//               <p className="text-sm text-gray-600">
+//                 <span className="font-semibold text-[#1e582d]">
+//                   {livro.titulo}
+//                 </span>{" "}
+//                 — {livro.editora} — {livro.quantidadeTotal} exemplares (
+//                 {livro.quantidadeEmprestada ?? 0} emprestados)
+//               </p>
+//             </div>
+//           )
+//         )}
+//       </main>
+//     </div>
+//   );
+// }
+
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import Link from "next/link";
 import Sidebar from "../../components/Sidebar";
-import { livros } from "../../mocks/livros-mock";
-import { MdDeleteOutline, MdRemoveCircleOutline, MdEdit } from "react-icons/md";
+import FormEditarLivro from "../../components/livro/formEditarLivro";
+import { Livro } from "../../types/livro";
+import { MdArrowBack } from "react-icons/md";
 
-export default function DetalhesLivro() {
+export default function EditarLivro() {
   const router = useRouter();
-  const { id } = router.query;
 
-  const livro = livros.find((l) => l.id === Number(id));
+  const [livro, setLivro] = useState<Livro | null>(null);
+  const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState("");
 
-  if (!livro) {
-    return <p>Livro não encontrado.</p>;
-  }
+  useEffect(() => {
+    if (!router.isReady) return;
+
+    const id = Number(router.query.id);
+
+    if (!Number.isInteger(id) || id <= 0) {
+      setErro("Livro não identificado.");
+      setCarregando(false);
+      return;
+    }
+
+    async function carregarLivro() {
+      try {
+        // Não existe canal livro:buscarPorId, então consulta incluindo inativos e filtra pelo id
+        const resposta = await window.ipc.livro.consultar({
+          incluirInativos: true,
+        });
+
+        if (!resposta?.success || !Array.isArray(resposta.data)) {
+          setErro(resposta?.error || "Não foi possível carregar o livro.");
+          return;
+        }
+
+        const encontrado = resposta.data.find((item) => item.id === id);
+
+        if (!encontrado) {
+          setErro("Livro não encontrado no acervo.");
+          return;
+        }
+
+        setLivro({
+          ...encontrado,
+          id,
+          ativo: encontrado.status === "ATIVO",
+        });
+      } catch (error) {
+        setErro(
+          error instanceof Error
+            ? error.message
+            : "Não foi possível carregar o livro."
+        );
+      } finally {
+        setCarregando(false);
+      }
+    }
+
+    carregarLivro();
+  }, [router.isReady, router.query.id]);
+
+  const inativo = livro !== null && livro.status !== "ATIVO";
 
   return (
     <div className="flex min-h-screen bg-white">
       <Sidebar />
 
-      <main className="flex-1 p-8">
+      <main className="flex-1 p-8 flex flex-col animate-fade-in">
         <p className="text-2xl font-bold text-gray-800 mb-6">
           Gerenciar livros
         </p>
+
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-gray-800">
-            Detalhes do livro
+            Editar detalhes do livro
           </h1>
 
-          <Link
-            href="/livro"
-            className="flex items-center gap-1 bg-[#2e8b45] text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-[#236c35] transition-colors"
+          <button
+            type="button"
+            onClick={() => router.push("/livro")}
+            className="flex items-center gap-1.5 bg-[#2e8b45] text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#236c35] transition-all shadow-sm cursor-pointer"
           >
-            ← Voltar
-          </Link>
+            <MdArrowBack size={18} />
+            Voltar
+          </button>
         </div>
-        <div className="border-2 border-[#2e8b45] rounded-3xl p-6 max-w-3xl">
-          <div className="flex gap-4 mb-4">
-            <div className="flex-1">
-              <label className="text-xs text-gray-500 mb-1 block">
-                Título do Livro
-              </label>
-              <input
-                type="text"
-                value={livro.titulo}
-                readOnly
-                className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 outline-none"
-              />
+
+        <div className="flex-1 flex items-center justify-center pb-16">
+          {carregando ? (
+            <div className="w-full max-w-2xl bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
+              <p className="text-base font-medium">Carregando livro...</p>
             </div>
-
-            <div>
-              <label className="text-xs text-gray-500 mb-1 block">Status</label>
-              <div
-                className={`px-3 py-2 rounded-lg text-sm font-semibold text-center bg-gray-50 border border-gray-200 ${
-                  livro.ativo ? "text-[#2e8b45]" : "text-gray-500"
-                }`}
-              >
-                {livro.ativo ? "Ativo" : "Inativo"}
-              </div>
+          ) : erro ? (
+            <div className="w-full max-w-2xl rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {erro}
             </div>
-          </div>
-
-          <div className="flex gap-4 mb-6">
-            <div className="flex-1">
-              <label className="text-xs text-gray-500 mb-1 block">
-                Editora
-              </label>
-              <input
-                type="text"
-                value={livro.editora}
-                readOnly
-                className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 outline-none"
-              />
+          ) : inativo ? (
+            <div className="w-full max-w-2xl rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              Apenas livros com status "Ativo" podem ser editados. Reative o
+              livro antes de editar.
             </div>
-
-            <div>
-              <label className="text-xs text-gray-500 mb-1 block">
-                Total de exemplares
-              </label>
-              <div className="px-3 py-2 rounded-lg text-sm font-semibold text-center bg-gray-50 border border-gray-200 text-[#2e8b45]">
-                {livro.quantidadeTotal}{" "}
-                {livro.quantidadeTotal === 1 ? "exemplar" : "exemplares"}
-              </div>
-            </div>
-          </div>
-
-          <div className="flex justify-end gap-3">
-            <button
-              disabled={livro.statusEmprestimo === "emprestado_atualmente"}
-              className={`flex items-center gap-1 px-5 py-2 rounded-full text-sm font-medium transition-colors ${
-                livro.statusEmprestimo === "emprestado_atualmente"
-                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  : "bg-red-500 text-white hover:bg-red-600"
-              }`}
-            >
-              {livro.statusEmprestimo === "nunca_emprestado" ? (
-                <>
-                  <MdDeleteOutline size={18} /> Excluir livro
-                </>
-              ) : (
-                <>
-                  <MdRemoveCircleOutline size={18} /> Desativar livro
-                </>
-              )}
-            </button>
-
-            <button className="flex items-center gap-1 bg-[#2e8b45] text-white px-5 py-2 rounded-full text-sm font-medium hover:bg-[#236c35] transition-colors">
-              <MdEdit size={18} /> Editar livro
-            </button>
-          </div>
+          ) : (
+            livro && <FormEditarLivro key={livro.id} livro={livro} />
+          )}
         </div>
       </main>
     </div>
