@@ -34,6 +34,12 @@ export class Turma {
     }
   }
 
+  // HU14 — Editar Turma
+  public atualizarNome(novoNome: string): void {
+    this.nome = novoNome.trim();
+    this.dataAtualizacao = new Date();
+  }
+
   // Comportamento de ciclo de vida
   public ativar(): void {
     this.status = 'ATIVO';

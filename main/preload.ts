@@ -7,12 +7,22 @@ contextBridge.exposeInMainWorld('ipc', {
     consultar: (input?: { nome?: string; email?: string; incluirInativos?: boolean }) =>
       ipcRenderer.invoke('professor:consultar', input),
     buscarPorId: (id: number) => ipcRenderer.invoke('professor:buscarPorId', id),
+    excluir: (id: number) => ipcRenderer.invoke('professor:excluir', id),
+    editar: (input: { id: number; primeiroNome: string; sobrenome: string; email: string }) =>
+      ipcRenderer.invoke('professor:editar', input),
+    reativar: (id: number) => ipcRenderer.invoke('professor:reativar', id),
+    desativar: (id: number) => ipcRenderer.invoke('professor:desativar', id),
   },
   turma: {
     cadastrar: (input: { nome: string }) => ipcRenderer.invoke('turma:cadastrar', input),
     consultar: (input?: { nome?: string; incluirInativos?: boolean }) =>
       ipcRenderer.invoke('turma:consultar', input),
     buscarPorId: (id: number) => ipcRenderer.invoke('turma:buscarPorId', id),
+    ativar: (id: number) => ipcRenderer.invoke('turma:ativar', id),
+    editar: (input: { id: number; nome: string }) =>
+      ipcRenderer.invoke('turma:editar', input),
+    desativar: (id: number) => ipcRenderer.invoke('turma:desativar', id),
+    excluir: (id: number) => ipcRenderer.invoke('turma:excluir', id),
   },
   livro: {
     cadastrar: (input: { titulo: string; editora: string; quantidadeTotal: number }) =>

@@ -170,13 +170,17 @@ export class LivroDAO {
 
   /**
    * RF04 — Consultar Livro
-   * - `titulo`: busca parcial em título.
-   * - `editora`: busca parcial em editora.
-   * - `termo`: busca parcial em título OU editora.
-   * - `incluirInativos`: por padrão `false` (retorna só ATIVOS); quando `true`, traz também INATIVOS (RN04).
-   * 
+   *
+   * Regras:
+   * - `incluirInativos`: por padrão `false` (retorna só ATIVOS);
+   *   quando `true`, traz também INATIVOS (RN04).
+   * - Os termos informados (`termo`, `titulo`, `editora`) são combinados com **OR**:
+   *   basta o termo bater em QUALQUER um dos campos
+   *   (título OR editora).
+   *
    * Buscas por texto são case-insensitive e ignoram espaços nas extremidades (RNF04).
-   * Ordenação: primeiro os ATIVOS, depois INATIVOS; dentro de cada grupo, em ordem alfabética por título e editora.
+   * Ordenação: primeiro os ATIVOS, depois INATIVOS; dentro de cada grupo,
+   * em ordem alfabética por título e editora.
    */
   public consultar(filtro: {
     titulo?: string;

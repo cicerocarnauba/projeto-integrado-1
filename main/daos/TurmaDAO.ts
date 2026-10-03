@@ -60,11 +60,6 @@ export class TurmaDAO {
 
   /**
    * HU13 — Consultar Turma
-   * - `nome`: busca parcial em nome (case-insensitive e trim - RNF04).
-   * - `incluirInativos`: se explicitamente `false`, retorna apenas turmas com status ATIVO.
-   *   Por padrão (quando omitido ou `true`), a listagem/seleção de turmas traz todas as turmas,
-   *   ordenando primeiro as turmas com status "Ativa" e depois as com status "Inativa" (HU13).
-   * - Dentro de cada grupo de status, a ordenação é alfabética por nome.
    */
   public consultar(filtro: {
     nome?: string;
@@ -85,13 +80,72 @@ export class TurmaDAO {
       params.push(`%${nome}%`);
     }
 
-    // HU13: Por padrão, a seleção mostra primeiro as turmas com status "Ativa" e depois as turmas com status "Inativa"
     sql += ` ORDER BY
       CASE status WHEN 'ATIVO' THEN 0 ELSE 1 END,
       nome ASC`;
 
     const rows = this.db.prepare(sql).all(...params) as TurmaRow[];
     return rows.map((row) => this.mapRowToEntity(row));
+  }
+
+  /**
+   * HU18 — Atualiza o status da turma (ATIVO/INATIVO).
+   */
+  public atualizarStatus(id: number, status: StatusCadastro): void {
+    this.db
+      .prepare(
+        `UPDATE turma
+         SET status = ?, data_atualizacao = ?
+         WHERE id = ?`
+      )
+      .run(status, new Date().toISOString(), id);
+  }
+
+  /**
+   * HU14 — Atualiza o nome da turma.
+   */
+  public atualizar(turma: Turma): void {
+    this.db
+      .prepare(
+        `UPDATE turma
+         SET nome = ?, data_atualizacao = ?
+         WHERE id = ?`
+      )
+      .run(
+        turma.nome,
+        turma.dataAtualizacao.toISOString(),
+        turma.id
+      );
+  }
+
+  /**
+   * HU16 — Exclusão definitiva do banco de dados.
+   * Só deve ser chamada quando a turma NÃO possui histórico de empréstimos.
+   */
+  public excluir(id: number): void {
+    this.db.prepare(`DELETE FROM turma WHERE id = ?`).run(id);
+  }
+
+  /**
+   * HU17 — Verifica se a turma possui algum empréstimo pendente.
+   *
+   * IMPORTANTE: Quando o módulo de Empréstimos for criado, esta consulta
+   * deve ser substituída por uma query real na tabela `emprestimo`.
+   */
+  public possuiEmprestimoPendente(_turmaId: number): boolean {
+    // TODO: Substituir por consulta real quando a tabela `emprestimo` existir.
+    return false;
+  }
+
+  /**
+   * HU17 — Verifica se a turma possui histórico de empréstimos.
+   *
+   * IMPORTANTE: Quando o módulo de Empréstimos for criado, esta consulta
+   * deve ser substituída por uma query real na tabela `emprestimo`.
+   */
+  public possuiHistoricoEmprestimos(_turmaId: number): boolean {
+    // TODO: Substituir por consulta real quando a tabela `emprestimo` existir.
+    return false;
   }
 
   private mapRowToEntity(row: TurmaRow): Turma {
