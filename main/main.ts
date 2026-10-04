@@ -13,6 +13,10 @@ import { registerTurmaHandlers } from './ipc/turmaHandlers';
 import { LivroDAO } from './daos/LivroDAO';
 import { LivroController } from './controllers/LivroController';
 import { registerLivroHandlers } from './ipc/livroHandlers';
+import { EmprestimoDAO } from './daos/EmprestimoDAO';
+import { EmprestimoController } from './controllers/EmprestimoController';
+import { registerEmprestimoHandlers } from './ipc/emprestimoHandlers';
+
 
 const isProd = process.env.NODE_ENV === 'production';
 
@@ -39,6 +43,10 @@ function bootstrapBackend(): void {
   const livroDAO = new LivroDAO(db);
   const livroController = new LivroController(livroDAO);
   registerLivroHandlers(livroController);
+  // Empréstimo
+  const emprestimoDAO = new EmprestimoDAO(db);
+  const emprestimoController = new EmprestimoController(emprestimoDAO,livroDAO,professorDAO,turmaDAO);
+  registerEmprestimoHandlers(emprestimoController);
 }
 
 function resolvePreloadPath(): string {

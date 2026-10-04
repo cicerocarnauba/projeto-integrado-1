@@ -3,13 +3,18 @@ import {
   MdEdit,
   MdRemoveCircleOutline,
 } from "react-icons/md";
+
 import { Turma } from "../../types/turma";
+import DesativarButton from "../DesativarButton";
+import AtivarButton from "../AtivarButton";
+import ExcluirButton from "../ExcluirButton";
 
 interface CardTurmasProps {
   turma: Turma;
   onEditar?: (turma: Turma) => void;
   onDesativar?: (turma: Turma) => void;
   onAtivar?: (turma: Turma) => void;
+  onExcluir?: (turma: Turma) => void;
 }
 
 export default function CardTurma({
@@ -17,17 +22,10 @@ export default function CardTurma({
   onEditar,
   onDesativar,
   onAtivar,
+  onExcluir,
 }: CardTurmasProps) {
   const ativo = turma.status === "ATIVO";
-
-  const handleDesativar = (e: React.MouseEvent) => {
-    e.preventDefault();
-    onDesativar?.(turma);
-  };
-
-  const handleAtivar = (e: React.MouseEvent) => {
-    e.preventDefault();
-  };
+  const historico: boolean = false
 
   return (
     <div
@@ -77,15 +75,20 @@ export default function CardTurma({
                   <MdEdit size={14} />
                   Editar
                 </button>
-
-                <button
-                  type="button"
-                  onClick={handleDesativar}
-                  className="flex items-center gap-1.5 bg-[#cf4a4a] text-white px-3 py-1.5 text-xs rounded-lg font-medium hover:bg-[#b83a3a] transition-colors cursor-pointer shrink-0"
-                >
-                  <MdRemoveCircleOutline size={14} />
-                  Desativar
-                </button>
+                
+                {historico ? (
+                  <>
+                    <DesativarButton 
+                    onClick={() => onDesativar?.(turma)}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <ExcluirButton
+                      onClick={() => onExcluir?.(turma)}/>
+                  </>
+                )}
+                
               </>
             ) : (
               <>
@@ -99,14 +102,9 @@ export default function CardTurma({
                   Editar
                 </button>
 
-                <button
-                  type="button"
-                  onClick={handleAtivar}
-                  className="flex items-center gap-1.5 bg-[#2e8b45] text-white px-3 py-1.5 text-xs rounded-lg font-medium hover:bg-[#236c35] transition-colors cursor-pointer shrink-0"
-                >
-                  <MdCheckCircleOutline size={14} />
-                  Ativar
-                </button>
+                <AtivarButton 
+                  onClick={() => onAtivar?.(turma)}
+                />
               </>
             )}
           </div>

@@ -56,6 +56,28 @@ export class DatabaseConnection {
         data_cadastro         TEXT NOT NULL,
         data_atualizacao      TEXT NOT NULL
       );
+            CREATE TABLE IF NOT EXISTS emprestimo (
+        id              INTEGER PRIMARY KEY AUTOINCREMENT,
+        professor_id    INTEGER NOT NULL,
+        turma_id        INTEGER NOT NULL,
+        data_retirada   TEXT NOT NULL,
+        status          TEXT NOT NULL DEFAULT 'PENDENTE'
+                        CHECK (status IN ('PENDENTE', 'CONCLUIDO', 'CANCELADO')),
+        FOREIGN KEY (professor_id) REFERENCES professor(id),
+        FOREIGN KEY (turma_id)     REFERENCES turma(id)
+      );
+
+      CREATE TABLE IF NOT EXISTS item_emprestimo (
+        id                      INTEGER PRIMARY KEY AUTOINCREMENT,
+        emprestimo_id           INTEGER NOT NULL,
+        livro_id                INTEGER NOT NULL,
+        quantidade_retirada     INTEGER NOT NULL,
+        quantidade_devolvida    INTEGER NOT NULL DEFAULT 0,
+        quantidade_perdida      INTEGER NOT NULL DEFAULT 0,
+        quantidade_danificada   INTEGER NOT NULL DEFAULT 0,
+        FOREIGN KEY (emprestimo_id) REFERENCES emprestimo(id),
+        FOREIGN KEY (livro_id)      REFERENCES livro(id)
+      );
 
       -- RN06: chave única de título + editora (case-insensitive, sem espaços nas extremidades)
       CREATE UNIQUE INDEX IF NOT EXISTS idx_livro_titulo_editora_unique

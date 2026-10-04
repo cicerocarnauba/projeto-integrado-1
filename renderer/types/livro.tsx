@@ -21,4 +21,5 @@ export interface Livro extends CadastroLivroDTO {
   dataAtualizacao?: Date | string;
   ativo?: boolean;
   statusEmprestimo?: StatusEmprestimo;
+  possuiHistorico?: boolean;
 }
