@@ -8,6 +8,7 @@ import Paginacao from "../../components/Paginacao";
 import { useRouter } from "next/router";
 import { MdAdd } from "react-icons/md";
 import ModalConfirmacao from "../../components/ModalConfirmacao";
+import ModalAtivaLivro from "../../components/modal/ModalAtivaLivro";
 
 export default function GerenciarLivros() {
   const router = useRouter();
@@ -24,6 +25,7 @@ export default function GerenciarLivros() {
 
   const [listaLivros, setListaLivros] = useState<Livro[]>([]);
   const [carregando, setCarregando] = useState(true);
+  const [livroParaAtivar, setLivroParaAtivar] = useState<Livro | null>(null);
 
   const [termoBusca, setTermoBusca] = useState("");
   const [incluirInativos, setIncluirInativos] = useState<boolean>(false);
@@ -157,6 +159,12 @@ export default function GerenciarLivros() {
     return () => clearTimeout(timer);
   }, [feedback]);
 
+  function confirmarAtivacao(quantidadeTotal: number) {
+    // Subtarefa 3: aqui entra a chamada ao backend
+    // quando o canal existir.
+    console.log("Ativar livro:", livroParaAtivar?.id, quantidadeTotal);
+    setLivroParaAtivar(null);
+  }
   return (
     <div className="flex min-h-screen bg-white">
       <Sidebar />
@@ -227,6 +235,7 @@ export default function GerenciarLivros() {
                   livro={livro}
                   onEditar={(l) => router.push(`/livro/${l.id}`)}
                   onExcluir={(l) => setLivroParaExcluir(l)}
+                  onAtivar={(l) => setLivroParaAtivar(l)}
                 />
               ))}
             </div>
@@ -248,6 +257,12 @@ export default function GerenciarLivros() {
           carregando={excluindo}
           onConfirmar={confirmarExclusao}
           onCancelar={() => setLivroParaExcluir(null)}
+        />
+
+        <ModalAtivaLivro
+          livro={livroParaAtivar}
+          onConfirmar={confirmarAtivacao}
+          onCancelar={() => setLivroParaAtivar(null)}
         />
       </main>
     </div>
