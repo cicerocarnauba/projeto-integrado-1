@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import Sidebar from "../../components/Sidebar";
 import { Professor } from "../../types/professor";
 import { MdArrowBack } from "react-icons/md";
+import FormEditarProfessor from "../../components/professor/formEditarProfessor";
 
 export default function EditarProfessor() {
   const router = useRouter();
@@ -36,7 +37,7 @@ export default function EditarProfessor() {
         setErro(
           error instanceof Error
             ? error.message
-            : "Não foi possível carregar o professor."
+            : "Não foi possível carregar o professor.",
         );
       } finally {
         setCarregando(false);
@@ -88,16 +89,7 @@ export default function EditarProfessor() {
             </div>
           ) : (
             professor && (
-              <div className="w-full bg-[#eef7f0] rounded-2xl p-8 shadow-xs">
-                {/* TEMPORÁRIO: confere se os dados do professor estão chegando.
-                    Na subtarefa 2 este bloco é substituído pelo FormEditarProfessor. */}
-                <p className="text-sm text-gray-600">
-                  <span className="font-semibold text-[#1e582d]">
-                    {professor.primeiroNome} {professor.sobrenome}
-                  </span>{" "}
-                  — {professor.email}
-                </p>
-              </div>
+              <FormEditarProfessor key={professor.id} professor={professor} />
             )
           )}
         </div>
