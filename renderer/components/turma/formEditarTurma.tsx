@@ -52,7 +52,7 @@ export default function FormEditarTurma({ turma }: FormEditarTurmaProps) {
             });
 
             if (!resposta.success) {
-                mostrarErro(resposta.error || "Erro ao editar o turma.");
+                mostrarErro(resposta.error || "Erro ao editar a turma.");
                 return;
             }
 
@@ -65,7 +65,7 @@ export default function FormEditarTurma({ turma }: FormEditarTurmaProps) {
             mostrarErro(
                 error instanceof Error
                 ? error.message
-                : "Não foi possível editar o turma."
+                : "Não foi possível editar a turma."
             );
         } finally {
             setSalvando(false);
@@ -95,7 +95,7 @@ export default function FormEditarTurma({ turma }: FormEditarTurmaProps) {
         
         <div className="md:col-span-12">
           <label className="text-sm font-semibold text-[#1e582d] mb-2 block">
-            Título do turma
+            Nome da turma
           </label>
           <input
             type="text"
