@@ -7,6 +7,7 @@ export const LIVRO_CHANNELS = {
   EDITAR: 'livro:editar',
   EXCLUIR: 'livro:excluir',
   DESATIVAR: 'livro:desativar',
+  ATIVAR: 'livro:ativar',
 } as const;
 
 export function registerLivroHandlers(controller: LivroController): void {
@@ -90,6 +91,26 @@ export function registerLivroHandlers(controller: LivroController): void {
       return { success: true, data: resultado };
     } catch (error) {
       // RNF03 — Mensagem clara e amigavel, sem exibir codigo tecnico
+      return {
+        success: false,
+        error: (error as Error).message,
+      };
+    }
+  });
+
+  // HU05 — Ativar Livro (Equivalente ao Endpoint PATCH /livros/{id}/ativar)
+  ipcMain.handle(LIVRO_CHANNELS.ATIVAR, async (_event, idOrInput: any, maybeQuantidade?: any) => {
+    try {
+      const id = typeof idOrInput === 'object' && idOrInput !== null ? idOrInput.id : idOrInput;
+      const quantidadeTotal =
+        typeof idOrInput === 'object' && idOrInput !== null
+          ? idOrInput.quantidadeTotal
+          : maybeQuantidade;
+
+      const resultado = controller.ativar(Number(id), Number(quantidadeTotal));
+      return { success: true, data: resultado };
+    } catch (error) {
+      // RNF03 — Mensagem clara e amigável, sem exibir código técnico
       return {
         success: false,
         error: (error as Error).message,

@@ -206,6 +206,28 @@ declare global {
           };
           error?: string;
         }>;
+
+        ativar: (
+          id: number,
+          quantidadeTotal: number
+        ) => Promise<{
+          success: boolean;
+          data?: {
+            mensagem: string;
+            livro: {
+              id: number | null;
+              titulo: string;
+              editora: string;
+              quantidadeTotal: number;
+              quantidadeEmprestada: number;
+              saldoDisponivel: number;
+              status: 'ATIVO' | 'INATIVO';
+              dataCadastro: Date;
+              dataAtualizacao: Date;
+            };
+          };
+          error?: string;
+        }>;
       };
 
       emprestimo: {

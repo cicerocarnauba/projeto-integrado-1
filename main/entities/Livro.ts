@@ -140,5 +140,37 @@ export class Livro {
     this.status = 'INATIVO';
     this.dataAtualizacao = new Date();
   }
+
+  /**
+   * HU05 / RN04 — Ativação de Livro Inativo (Information Expert):
+   * Altera o status para "ATIVO", define a nova quantidade total de cópias
+   * e renova a data de atualização.
+   */
+  public ativar(novaQuantidadeTotal: number): void {
+    if (this.status !== 'INATIVO') {
+      throw new Error('Apenas livros com status "Inativo" podem ser ativados.');
+    }
+
+    if (
+      novaQuantidadeTotal === undefined ||
+      novaQuantidadeTotal === null ||
+      !Number.isInteger(novaQuantidadeTotal) ||
+      novaQuantidadeTotal <= 0
+    ) {
+      throw new Error(
+        'A "Quantidade Total de Cópias" deve ser um número inteiro maior que zero.'
+      );
+    }
+
+    if (novaQuantidadeTotal < this.quantidadeEmprestada) {
+      throw new Error(
+        `A nova quantidade total (${novaQuantidadeTotal}) não pode ser inferior à quantidade de cópias já emprestadas (${this.quantidadeEmprestada}).`
+      );
+    }
+
+    this.quantidadeTotal = novaQuantidadeTotal;
+    this.status = 'ATIVO';
+    this.dataAtualizacao = new Date();
+  }
 }
 
