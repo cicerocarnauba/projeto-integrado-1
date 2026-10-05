@@ -68,12 +68,9 @@ export default function EditarLivro() {
       <Sidebar />
 
       <main className="flex-1 p-8 flex flex-col animate-fade-in">
-        <p className="text-2xl font-bold text-gray-800 mb-6">
-          Gerenciar livros
-        </p>
 
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">
+          <h1 className="text-2xl font-bold text-black">
             Editar detalhes do livro
           </h1>
 
