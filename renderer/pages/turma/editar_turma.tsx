@@ -5,7 +5,7 @@ import FormEditarTurma from "../../components/turma/formEditarTurma";
 import { Turma } from "../../types/turma";
 import { MdArrowBack } from "react-icons/md";
 
-export default function EditarLivro() {
+export default function EditarTurma() {
   const router = useRouter();
 
   const [turma, setTurma] = useState<Turma | null>(null);
@@ -25,7 +25,6 @@ export default function EditarLivro() {
 
     async function carregarTurma() {
       try {
-        // Não existe canal turma:buscarPorId, então consulta incluindo inativos e filtra pelo id
         const resposta = await window.ipc.turma.consultar({
           incluirInativos: true,
         });
@@ -38,15 +37,11 @@ export default function EditarLivro() {
         const encontrada = resposta.data.find((item) => item.id === id);
 
         if (!encontrada) {
-          setErro("Turma não encontrada no acervo.");
+          setErro("Turma não encontrada.");
           return;
         }
 
-        setTurma({
-          ...encontrada,
-          id,
-          ativo: encontrada.status === "ATIVO",
-        });
+        setTurma(encontrada);
       } catch (error) {
         setErro(
           error instanceof Error
@@ -69,7 +64,7 @@ export default function EditarLivro() {
 
       <main className="flex-1 p-8 flex flex-col animate-fade-in">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">
+          <h1 className="text-2xl font-bold text-black">
             Editar detalhes da turma
           </h1>
 
@@ -78,7 +73,7 @@ export default function EditarLivro() {
             onClick={() => router.push("/turma")}
             className="flex items-center gap-1.5 bg-[#2e8b45] text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#236c35] transition-all shadow-sm cursor-pointer"
           >
-            <MdArrowBack size={18} />
+            <MdArrowBack size={14} />
             Voltar
           </button>
         </div>
@@ -94,7 +89,7 @@ export default function EditarLivro() {
             </div>
           ) : inativo ? (
             <div className="w-full rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-              Apenas turmas com status "Ativa" podem ser editadas. Reative a
+              Apenas turmas ativas podem ser editadas. Reative a
               turma antes de editar.
             </div>
           ) : (
