@@ -150,6 +150,45 @@ export class LivroDAO {
     return false;
   }
 
+  /**
+   * HU04 / RN04 — Verifica se o livro possui algum empréstimo com status "PENDENTE".
+   * A desativação manual é bloqueada enquanto houver empréstimos pendentes associados.
+   * Consulta a tabela item_emprestimo JOIN emprestimo filtrando status = 'PENDENTE'.
+   */
+  public possuiEmprestimoPendente(id: number): boolean {
+    const livro = this.buscarPorId(id);
+    if (!livro) {
+      return false;
+    }
+
+    if (livro.quantidadeEmprestada > 0) {
+      return true;
+    }
+
+    try {
+      const temItemEmprestimo = this.db
+        .prepare(`SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'item_emprestimo'`)
+        .get();
+      if (!temItemEmprestimo) {
+        return false;
+      }
+
+      const row = this.db
+        .prepare(`
+          SELECT COUNT(*) as count
+          FROM item_emprestimo ie
+          INNER JOIN emprestimo e ON e.id = ie.emprestimo_id
+          WHERE ie.livro_id = ?
+            AND e.status = 'PENDENTE'
+        `)
+        .get(id) as { count: number } | undefined;
+
+      return !!(row && row.count > 0);
+    } catch {
+      return false;
+    }
+  }
+
 
   /**
    * RN06 — Chave única: combinação de Título e Editora.

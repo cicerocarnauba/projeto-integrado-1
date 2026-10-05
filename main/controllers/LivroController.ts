@@ -269,6 +269,12 @@ export class LivroController {
       throw new Error('Apenas livros com status "Ativo" podem ser desativados.');
     }
 
+    if (this.livroDAO.possuiEmprestimoPendente(id)) {
+      throw new Error(
+        'Não é possível desativar este livro, pois ele possui empréstimos pendentes.'
+      );
+    }
+
     livro.desativar();
     this.livroDAO.atualizar(livro);
 
