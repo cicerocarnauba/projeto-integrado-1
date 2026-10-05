@@ -15,6 +15,8 @@ import { MdAdd } from "react-icons/md";
 export default function GerenciarProfessores() {
   const router = useRouter();
   const mostrarSucesso = router.query.sucesso === "1";
+  const sucessoEdicao =
+    router.query.sucesso === "editado" || router.query.aviso === "editado";
 
   const [professores, setPofessores] = useState<any[]>([]);
   const [carregado, setCarregado] = useState(true);
@@ -104,6 +106,12 @@ export default function GerenciarProfessores() {
         {mostrarSucesso && (
           <div className="bg-[#d8f3dc] text-[#2e8b45] px-4 py-2.5 rounded-xl mb-4 text-sm font-medium flex items-center gap-2">
             ✓ Professor cadastrado com sucesso!
+          </div>
+        )}
+
+        {sucessoEdicao && (
+          <div className="bg-[#d8f3dc] text-[#2e8b45] px-4 py-2.5 rounded-xl mb-4 text-sm font-medium flex items-center gap-2">
+            ✓ Professor editado com sucesso!
           </div>
         )}
 
