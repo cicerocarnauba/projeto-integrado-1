@@ -13,5 +13,6 @@ export interface Professor extends CadastroProfessorDTO {
   dataAtualizacao?: string;
   ativo?: boolean;
   statusEmprestimoProf?: string;
+  possuiHistorico?: boolean;
 }
 
