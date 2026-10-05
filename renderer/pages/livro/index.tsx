@@ -7,7 +7,7 @@ import CardLivro from "../../components/livro/cardLivro";
 import Paginacao from "../../components/Paginacao";
 import { useRouter } from "next/router";
 import { MdAdd } from "react-icons/md";
-import ModalConfirmacao from "../../components/ModalConfirmacao";
+import ModalConfirmacao from "../../components/modal/ModalConfirmacao";
 import ModalAtivaLivro from "../../components/modal/ModalAtivaLivro";
 
 export default function GerenciarLivros() {

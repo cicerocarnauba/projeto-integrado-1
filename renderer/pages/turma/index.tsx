@@ -169,7 +169,6 @@ export default function GerenciarTurmas() {
       )
     }
   };
-
     const handleAtivar = async (turma: Turma) => {
     try {
       const resposta = await window.ipc?.turma?.ativar(turma.id);
@@ -276,6 +275,7 @@ export default function GerenciarTurmas() {
 
                   <CardTurma
                     turma={turma}
+                    onEditar={(l) => router.push(`/turma/${l.id}`)}
                     onDesativar={handleDesativar}
                     onAtivar={handleAtivar}
                     onExcluir={(turma) => setTurmaParaExcluir(turma)}
