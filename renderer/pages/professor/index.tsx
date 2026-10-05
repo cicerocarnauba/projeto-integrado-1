@@ -15,6 +15,8 @@ import { MdAdd } from "react-icons/md";
 export default function GerenciarProfessores() {
   const router = useRouter();
   const mostrarSucesso = router.query.sucesso === "1";
+  const sucessoEdicao =
+    router.query.sucesso === "editado" || router.query.aviso === "editado";
 
   const [professores, setPofessores] = useState<any[]>([]);
   const [carregado, setCarregado] = useState(true);
@@ -42,18 +44,18 @@ export default function GerenciarProfessores() {
           incluirInativos: incluirInativos,
         });
 
-        if (!resposta.success){
+        if (!resposta.success) {
           setErro(resposta.error || "Erro ao carregar professores.");
           return;
         }
 
         setPofessores(resposta.data || []);
       } catch (error) {
-        const mensagem = 
+        const mensagem =
           error instanceof Error
             ? error.message
-            : "Não foi possível carregar os professores."
-        
+            : "Não foi possível carregar os professores.";
+
         setErro(mensagem);
       } finally {
         setCarregado(false);
@@ -77,7 +79,7 @@ export default function GerenciarProfessores() {
 
   const totalPaginas = Math.max(
     1,
-    Math.ceil(professoresExibidos.length / ITENS_POR_PAGINA)
+    Math.ceil(professoresExibidos.length / ITENS_POR_PAGINA),
   );
 
   useEffect(() => {
@@ -89,7 +91,7 @@ export default function GerenciarProfessores() {
   const inicio = (paginaAtual - 1) * ITENS_POR_PAGINA;
   const professoresPaginados = professoresExibidos.slice(
     inicio,
-    inicio + ITENS_POR_PAGINA
+    inicio + ITENS_POR_PAGINA,
   );
 
   return (
@@ -107,9 +109,15 @@ export default function GerenciarProfessores() {
           </div>
         )}
 
+        {sucessoEdicao && (
+          <div className="bg-[#d8f3dc] text-[#2e8b45] px-4 py-2.5 rounded-xl mb-4 text-sm font-medium flex items-center gap-2">
+            ✓ Professor editado com sucesso!
+          </div>
+        )}
+
         {/* Barra de busca e botão de adicionar */}
         <div className="flex items-start gap-4 mb-5 w-full">
-          <SearchBar 
+          <SearchBar
             placeholder="Pesquisar professor por nome ou e-mail..."
             valorBusca={termoBusca}
             onChangeBusca={setTermoBusca}
@@ -137,9 +145,7 @@ export default function GerenciarProfessores() {
 
         {carregado ? (
           <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
-            <p className="text-base font-medium">
-              Carregando professores...
-            </p>
+            <p className="text-base font-medium">Carregando professores...</p>
           </div>
         ) : professores.length === 0 ? (
           <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
@@ -157,6 +163,7 @@ export default function GerenciarProfessores() {
                 <CardProfessor
                   key={professor.id}
                   professor={professor}
+                  onEditar={(p) => router.push(`/professor/${p.id}`)}
                 />
               ))}
             </div>
