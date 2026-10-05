@@ -45,6 +45,11 @@ export interface DesativarLivroDTO {
   livro: LivroConsultaDTO;
 }
 
+export interface AtivarLivroDTO {
+  mensagem: string;
+  livro: LivroConsultaDTO;
+}
+
 // GRASP Controller: ponto de entrada das operações de Livro
 
 // GRASP Creator: é quem cria instâncias de Livro
@@ -280,6 +285,46 @@ export class LivroController {
 
     return {
       mensagem: 'Livro desativado com sucesso.',
+      livro: {
+        id: livro.id,
+        titulo: livro.titulo,
+        editora: livro.editora,
+        quantidadeTotal: livro.quantidadeTotal,
+        quantidadeEmprestada: livro.quantidadeEmprestada,
+        saldoDisponivel: livro.getSaldoDisponivel(),
+        status: livro.status,
+        dataCadastro: livro.dataCadastro,
+        dataAtualizacao: livro.dataAtualizacao,
+      },
+    };
+  }
+
+  /**
+   * HU05 — Ativar Livro
+   * Regras aplicadas:
+   *  - Só é possível ativar um livro com status "Inativo".
+   *  - O status muda para "Ativo" com a nova quantidade informada.
+   *  - Caso o livro não seja encontrado, rejeita com mensagem clara (RNF03).
+   */
+  public ativar(id: number, quantidadeTotal: number): AtivarLivroDTO {
+    if (!id || !Number.isInteger(id) || id <= 0) {
+      throw new Error('ID do livro inválido para ativação.');
+    }
+
+    const livro = this.livroDAO.buscarPorId(id);
+    if (!livro) {
+      throw new Error('Livro não encontrado no acervo.');
+    }
+
+    if (livro.status === 'ATIVO') {
+      throw new Error('Este livro já está ativo.');
+    }
+
+    livro.ativar(quantidadeTotal);
+    this.livroDAO.atualizar(livro);
+
+    return {
+      mensagem: 'Livro ativado com sucesso.',
       livro: {
         id: livro.id,
         titulo: livro.titulo,

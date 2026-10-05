@@ -33,6 +33,8 @@ contextBridge.exposeInMainWorld('ipc', {
       ipcRenderer.invoke('livro:editar', id, input),
     excluir: (id: number) => ipcRenderer.invoke('livro:excluir', id),
     desativar: (id: number) => ipcRenderer.invoke('livro:desativar', id),
+    ativar: (id: number, quantidadeTotal: number) =>
+      ipcRenderer.invoke('livro:ativar', id, quantidadeTotal),
   },
     emprestimo: {
     realizar: (input: {
