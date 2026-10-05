@@ -231,7 +231,7 @@ export default function GerenciarTurmas() {
         </div>
 
         {feedback && (
-          <div className="fixed top-31.5 left-45 z-50 bg-[#d8f3dc] text-[#2e8b45] px-4 py-2.5 rounded-xl mb-4 text-sm font-medium flex items-center gap-2 animate-fade-in">
+          <div className=" w-[657.5px] fixed top-31.5 left-45 z-50 bg-[#d8f3dc] text-[#2e8b45] px-4 py-2.5 rounded-xl mb-4 text-sm font-medium flex items-center gap-2 animate-fade-in">
             ✓ {feedback}
           </div>
         )}
@@ -275,7 +275,12 @@ export default function GerenciarTurmas() {
 
                   <CardTurma
                     turma={turma}
-                    onEditar={(l) => router.push(`/turma/${l.id}`)}
+                    onEditar={ (turma) => {
+                      router.push({
+                        pathname: "/turma/editar_turma",
+                        query: {id: turma.id}
+                      })
+                    }}
                     onDesativar={handleDesativar}
                     onAtivar={handleAtivar}
                     onExcluir={(turma) => setTurmaParaExcluir(turma)}
@@ -308,7 +313,6 @@ export default function GerenciarTurmas() {
             ) : (
               ""
             )
-
           }
           onCancelar={() => setTurmaParaExcluir(null)}
           onConfirmar={async () => {
