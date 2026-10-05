@@ -1,6 +1,5 @@
 import { MdEdit } from "react-icons/md";
 import { Livro } from "../../types/livro";
-// Ajuste os três caminhos para a pasta onde estão os botões (Ctrl + P e busque "ExcluirButton")
 import ExcluirButton from "../ExcluirButton";
 import DesativarButton from "../DesativarButton";
 import AtivarButton from "../AtivarButton";
