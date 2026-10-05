@@ -198,7 +198,7 @@ export class LivroController {
    *  - Caso o livro não seja encontrado, rejeita com mensagem clara (RNF03).
    */
   public excluir(id: number): ResultadoExclusaoLivroDTO {
-    if (!id || !Number.isInteger(id)) {
+    if (!id || !Number.isInteger(id) || id <= 0) {
       throw new Error('ID do livro inválido para exclusão.');
     }
 
