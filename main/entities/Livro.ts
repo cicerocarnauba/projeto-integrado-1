@@ -151,6 +151,23 @@ export class Livro {
       throw new Error('Apenas livros com status "Inativo" podem ser ativados.');
     }
 
+    if (
+      novaQuantidadeTotal === undefined ||
+      novaQuantidadeTotal === null ||
+      !Number.isInteger(novaQuantidadeTotal) ||
+      novaQuantidadeTotal <= 0
+    ) {
+      throw new Error(
+        'A "Quantidade Total de Cópias" deve ser um número inteiro maior que zero.'
+      );
+    }
+
+    if (novaQuantidadeTotal < this.quantidadeEmprestada) {
+      throw new Error(
+        `A nova quantidade total (${novaQuantidadeTotal}) não pode ser inferior à quantidade de cópias já emprestadas (${this.quantidadeEmprestada}).`
+      );
+    }
+
     this.quantidadeTotal = novaQuantidadeTotal;
     this.status = 'ATIVO';
     this.dataAtualizacao = new Date();

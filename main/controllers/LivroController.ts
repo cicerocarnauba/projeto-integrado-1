@@ -311,6 +311,19 @@ export class LivroController {
       throw new Error('ID do livro inválido para ativação.');
     }
 
+    if (
+      quantidadeTotal === undefined ||
+      quantidadeTotal === null ||
+      typeof quantidadeTotal !== 'number' ||
+      isNaN(quantidadeTotal)
+    ) {
+      throw new Error('Informe a nova quantidade de exemplares para ativar o livro.');
+    }
+
+    if (!Number.isInteger(quantidadeTotal) || quantidadeTotal <= 0) {
+      throw new Error('A quantidade deve ser um número inteiro maior que zero.');
+    }
+
     const livro = this.livroDAO.buscarPorId(id);
     if (!livro) {
       throw new Error('Livro não encontrado no acervo.');
