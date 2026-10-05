@@ -116,7 +116,7 @@ export default function FormEditarLivro({ livro }: FormEditarLivroProps) {
     <form
       onSubmit={salvar}
       noValidate
-      className="w-full max-w-2xl bg-[#eef7f0] rounded-2xl p-8 shadow-xs"
+      className="w-full bg-[#eef7f0] rounded-2xl p-8 shadow-xs"
     >
       {erro && (
         <div
@@ -205,7 +205,7 @@ export default function FormEditarLivro({ livro }: FormEditarLivroProps) {
       {/* Efeito em tempo real da quantidade escolhida */}
       <div className="mb-8 space-y-3">
         <p className="text-sm text-[#245B2F]">
-          Disponíveis para empréstimo:{" "}
+          Exemplares disponíveis para empréstimo:{" "}
           <span className="font-bold">{disponiveis}</span>
           {emprestados > 0 && (
             <span className="text-[#5AA365]">
