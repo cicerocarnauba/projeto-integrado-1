@@ -6,6 +6,7 @@ export const LIVRO_CHANNELS = {
   CONSULTAR: 'livro:consultar',
   EDITAR: 'livro:editar',
   EXCLUIR: 'livro:excluir',
+  DESATIVAR: 'livro:desativar',
 } as const;
 
 export function registerLivroHandlers(controller: LivroController): void {
@@ -74,6 +75,21 @@ export function registerLivroHandlers(controller: LivroController): void {
       return { success: true, data: resultado };
     } catch (error) {
       // RNF03 — Mensagem clara e amigável, sem exibir código técnico
+      return {
+        success: false,
+        error: (error as Error).message,
+      };
+    }
+  });
+
+
+  // HU04 — Desativar Livro (Equivalente ao Endpoint PATCH /livros/{id}/desativar)
+  ipcMain.handle(LIVRO_CHANNELS.DESATIVAR, async (_event, id: any) => {
+    try {
+      const resultado = controller.desativar(Number(id));
+      return { success: true, data: resultado };
+    } catch (error) {
+      // RNF03 — Mensagem clara e amigavel, sem exibir codigo tecnico
       return {
         success: false,
         error: (error as Error).message,
