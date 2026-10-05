@@ -3,7 +3,6 @@ import { useState } from "react";
 import { MdCheck, MdClear } from "react-icons/md";
 import { Professor } from "../../types/professor";
 
-
 interface FormEditarProfessorProps {
   professor: Professor;
 }
@@ -17,8 +16,47 @@ export default function FormEditarProfessor({
   const [sobrenome, setSobrenome] = useState(professor.sobrenome);
   const [email, setEmail] = useState(professor.email);
 
+  const [erro, setErro] = useState("");
+
+  // Usada pelas validações do front e, na subtarefa 4, pela resposta do backend
+  function mostrarErro(mensagem: string) {
+    setErro(mensagem);
+  }
+
+  function limparErro() {
+    if (erro) setErro("");
+  }
+
+  function validar(): string | null {
+    if (!primeiroNome.trim()) {
+      return 'O campo "Primeiro nome" é obrigatório.';
+    }
+
+    if (!sobrenome.trim()) {
+      return 'O campo "Sobrenome" é obrigatório.';
+    }
+
+    if (!email.trim()) {
+      return 'O campo "E-mail" é obrigatório.';
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      return "Informe um e-mail válido.";
+    }
+
+    return null;
+  }
+
   function salvar(e: React.FormEvent) {
     e.preventDefault();
+    limparErro();
+
+    const mensagemErro = validar();
+
+    if (mensagemErro) {
+      mostrarErro(mensagemErro);
+      return;
+    }
 
     const dados = {
       id: professor.id,
@@ -27,7 +65,9 @@ export default function FormEditarProfessor({
       email: email.trim(),
     };
 
-    // Subtarefa 4: aqui entra window.ipc.professor.editar(dados)
+    // Subtarefa 4: aqui entra window.ipc.professor.editar(dados).
+    // Se vier { success: false, error }, chamar mostrarErro(resposta.error)
+    // (cobre e-mail duplicado e professor inativo).
     console.log("Edição (ainda não salva):", dados);
   }
 
@@ -38,8 +78,18 @@ export default function FormEditarProfessor({
   return (
     <form
       onSubmit={salvar}
+      noValidate
       className="w-full bg-[#eef7f0] rounded-2xl p-8 shadow-xs"
     >
+      {erro && (
+        <div
+          role="alert"
+          className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+        >
+          {erro}
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-8">
         <div className="md:col-span-5">
           <label className="text-sm font-semibold text-[#1e582d] mb-2 block">
@@ -47,9 +97,11 @@ export default function FormEditarProfessor({
           </label>
           <input
             type="text"
-            required
             value={primeiroNome}
-            onChange={(e) => setPrimeiroNome(e.target.value)}
+            onChange={(e) => {
+              limparErro();
+              setPrimeiroNome(e.target.value);
+            }}
             className="w-full bg-white border border-[#cde5d3] rounded-xl px-4 py-3 text-sm text-gray-800 placeholder:text-gray-400 outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20"
           />
         </div>
@@ -60,9 +112,11 @@ export default function FormEditarProfessor({
           </label>
           <input
             type="text"
-            required
             value={sobrenome}
-            onChange={(e) => setSobrenome(e.target.value)}
+            onChange={(e) => {
+              limparErro();
+              setSobrenome(e.target.value);
+            }}
             className="w-full bg-white border border-[#cde5d3] rounded-xl px-4 py-3 text-sm text-gray-800 placeholder:text-gray-400 outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20"
           />
         </div>
@@ -73,9 +127,11 @@ export default function FormEditarProfessor({
           </label>
           <input
             type="email"
-            required
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              limparErro();
+              setEmail(e.target.value);
+            }}
             className="w-full bg-white border border-[#cde5d3] rounded-xl px-4 py-3 text-sm text-gray-800 placeholder:text-gray-400 outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20"
           />
         </div>
