@@ -40,6 +40,11 @@ export interface ResultadoExclusaoLivroDTO {
   livro?: LivroConsultaDTO;
 }
 
+export interface DesativarLivroDTO {
+  mensagem: string;
+  livro: LivroConsultaDTO;
+}
+
 // GRASP Controller: ponto de entrada das operações de Livro
 
 // GRASP Creator: é quem cria instâncias de Livro
@@ -240,5 +245,46 @@ export class LivroController {
       },
     };
   }
-}
 
+  /**
+   * HU04 / RN04 — Desativar Livro Manualmente
+   * Regras aplicadas:
+   *  - Só é possível desativar um livro com status "Ativo" (Conversa da HU04).
+   *  - A desativação NÃO depende de o livro ter ou não histórico — diferente da exclusão.
+   *  - Bloqueada se houver algum empréstimo com status "Pendente" associado ao livro.
+   *  - O livro passa a ter status "Inativo" e não aparece nas operações do dia a dia,
+   *    mas permanece consultável no histórico (RF04 com incluirInativos: true).
+   */
+  public desativar(id: number): DesativarLivroDTO {
+    if (!id || !Number.isInteger(id) || id <= 0) {
+      throw new Error('ID do livro inválido para desativação.');
+    }
+
+    const livro = this.livroDAO.buscarPorId(id);
+    if (!livro) {
+      throw new Error('Livro não encontrado no acervo.');
+    }
+
+    if (livro.status !== 'ATIVO') {
+      throw new Error('Apenas livros com status "Ativo" podem ser desativados.');
+    }
+
+    livro.desativar();
+    this.livroDAO.atualizar(livro);
+
+    return {
+      mensagem: 'Livro desativado com sucesso.',
+      livro: {
+        id: livro.id,
+        titulo: livro.titulo,
+        editora: livro.editora,
+        quantidadeTotal: livro.quantidadeTotal,
+        quantidadeEmprestada: livro.quantidadeEmprestada,
+        saldoDisponivel: livro.getSaldoDisponivel(),
+        status: livro.status,
+        dataCadastro: livro.dataCadastro,
+        dataAtualizacao: livro.dataAtualizacao,
+      },
+    };
+  }
+}
