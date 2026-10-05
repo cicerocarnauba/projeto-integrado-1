@@ -81,7 +81,7 @@ export default function FormCadastroTurma() {
           type="button"
           onClick={cancelar}
           disabled={salvando}
-          className="flex items-center gap-1.5 px-6 py-2.5 rounded-xl text-sm font-medium text-white bg-red-500 hover:bg-red-600 transition-colors shadow-xs active:scale-95 cursor-pointer"
+          className="flex items-center gap-1.5 px-6 py-2.5 rounded-xl text-sm font-medium text-white bg-[#cf4a4a] hover:bg-red-600 transition-colors shadow-xs active:scale-95 cursor-pointer"
         >
           <MdClear size={18} />
           Cancelar
