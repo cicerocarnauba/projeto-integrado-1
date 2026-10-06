@@ -8,7 +8,10 @@ import Sidebar from "../../components/Sidebar";
 import SearchBar, { TipoOrdenacao } from "../../components/Searchbar";
 import CardTurma from "../../components/turma/cardTurma";
 import Paginacao from "../../components/Paginacao";
+
 import ModalExcluir from "../../components/modal/modalExcluir";
+import ModalAtivar from "../../components/modal/modalAtivar";
+import ModalDesativar from "../../components/modal/modalDesativar";
 
 
 import { MdAdd } from "react-icons/md";
@@ -30,6 +33,8 @@ export default function GerenciarTurmas() {
   
   const [turmaParaExcluir, setTurmaParaExcluir] = useState<Turma | null>(null);
   const [turmaExcluindo, setTurmaExcluindo] = useState<number | null>(null);
+  const [turmaParaAtivar, setTurmaParaAtivar] = useState<Turma | null>(null);
+  const [turmaParaDesativar, setTurmaParaDesativar] = useState<Turma | null>(null);
 
   const [feedback, setFeedback] = useState("");
 
@@ -281,8 +286,8 @@ export default function GerenciarTurmas() {
                         query: {id: turma.id}
                       })
                     }}
-                    onDesativar={handleDesativar}
-                    onAtivar={handleAtivar}
+                    onDesativar={(turma) => setTurmaParaDesativar(turma)}
+                    onAtivar={(turma) => setTurmaParaAtivar(turma)}
                     onExcluir={(turma) => setTurmaParaExcluir(turma)}
                   />
                 </div>
@@ -306,7 +311,7 @@ export default function GerenciarTurmas() {
             turmaParaExcluir ? (
               <>
                 Tem certeza que deseja excluir a turma:
-                <span className="block font-bold text-[#2e8b45]">
+                <span className="block font-bold text-[#cf4a4a]">
                   {turmaParaExcluir.nome}
                 </span>
               </>
@@ -328,7 +333,58 @@ export default function GerenciarTurmas() {
               setTurmaExcluindo(null);
             }, 200);
           }}
-        
+        />
+
+        <ModalDesativar
+          aberto={turmaParaDesativar !== null}
+          mensagem={
+            turmaParaDesativar ? (
+              <>
+                Tem certeza que deseja desativar a turma:
+                <span className="block font-bold text-[#cf4a4a]">
+                  {turmaParaDesativar.nome}
+                </span>
+              </>
+            ) : (
+              ""
+            )
+          }
+          onCancelar={() => setTurmaParaDesativar(null)}
+          onConfirmar={async () => {
+            if (!turmaParaDesativar) return;
+
+            const turma = turmaParaDesativar;
+
+            setTurmaParaDesativar(null);
+
+            await handleDesativar(turma);
+          }}
+        />
+
+        <ModalAtivar
+          aberto={turmaParaAtivar !== null}
+          mensagem={
+            turmaParaAtivar ? (
+              <>
+                Tem certeza que deseja ativar a turma:
+                <span className="block font-bold text-[#2e8b45]">
+                  {turmaParaAtivar.nome}
+                </span>
+              </>
+            ) : (
+              ""
+            )
+          }
+          onCancelar={() => setTurmaParaAtivar(null)}
+          onConfirmar={async () => {
+            if (!turmaParaAtivar) return;
+
+            const turma = turmaParaAtivar;
+
+            setTurmaParaAtivar(null);
+
+            await handleAtivar(turma);
+          }}
         />
 
       </main>
