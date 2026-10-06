@@ -3,6 +3,7 @@ import { useState } from "react";
 import { MdCheck, MdClear } from "react-icons/md";
 import { Livro } from "../../types/livro";
 
+import ModalEditar from "../modal/modalEditar";
 interface FormEditarLivroProps {
   livro: Livro;
 }
@@ -22,6 +23,8 @@ export default function FormEditarLivro({ livro }: FormEditarLivroProps) {
 
   const [erro, setErro] = useState("");
   const [salvando, setSalvando] = useState(false);
+
+  const [modalAberto, setModalAberto] = useState(false);
 
   // Saldo que ficaria disponível para empréstimo com a quantidade digitada
   const disponiveis = Math.max(0, quantidadeTotal - emprestados);
@@ -56,7 +59,7 @@ export default function FormEditarLivro({ livro }: FormEditarLivroProps) {
     return null;
   }
 
-  async function salvar(e: React.FormEvent) {
+  function salvar(e: React.FormEvent) {
     e.preventDefault();
     limparErro();
 
@@ -66,6 +69,12 @@ export default function FormEditarLivro({ livro }: FormEditarLivroProps) {
       mostrarErro(mensagemErro);
       return;
     }
+
+    setModalAberto(true);
+  }
+
+  async function confirmarEdicao() {
+    setModalAberto(false);
 
     setSalvando(true);
 
@@ -97,6 +106,7 @@ export default function FormEditarLivro({ livro }: FormEditarLivroProps) {
       setSalvando(false);
     }
   }
+
 
   function cancelar() {
     router.push("/livro");
@@ -247,6 +257,20 @@ export default function FormEditarLivro({ livro }: FormEditarLivroProps) {
           {salvando ? "Salvando..." : "Confirmar edição"}
         </button>
       </div>
+
+      <ModalEditar
+        aberto={modalAberto}
+        mensagem={
+          <>
+            Deseja salvar as alterações do livro?
+            <span className="block font-bold text-[#2e8b45]">
+              {titulo}
+            </span>
+          </>
+        }
+        onCancelar={() => setModalAberto(false)}
+        onConfirmar={confirmarEdicao}
+      />
     </form>
   );
 }
