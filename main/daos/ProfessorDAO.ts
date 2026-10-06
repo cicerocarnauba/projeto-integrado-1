@@ -137,12 +137,55 @@ export class ProfessorDAO {
       );
   }
 
-  public possuiEmprestimoPendente(_professorId: number): boolean {
-    return false;
+  /**
+   * HU10 / HU11 — Verifica se o professor possui histórico de empréstimos.
+   * Um professor tem histórico se existe qualquer registro em `emprestimo`
+   * associado a ele (independente do status: PENDENTE, CONCLUIDO ou CANCELADO).
+   */
+  public possuiHistoricoEmprestimos(professorId: number): boolean {
+    try {
+      const temTabela = this.db
+        .prepare(
+          `SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'emprestimo'`
+        )
+        .get();
+      if (!temTabela) return false;
+
+      const row = this.db
+        .prepare(
+          `SELECT COUNT(*) as count FROM emprestimo WHERE professor_id = ?`
+        )
+        .get(professorId) as { count: number } | undefined;
+
+      return !!row && row.count > 0;
+    } catch {
+      return false;
+    }
   }
 
-  public possuiHistoricoEmprestimos(_professorId: number): boolean {
-    return false;
+  /**
+   * HU10 / HU11 — Verifica se o professor possui empréstimo com status PENDENTE.
+   */
+  public possuiEmprestimoPendente(professorId: number): boolean {
+    try {
+      const temTabela = this.db
+        .prepare(
+          `SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'emprestimo'`
+        )
+        .get();
+      if (!temTabela) return false;
+
+      const row = this.db
+        .prepare(
+          `SELECT COUNT(*) as count FROM emprestimo
+           WHERE professor_id = ? AND status = 'PENDENTE'`
+        )
+        .get(professorId) as { count: number } | undefined;
+
+      return !!row && row.count > 0;
+    } catch {
+      return false;
+    }
   }
 
   private mapRowToEntity(row: ProfessorRow): Professor {

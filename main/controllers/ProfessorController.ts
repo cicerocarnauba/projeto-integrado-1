@@ -19,6 +19,23 @@ export interface EditarProfessorInput {
   email: string;
 }
 
+/**
+ * DTO retornado por `consultar` e `buscarPorId`.
+ * Contém todos os campos da entidade Professor + o booleano `possuiHistorico`
+ * calculado sob demanda, usado pelo front para decidir entre
+ * habilitar "Desativar" ou "Excluir".
+ */
+export interface ProfessorDTO {
+  id: number | null;
+  primeiroNome: string;
+  sobrenome: string;
+  email: string;
+  status: 'ATIVO' | 'INATIVO';
+  dataCadastro: Date;
+  dataAtualizacao: Date;
+  possuiHistorico: boolean;
+}
+
 // GRASP Controller: ponto de entrada das operações de Professor
 // GRASP Creator: é quem cria instâncias de Professor
 export class ProfessorController {
@@ -57,28 +74,37 @@ export class ProfessorController {
 
   /**
    * RF09 — Consultar Professor
+   * Retorna DTO com `possuiHistorico` em cada item.
    */
-  public consultar(input: ConsultarProfessorInput): Professor[] {
-    return this.professorDAO.consultar({
+  public consultar(input: ConsultarProfessorInput): ProfessorDTO[] {
+    const professores = this.professorDAO.consultar({
       nome: input.nome,
       email: input.email,
       incluirInativos: input.incluirInativos,
     });
+    return professores.map((p) => this.toDTO(p));
   }
 
   /**
    * Apoio ao fluxo de Detalhes/Edição.
+   * Retorna DTO com `possuiHistorico`.
    */
-  public buscarPorId(id: number): Professor {
+  public buscarPorId(id: number): ProfessorDTO {
     const professor = this.professorDAO.buscarPorId(id);
     if (!professor) {
       throw new Error('Professor não encontrado.');
     }
-    return professor;
+    return this.toDTO(professor);
   }
 
   /**
    * HU10 — Excluir Professor
+   *
+   * Regras:
+   * 1. O professor precisa existir.
+   * 2. Se houver empréstimo PENDENTE associado → bloqueia.
+   * 3. Se houver histórico → desativação lógica (status = INATIVO).
+   * 4. Se NÃO houver histórico → exclusão física do banco de dados.
    */
   public excluir(id: number): { tipo: 'EXCLUSAO' | 'DESATIVACAO'; professor: Professor } {
     const professor = this.professorDAO.buscarPorId(id);
@@ -172,24 +198,22 @@ export class ProfessorController {
    * Relações: [RF12], [RN04], [RNF03]
    */
   public reativar(id: number): Professor {
-    // 1. Busca o professor
     const professor = this.professorDAO.buscarPorId(id);
     if (!professor) {
       throw new Error('Professor não encontrado.');
     }
 
-    // 2. Só permite reativar quem está INATIVO
     if (professor.status === 'ATIVO') {
       throw new Error('Este professor já está ativo.');
     }
 
-    // 3. Reativa (a entidade já tem o método `ativar()`)
     professor.ativar();
     this.professorDAO.atualizarStatus(id, 'ATIVO');
 
     return professor;
   }
-    /**
+
+  /**
    * HU11 — Desativar Professor
    *
    * Regras de negócio:
@@ -203,35 +227,49 @@ export class ProfessorController {
    * Relações: [RF11], [RN04], [RNF03]
    */
   public desativar(id: number): Professor {
-    // 1. Busca o professor
     const professor = this.professorDAO.buscarPorId(id);
     if (!professor) {
       throw new Error('Professor não encontrado.');
     }
 
-    // 2. Só permite desativar quem está ATIVO
     if (professor.status !== 'ATIVO') {
       throw new Error('Este professor já está inativo.');
     }
 
-    // 3. Bloqueia se houver empréstimo pendente
     if (this.professorDAO.possuiEmprestimoPendente(id)) {
       throw new Error(
         'Não é possível desativar este professor, pois ele possui empréstimos pendentes.'
       );
     }
 
-    // 4. Só permite desativar se houver histórico
     if (!this.professorDAO.possuiHistoricoEmprestimos(id)) {
       throw new Error(
         'Este professor não possui histórico de empréstimos. Utilize a opção "Excluir" para removê-lo definitivamente.'
       );
     }
 
-    // 5. Desativa
     professor.inativar();
     this.professorDAO.atualizarStatus(id, 'INATIVO');
 
     return professor;
+  }
+
+  /**
+   * Monta o DTO do professor, incluindo `possuiHistorico` (usado pelo front
+   * para decidir entre habilitar "Desativar" ou "Excluir").
+   */
+  private toDTO(professor: Professor): ProfessorDTO {
+    return {
+      id: professor.id,
+      primeiroNome: professor.primeiroNome,
+      sobrenome: professor.sobrenome,
+      email: professor.email,
+      status: professor.status,
+      dataCadastro: professor.dataCadastro,
+      dataAtualizacao: professor.dataAtualizacao,
+      possuiHistorico:
+        professor.id !== null &&
+        this.professorDAO.possuiHistoricoEmprestimos(professor.id),
+    };
   }
 }
