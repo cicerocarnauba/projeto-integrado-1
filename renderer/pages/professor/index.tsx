@@ -11,6 +11,7 @@ import CardProfessor from "../../components/professor/cardProfessor";
 import Paginacao from "../../components/Paginacao";
 
 import { MdAdd } from "react-icons/md";
+import ModalAtivar from "../../components/modal/modalExcluir";
 
 export default function GerenciarProfessores() {
   const router = useRouter();
@@ -28,6 +29,11 @@ export default function GerenciarProfessores() {
 
   const [paginaAtual, setPaginaAtual] = useState(1);
   const ITENS_POR_PAGINA = 6; // 4 linhas x 3 colunas
+
+  const [professorParaAtivar, setProfessorParaAtivar] = useState<any | null>(
+    null,
+  );
+  const [sucessoAtivacao, setSucessoAtivacao] = useState("");
 
   useEffect(() => {
     setPaginaAtual(1);
@@ -164,6 +170,7 @@ export default function GerenciarProfessores() {
                   key={professor.id}
                   professor={professor}
                   onEditar={(p) => router.push(`/professor/${p.id}`)}
+                  onAtivar={(p) => setProfessorParaAtivar(p)}
                 />
               ))}
             </div>
