@@ -33,7 +33,7 @@ export default function GerenciarLivros() {
 
   const [paginaAtual, setPaginaAtual] = useState(1);
   const [livroParaExcluir, setLivroParaExcluir] = useState<Livro | null>(null);
-  const ITENS_POR_PAGINA = 12; // 4 linhas x 3 colunas
+  const ITENS_POR_PAGINA = 6; // 4 linhas x 3 colunas
 
   const [excluindo, setExcluindo] = useState(false);
   const [recarregar, setRecarregar] = useState(0);

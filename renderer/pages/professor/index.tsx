@@ -27,7 +27,7 @@ export default function GerenciarProfessores() {
   const [ordenacao, setOrdenacao] = useState<TipoOrdenacao>("alfabetica");
 
   const [paginaAtual, setPaginaAtual] = useState(1);
-  const ITENS_POR_PAGINA = 12; // 4 linhas x 3 colunas
+  const ITENS_POR_PAGINA = 6; // 4 linhas x 3 colunas
 
   useEffect(() => {
     setPaginaAtual(1);
