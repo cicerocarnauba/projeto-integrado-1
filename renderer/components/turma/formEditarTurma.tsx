@@ -2,6 +2,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { MdCheck, MdClear } from "react-icons/md";
 import { Turma } from "../../types/turma";
+import ModalEditar from "../modal/modalEditar";
 
 interface FormEditarTurmaProps {
   turma: Turma;
@@ -14,6 +15,8 @@ export default function FormEditarTurma({ turma }: FormEditarTurmaProps) {
 
     const [erro, setErro] = useState("");
     const [salvando, setSalvando] = useState(false);
+
+    const [modalAberto, setModalAberto] = useState(false);
 
 
     function mostrarErro(mensagem: string) {
@@ -32,46 +35,54 @@ export default function FormEditarTurma({ turma }: FormEditarTurmaProps) {
         return null;
     }
 
-    async function salvar(e: React.FormEvent) {
-        e.preventDefault();
-        limparErro();
+    function salvar(e: React.FormEvent) {
+      e.preventDefault();
+      limparErro();
 
-        const mensagemErro = validar();
+      const mensagemErro = validar();
 
-        if (mensagemErro) {
-            mostrarErro(mensagemErro);
-            return;
-        }
+      if (mensagemErro) {
+        mostrarErro(mensagemErro);
+        return;
+      }
 
-        setSalvando(true);
-
-        try {
-            const resposta = await window.ipc.turma.editar({
-                id: turma.id,
-                nome: nome.trim()
-            });
-
-            if (!resposta.success) {
-                mostrarErro(resposta.error || "Erro ao editar a turma.");
-                return;
-            }
-
-            const desativado = resposta.data?.status === "INATIVO";
-
-            router.push(
-                desativado ? "/turma?sucesso=editado_inativo" : "/turma?sucesso=editado"
-            );
-        } catch (error) {
-            mostrarErro(
-                error instanceof Error
-                ? error.message
-                : "Não foi possível editar a turma."
-            );
-        } finally {
-            setSalvando(false);
-        }
+      setModalAberto(true);
     }
 
+    async function confirmarEdicao() {
+      setModalAberto(false);
+
+      setSalvando(true);
+
+      try {
+        const resposta = await window.ipc.turma.editar({
+          id: turma.id,
+          nome: nome.trim()
+        });
+
+        if (!resposta.success) {
+          mostrarErro(resposta.error || "Erro ao editar a turma.");
+          return;
+        }
+
+        const desativado = resposta.data?.status === "INATIVO";
+
+        router.push(
+          desativado ? "/turma?sucesso=editado_inativo" : "/turma?sucesso=editado"
+        );
+      } catch (error) {
+        mostrarErro(
+          error instanceof Error
+          ? error.message
+          : "Não foi possível editar a turma."
+        );
+      } finally {
+        setSalvando(false);
+      }
+    }
+
+
+      
   function cancelar() {
     router.push("/turma");
   }
@@ -131,6 +142,20 @@ export default function FormEditarTurma({ turma }: FormEditarTurmaProps) {
           {salvando ? "Salvando..." : "Confirmar edição"}
         </button>
       </div>
+
+      <ModalEditar
+        aberto={modalAberto}
+        mensagem={
+          <>
+            Deseja salvar as alterações da turma:
+            <span className="block font-bold text-[#2e8b45]">
+              {nome}
+            </span>
+          </>
+        }
+        onCancelar={() => setModalAberto(false)}
+        onConfirmar={confirmarEdicao}
+      />
     </form>
   );
 }
