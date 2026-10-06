@@ -127,7 +127,7 @@ export default function GerenciarTurmas() {
     inicio + ITENS_POR_PAGINA
   );
 
-    const handleExcluir = async (turma: Turma) => {
+  const handleExcluir = async (turma: Turma) => {
     try {
       const resposta = await window.ipc?.turma?.excluir(turma.id);
 
@@ -180,7 +180,8 @@ export default function GerenciarTurmas() {
       )
     }
   };
-    const handleAtivar = async (turma: Turma) => {
+  
+  const handleAtivar = async (turma: Turma) => {
     try {
       const resposta = await window.ipc?.turma?.ativar(turma.id);
 
