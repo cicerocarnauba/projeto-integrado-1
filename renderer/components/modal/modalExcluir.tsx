@@ -1,5 +1,5 @@
 
-import {MdDelete, MdOutlineCancel} from "react-icons/md"
+import {MdDelete, MdClear} from "react-icons/md"
 
 import React from "react";
 
@@ -37,9 +37,9 @@ export default function ModalExcluir({
           <button
             type="button"
             onClick={onCancelar}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-white bg-[#2e8b45] hover:bg-[#236c35] transition-colors cursor-pointer"
           >
-            <MdOutlineCancel size={14}/>
+            <MdClear size={16}/>
             Cancelar
           </button>
 
@@ -48,7 +48,7 @@ export default function ModalExcluir({
             onClick={onConfirmar}
             className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-white bg-[#cf4a4a] hover:bg-[#b83a3a] transition-colors cursor-pointer"
           >
-            <MdDelete size={14}/>
+            <MdDelete size={16}/>
             Excluir
           </button>
         </div>

@@ -72,7 +72,7 @@ export default function CardTurma({
                   onClick={() => onEditar?.(turma)}
                   className="flex items-center gap-1.5 bg-[#389348] text-white px-3 py-1.5 text-xs rounded-lg font-medium hover:bg-[#2e7d3d] transition-colors cursor-pointer shrink-0"
                 >
-                  <MdEdit size={14} />
+                  <MdEdit size={16} />
                   Editar
                 </button>
                 
@@ -98,7 +98,7 @@ export default function CardTurma({
                   title="Turma desativada não pode ser editada"
                   className="flex items-center gap-1.5 bg-gray-200 text-gray-400 px-3 py-1.5 text-xs rounded-lg font-medium cursor-not-allowed shrink-0"
                 >
-                  <MdEdit size={14} />
+                  <MdEdit size={16} />
                   Editar
                 </button>
 
