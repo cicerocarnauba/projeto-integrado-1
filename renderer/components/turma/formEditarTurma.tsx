@@ -116,9 +116,9 @@ export default function FormEditarTurma({ turma }: FormEditarTurmaProps) {
           type="button"
           onClick={cancelar}
           disabled={salvando}
-          className="flex items-center gap-1.5 px-6 py-2.5 rounded-xl text-sm font-medium text-white bg-[#cf4a4a] hover:bg-red-600 transition-colors shadow-xs active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-1.5 px-6 py-2.5 rounded-xl text-sm font-medium text-white bg-[#cf4a4a] hover:bg-[#b83a3a] transition-colors shadow-xs active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <MdClear size={14} />
+          <MdClear size={16} />
           Cancelar edição
         </button>
 
@@ -127,7 +127,7 @@ export default function FormEditarTurma({ turma }: FormEditarTurmaProps) {
           disabled={salvando}
           className="flex items-center gap-1.5 bg-[#2e8b45] hover:bg-[#236c35] text-white px-7 py-2.5 rounded-xl text-sm font-medium transition-all shadow-sm active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <MdCheck size={14} />
+          <MdCheck size={16} />
           {salvando ? "Salvando..." : "Confirmar edição"}
         </button>
       </div>

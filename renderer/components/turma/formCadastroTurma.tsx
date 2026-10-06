@@ -83,7 +83,7 @@ export default function FormCadastroTurma() {
           disabled={salvando}
           className="flex items-center gap-1.5 px-6 py-2.5 rounded-xl text-sm font-medium text-white bg-[#cf4a4a] hover:bg-red-600 transition-colors shadow-xs active:scale-95 cursor-pointer"
         >
-          <MdClear size={18} />
+          <MdClear size={16} />
           Cancelar
         </button>
 
@@ -92,7 +92,7 @@ export default function FormCadastroTurma() {
           disabled={salvando}
           className="flex items-center gap-1.5 bg-[#2e8b45] hover:bg-[#236c35] text-white px-7 py-2.5 rounded-xl text-sm font-medium transition-all shadow-sm active:scale-95 cursor-pointer"
         >
-          <MdCheck size={18} />
+          <MdCheck size={16} />
           {salvando ? "Salvando..." : "Confirmar"}
         </button>
       </div>
