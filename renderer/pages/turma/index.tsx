@@ -305,8 +305,8 @@ export default function GerenciarTurmas() {
           mensagem={
             turmaParaExcluir ? (
               <>
-                Tem certeza que deseja excluir a turma{" "}
-                <span className="font-bold text-[#2e8b45]">
+                Tem certeza que deseja excluir a turma:
+                <span className="block font-bold text-[#2e8b45]">
                   {turmaParaExcluir.nome}
                 </span>
               </>
