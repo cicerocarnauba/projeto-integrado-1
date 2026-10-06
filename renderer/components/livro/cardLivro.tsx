@@ -9,6 +9,7 @@ interface CardLivroProps {
   onEditar?: (livro: Livro) => void;
   onExcluir?: (livro: Livro) => void;
   onAtivar?: (livro: Livro) => void;
+  onDesativar?: (livro: Livro) => void;
 }
 
 export default function CardLivro({
@@ -16,6 +17,7 @@ export default function CardLivro({
   onEditar,
   onExcluir,
   onAtivar,
+  onDesativar,
 }: CardLivroProps) {
   const ativo = livro.status === "ATIVO" || livro.ativo === true;
 
@@ -92,7 +94,7 @@ export default function CardLivro({
                 </button>
 
                 {temHistorico ? (
-                  <DesativarButton onClick={() => onExcluir?.(livro)} />
+                  <DesativarButton onClick={() => onDesativar?.(livro)} />
                 ) : (
                   <ExcluirButton onClick={() => onExcluir?.(livro)} />
                 )}

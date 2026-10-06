@@ -7,12 +7,13 @@ import CardLivro from "../../components/livro/cardLivro";
 import Paginacao from "../../components/Paginacao";
 import { useRouter } from "next/router";
 import { MdAdd } from "react-icons/md";
-import ModalConfirmacao from "../../components/modal/ModalConfirmacao";
-import ModalAtivaLivro from "../../components/modal/ModalAtivaLivro";
+
+import ModalExcluir from "../../components/modal/modalExcluir";
+import ModalAtivar from "../../components/modal/modalAtivar";
+import ModalDesativar from "../../components/modal/modalDesativar";
 
 export default function GerenciarLivros() {
   const router = useRouter();
-  // const mostrarSucesso = router.query.sucesso === "1";
   const sucesso = router.query.sucesso;
   const mensagemSucesso =
     sucesso === "1"
@@ -25,22 +26,137 @@ export default function GerenciarLivros() {
 
   const [listaLivros, setListaLivros] = useState<Livro[]>([]);
   const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState("");
+
+
+  const [livroParaExcluir, setLivroParaExcluir] = useState<Livro | null>(null);
+  const [livroExcluindo, setLivroExcluindo] = useState<number | null>(null);
   const [livroParaAtivar, setLivroParaAtivar] = useState<Livro | null>(null);
+  const [livroParaDesativar, setLivroParaDesativar] = useState<Livro | null>(null);
+
 
   const [termoBusca, setTermoBusca] = useState("");
   const [incluirInativos, setIncluirInativos] = useState<boolean>(false);
   const [ordenacao, setOrdenacao] = useState<TipoOrdenacao>("alfabetica");
 
   const [paginaAtual, setPaginaAtual] = useState(1);
-  const [livroParaExcluir, setLivroParaExcluir] = useState<Livro | null>(null);
   const ITENS_POR_PAGINA = 6; // 4 linhas x 3 colunas
 
   const [excluindo, setExcluindo] = useState(false);
   const [recarregar, setRecarregar] = useState(0);
-  const [feedback, setFeedback] = useState<{
-    tipo: "sucesso" | "erro";
-    texto: string;
-  } | null>(null);
+  // const [feedback, setFeedback] = useState<{
+  //   tipo: "sucesso" | "erro";
+  //   texto: string;
+  // } | null>(null);
+
+  const [feedback, setFeedback] = useState("");
+
+  useEffect(() => {
+    if (!feedback) return;
+
+    const timer = setTimeout(() => {
+      setFeedback("");
+    }, 2500);
+  
+    return () => clearTimeout(timer);
+  }, [feedback]);
+
+   useEffect(() => {
+    const sucesso = router.query.sucesso;
+
+    if (sucesso === "1") {
+      setFeedback("Livro cadastrado com sucesso!");
+    }
+
+    if (sucesso === "editado") {
+      setFeedback("Livro editado com sucesso!");
+    }
+  }, [router.query.sucesso]);
+
+
+  const handleExcluir = async (livro: Livro) => {
+    try {
+      const resposta = await window.ipc?.livro?.excluir(livro.id);
+
+      if (!resposta?.success) {
+       setErro(resposta?.error || "Erro ao excluir o livro.");
+       return; 
+      }
+
+      setListaLivros((livrosAtuais) =>
+        livrosAtuais.filter((item) => item.id !== livro.id)
+      );
+
+      setFeedback("Livro excluído com successo!")
+
+    } catch (error) {
+      setErro(
+        error instanceof Error
+        ? error.message
+        : "Não foi possível excluir o livro."
+      )
+    }
+  };
+
+  const handleAtivar = async (livro: Livro) => {
+    try {
+      const resposta = await window.ipc?.livro?.ativar(livro.id, livro.quantidadeTotal);
+
+      if (!resposta?.success) {
+       setErro(resposta?.error || "Erro ao ativar livro.");
+       return; 
+      }
+
+      const atualizada = await window.ipc?.livro?.consultar({
+        titulo: termoBusca,
+        editora: termoBusca,
+        incluirInativos: incluirInativos,
+      });
+
+      if (atualizada?.success){
+        setListaLivros(atualizada.data || []);
+      }
+
+      setFeedback("livro ativado com successo!")
+      
+    } catch (error) {
+      setErro(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível ativar o livro."
+      )
+    }
+  };
+
+  const handleDesativar = async (livro: Livro) => {
+    try {
+      const resposta = await window.ipc?.livro?.desativar(livro.id);
+
+      if (!resposta?.success) {
+       setErro(resposta?.error || "Erro ao desativar livro.");
+       return; 
+      }
+      
+      const atualizada = await window.ipc?.livro?.consultar({
+        titulo: termoBusca,
+        editora: termoBusca,
+        incluirInativos: incluirInativos,
+      });
+
+      if (atualizada?.success){
+        setListaLivros(atualizada.data || []);
+      }
+
+      setFeedback("Livro deastivado com successo!")
+
+    } catch (error) {
+      setErro(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível desativar o livro."
+      )
+    }
+  };
 
   useEffect(() => {
     setPaginaAtual(1);
@@ -116,48 +232,40 @@ export default function GerenciarLivros() {
     if (!livroParaExcluir) return;
 
     setExcluindo(true);
-    setFeedback(null);
+    setFeedback("Livro excluído com successo!");
 
     try {
       const resposta = await window.ipc.livro.excluir(livroParaExcluir.id);
 
-      if (!resposta.success) {
-        setFeedback({
-          tipo: "erro",
-          texto: resposta.error || "Não foi possível excluir o livro.",
-        });
-        return;
-      }
+      // if (!resposta.success) {
+      //   setFeedback({
+      //     tipo: "erro",
+      //     texto: resposta.error || "Não foi possível excluir o livro.",
+      //   });
+      //   return;
+      // }
 
       // O backend decide sozinho entre excluir e desativar, e já manda a mensagem pronta
-      setFeedback({
-        tipo: "sucesso",
-        texto:
-          resposta.data?.mensagem ||
-          (resposta.data?.acao === "DESATIVADO"
-            ? "Livro desativado com sucesso."
-            : "Livro excluído com sucesso."),
-      });
+      // setFeedback({
+      //   tipo: "sucesso",
+      //   texto:
+      //     resposta.data?.mensagem ||
+      //     (resposta.data?.acao === "DESATIVADO"
+      //       ? "Livro desativado com sucesso."
+      //       : "Livro excluído com sucesso."),
+      // });
       setRecarregar((n) => n + 1);
     } catch (error) {
-      setFeedback({
-        tipo: "erro",
-        texto:
-          error instanceof Error
-            ? error.message
-            : "Não foi possível excluir o livro.",
-      });
+      setErro(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível excluir o livro."
+      )
     } finally {
       setExcluindo(false);
       setLivroParaExcluir(null);
     }
   }
-
-  useEffect(() => {
-    if (feedback?.tipo !== "sucesso") return;
-    const timer = setTimeout(() => setFeedback(null), 6000);
-    return () => clearTimeout(timer);
-  }, [feedback]);
 
   function confirmarAtivacao(quantidadeTotal: number) {
     // Subtarefa 3: aqui entra a chamada ao backend
@@ -174,21 +282,9 @@ export default function GerenciarLivros() {
           Gerenciar livros
         </h1>
 
-        {!feedback && mensagemSucesso && (
-          <div className="bg-[#d8f3dc] text-[#2e8b45] px-4 py-2.5 rounded-xl mb-4 text-sm font-medium flex items-center gap-2">
-            ✓ {mensagemSucesso}
-          </div>
-        )}
-
         {feedback && (
-          <div
-            className={`px-4 py-2.5 rounded-xl mb-4 text-sm font-medium flex items-center gap-2 ${
-              feedback.tipo === "sucesso"
-                ? "bg-[#d8f3dc] text-[#2e8b45]"
-                : "bg-red-50 text-red-700 border border-red-200"
-            }`}
-          >
-            {feedback.tipo === "sucesso" ? "✓" : "✕"} {feedback.texto}
+          <div className=" w-[657.5px] fixed top-31.5 left-45 z-50 bg-[#d8f3dc] text-[#2e8b45] px-4 py-2.5 rounded-xl mb-4 text-sm font-medium flex items-center gap-2 animate-fade-in">
+            ✓ {feedback}
           </div>
         )}
 
@@ -234,8 +330,9 @@ export default function GerenciarLivros() {
                   key={livro.id}
                   livro={livro}
                   onEditar={(l) => router.push(`/livro/${l.id}`)}
-                  onExcluir={(l) => setLivroParaExcluir(l)}
-                  onAtivar={(l) => setLivroParaAtivar(l)}
+                  onDesativar={(livro) => setLivroParaDesativar(livro)}
+                  onAtivar={(livro) => setLivroParaAtivar(livro)}
+                  onExcluir={(livro) => setLivroParaExcluir(livro)}
                 />
               ))}
             </div>
@@ -251,18 +348,92 @@ export default function GerenciarLivros() {
           </div>
         )}
 
-        <ModalConfirmacao
-          isOpen={livroParaExcluir !== null}
-          acao={livroTemHistorico ? "desativar" : "excluir"}
-          carregando={excluindo}
-          onConfirmar={confirmarExclusao}
+
+        <ModalExcluir
+          aberto={livroParaExcluir !== null}
+          mensagem={
+            livroParaExcluir ? (
+              <div className="text-sm">
+                Tem certeza que deseja excluir a livro?
+                <span className="block text-xs mt-0.75">
+                  Título:{" "}
+                  <span className="font-bold text-[#cf4a4a] text-sm">
+                    {livroParaExcluir.titulo}
+                  </span>
+                </span>
+                 <span className="block text-xs">
+                  Editora:{" "}
+                  <span className="font-bold text-[#cf4a4a] text-sm">
+                    {livroParaExcluir.editora} 
+                  </span>
+                </span>
+              </div>
+            ) : (
+              ""
+            )
+          }
           onCancelar={() => setLivroParaExcluir(null)}
+          onConfirmar={async () => {
+            if (!livroParaExcluir) return;
+
+            const livro = livroParaExcluir;
+
+            setLivroExcluindo(livroParaExcluir.id);
+            setLivroParaExcluir(null);
+
+            setTimeout(async () => {
+              await handleExcluir(livro);
+              setLivroExcluindo(null);
+            }, 200);
+          }}
         />
 
-        <ModalAtivaLivro
-          livro={livroParaAtivar}
-          onConfirmar={confirmarAtivacao}
+        <ModalDesativar
+          aberto={livroParaDesativar !== null}
+          mensagem={
+            livroParaDesativar ? (
+              <>
+                Tem certeza que deseja desativar o livro:
+                <span className="block font-bold text-[#cf4a4a]">
+                  {livroParaDesativar.titulo}
+                </span>
+              </>
+            ) : ""
+          }
+          onCancelar={() => setLivroParaDesativar(null)}
+          onConfirmar={async () => {
+            if (!livroParaDesativar) return;
+
+            const livro = livroParaDesativar;
+
+            setLivroParaDesativar(null);
+
+            await handleDesativar(livro)
+          }}
+        />
+
+        <ModalAtivar
+          aberto={livroParaAtivar !== null}
+          mensagem={
+            livroParaAtivar ? (
+              <>
+                Tem certeza que deseja ativar o livro:
+                <span className="block font-bold text-[#2e8b45]">
+                  {livroParaAtivar.titulo}
+                </span>
+              </>
+            ) : ""
+          }
           onCancelar={() => setLivroParaAtivar(null)}
+          onConfirmar={async () => {
+            if (!livroParaAtivar) return;
+
+            const livro = livroParaAtivar;
+
+            setLivroParaAtivar(null);
+
+            await handleAtivar(livro)
+          }}
         />
       </main>
     </div>
