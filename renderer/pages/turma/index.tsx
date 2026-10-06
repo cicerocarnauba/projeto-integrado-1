@@ -43,16 +43,22 @@ export default function GerenciarTurmas() {
 
     const timer = setTimeout(() => {
       setFeedback("");
-    }, 1500);
+    }, 2500);
 
     return () => clearTimeout(timer);
   }, [feedback]);
 
   useEffect(() => {
-    if (router.query.sucesso === "1") {
+    const sucesso = router.query.sucesso;
+
+    if (sucesso === "1") {
       setFeedback("Turma cadastrada com sucesso!");
     }
-  }, [router.query.successo]);
+
+    if (sucesso === "editado") {
+      setFeedback("Turma editada com sucesso!");
+    }
+  }, [router.query.sucesso]);
 
   const [paginaAtual, setPaginaAtual] = useState(1);
   const ITENS_POR_PAGINA = 12; // 4 linhas x 3 colunas
