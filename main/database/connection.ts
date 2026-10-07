@@ -1,6 +1,7 @@
 import Database from 'better-sqlite3';
 import path from 'path';
 import { app } from 'electron';
+import { executarSeedSeVazio } from './seed.ts';
 
 // Pure Fabrication: isola a criação da conexão e do schema
 export class DatabaseConnection {
@@ -15,6 +16,7 @@ export class DatabaseConnection {
       DatabaseConnection.instance.pragma('journal_mode = WAL');
       DatabaseConnection.instance.pragma('foreign_keys = ON');
       DatabaseConnection.createSchema(DatabaseConnection.instance);
+      executarSeedSeVazio(DatabaseConnection.instance);
     }
     return DatabaseConnection.instance;
   }

@@ -10,6 +10,8 @@
     "build:linux": "nextron build --linux",
     "build:win": "nextron build --win",
     "test": "node --experimental-transform-types --test tests/*.test.ts",
+    "seed": "node popular_banco.js",
+    "reset:db": "node popular_banco.js",
     "lint:commit": "commitlint --from=HEAD~1",
     "lint:commit:last": "commitlint --last",
     "prepare": "git config core.hooksPath .githooks"
