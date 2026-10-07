@@ -24,7 +24,7 @@ export default function CardLivro({
   // Excluir é o padrão. Só vira Desativar quando o livro tem histórico de
   // empréstimos. Usa o campo possuiHistorico quando o backend enviar; até lá,
   // considera apenas exemplares emprestados agora.
-  const temHistorico =
+  const temHistorico = 
     livro.possuiHistorico ?? (livro.quantidadeEmprestada ?? 0) > 0;
 
   return (
