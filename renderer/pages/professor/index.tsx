@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 
 import { useEffect, useState } from "react";
@@ -10,6 +11,7 @@ import SearchBar, { TipoOrdenacao } from "../../components/Searchbar";
 import CardProfessor from "../../components/professor/cardProfessor";
 import Paginacao from "../../components/Paginacao";
 import ModalDesativar from "../../components/modal/modalDesativar";
+import ModalAtivar from "../../components/modal/modalAtivar";
 
 import { MdAdd } from "react-icons/md";
 
@@ -46,6 +48,23 @@ function desativarMock(id: number): {
   p.ativo = false;
   return { success: true, data: p };
 }
+
+function ativarMock(id: number): {
+  success: boolean;
+  data?: any;
+  error?: string;
+} {
+  const p = bancoMock.find((x) => x.id === id);
+  if (!p) return { success: false, error: "Professor não encontrado." };
+
+  if (p.status !== "INATIVO") {
+    return { success: false, error: "O professor já está ativo." };
+  }
+
+  p.status = "ATIVO";
+  p.ativo = true;
+  return { success: true, data: p };
+}
 // ====================== FIM MOCK (só para teste) =======================
 
 export default function GerenciarProfessores() {
@@ -63,13 +82,15 @@ export default function GerenciarProfessores() {
   const [ordenacao, setOrdenacao] = useState<TipoOrdenacao>("alfabetica");
 
   const [paginaAtual, setPaginaAtual] = useState(1);
-  const ITENS_POR_PAGINA = 9; // 4 linhas x 3 colunas
+  const ITENS_POR_PAGINA = 6; // 4 linhas x 3 colunas
 
-  // Ativação (HU12) - ainda sem modal ligado
+  // Ativação (HU12)
   const [professorParaAtivar, setProfessorParaAtivar] = useState<any | null>(
     null,
   );
+  const [ativando, setAtivando] = useState(false);
   const [sucessoAtivacao, setSucessoAtivacao] = useState("");
+  const [erroAtivacao, setErroAtivacao] = useState("");
 
   // Desativação (HU11)
   const [professorParaDesativar, setProfessorParaDesativar] = useState<
@@ -78,7 +99,15 @@ export default function GerenciarProfessores() {
   const [desativando, setDesativando] = useState(false);
   const [sucessoDesativacao, setSucessoDesativacao] = useState("");
   const [avisoBloqueio, setAvisoBloqueio] = useState("");
+
   const [recarregar, setRecarregar] = useState(0);
+
+  function limparMensagens() {
+    setSucessoAtivacao("");
+    setErroAtivacao("");
+    setSucessoDesativacao("");
+    setAvisoBloqueio("");
+  }
 
   useEffect(() => {
     setPaginaAtual(1);
@@ -129,8 +158,7 @@ export default function GerenciarProfessores() {
     if (!professorParaDesativar || desativando) return;
 
     setDesativando(true);
-    setSucessoDesativacao("");
-    setAvisoBloqueio("");
+    limparMensagens();
 
     try {
       // MOCK: trocar pela linha REAL quando o back estiver pronto
@@ -161,6 +189,44 @@ export default function GerenciarProfessores() {
     } finally {
       setDesativando(false);
       setProfessorParaDesativar(null);
+    }
+  }
+
+  async function handleConfirmarAtivacao() {
+    if (!professorParaAtivar || ativando) return;
+
+    setAtivando(true);
+    limparMensagens();
+
+    try {
+      // MOCK: trocar pela linha REAL quando o back estiver pronto
+      const resposta = USAR_MOCK
+        ? ativarMock(professorParaAtivar.id)
+        : await window.ipc.professor.reativar(professorParaAtivar.id);
+
+      // REAL (versão final, sem mock):
+      // const resposta = await window.ipc.professor.reativar(
+      //   professorParaAtivar.id,
+      // );
+
+      if (!resposta.success) {
+        setErroAtivacao(
+          resposta.error || "Não foi possível ativar o professor.",
+        );
+        return;
+      }
+
+      setSucessoAtivacao("Professor ativado com sucesso!");
+      setRecarregar((n) => n + 1);
+    } catch (error) {
+      setErroAtivacao(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível ativar o professor.",
+      );
+    } finally {
+      setAtivando(false);
+      setProfessorParaAtivar(null);
     }
   }
 
@@ -211,6 +277,18 @@ export default function GerenciarProfessores() {
         {sucessoEdicao && (
           <div className="bg-[#d8f3dc] text-[#2e8b45] px-4 py-2.5 rounded-xl mb-4 text-sm font-medium flex items-center gap-2">
             ✓ Professor editado com sucesso!
+          </div>
+        )}
+
+        {sucessoAtivacao && (
+          <div className="bg-[#d8f3dc] text-[#2e8b45] px-4 py-2.5 rounded-xl mb-4 text-sm font-medium flex items-center gap-2">
+            ✓ {sucessoAtivacao}
+          </div>
+        )}
+
+        {erroAtivacao && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2.5 rounded-xl mb-4 text-sm font-medium flex items-center gap-2">
+            ✕ {erroAtivacao}
           </div>
         )}
 
@@ -275,10 +353,12 @@ export default function GerenciarProfessores() {
                   key={professor.id}
                   professor={professor}
                   onEditar={(p) => router.push(`/professor/${p.id}`)}
-                  onAtivar={(p) => setProfessorParaAtivar(p)}
+                  onAtivar={(p) => {
+                    limparMensagens();
+                    setProfessorParaAtivar(p);
+                  }}
                   onDesativar={(p) => {
-                    setSucessoDesativacao("");
-                    setAvisoBloqueio("");
+                    limparMensagens();
                     setProfessorParaDesativar(p);
                   }}
                 />
@@ -297,8 +377,6 @@ export default function GerenciarProfessores() {
         )}
       </main>
 
-     
-
       <ModalDesativar
         aberto={professorParaDesativar !== null}
         titulo="Desativar registro?"
@@ -314,6 +392,23 @@ export default function GerenciarProfessores() {
         }
         onConfirmar={handleConfirmarDesativacao}
         onCancelar={() => setProfessorParaDesativar(null)}
+      />
+
+      <ModalAtivar
+        aberto={professorParaAtivar !== null}
+        titulo="Ativar registro?"
+        mensagem={
+          <>
+            Tem certeza que deseja ativar o professor:
+            <br />
+            <span className="font-semibold text-[#2e8b45]">
+              {professorParaAtivar?.primeiroNome}{" "}
+              {professorParaAtivar?.sobrenome}
+            </span>
+          </>
+        }
+        onConfirmar={handleConfirmarAtivacao}
+        onCancelar={() => setProfessorParaAtivar(null)}
       />
     </div>
   );
