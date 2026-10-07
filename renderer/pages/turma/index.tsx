@@ -61,7 +61,7 @@ export default function GerenciarTurmas() {
   }, [router.query.sucesso]);
 
   const [paginaAtual, setPaginaAtual] = useState(1);
-  const ITENS_POR_PAGINA = 6; // 4 linhas x 3 colunas
+  const ITENS_POR_PAGINA = 9; // 4 linhas x 3 colunas
 
   useEffect(() => {
     setPaginaAtual(1);
@@ -318,8 +318,11 @@ export default function GerenciarTurmas() {
             turmaParaExcluir ? (
               <>
                 Tem certeza que deseja excluir a turma:
-                <span className="block font-bold text-[#cf4a4a]">
-                  {turmaParaExcluir.nome}
+                <span className="block font-bold text-gray-800 text-xs mt-0.75">
+                  Nome:{" "}
+                  <span className="text-sm font-normal text-gray-600">
+                    {turmaParaExcluir.nome}
+                  </span>
                 </span>
               </>
             ) : (
@@ -348,8 +351,11 @@ export default function GerenciarTurmas() {
             turmaParaDesativar ? (
               <>
                 Tem certeza que deseja desativar a turma:
-                <span className="block font-bold text-[#cf4a4a]">
-                  {turmaParaDesativar.nome}
+                <span className="block font-bold text-gray-800 text-xs mt-0.75">
+                  Nome:{" "}
+                  <span className="text-sm font-normal text-gray-600">
+                    {turmaParaDesativar.nome}
+                  </span>
                 </span>
               </>
             ) : (
@@ -374,8 +380,11 @@ export default function GerenciarTurmas() {
             turmaParaAtivar ? (
               <>
                 Tem certeza que deseja ativar a turma:
-                <span className="block font-bold text-[#2e8b45]">
-                  {turmaParaAtivar.nome}
+                <span className="block font-bold text-gray-800 text-xs mt-0.75">
+                  Nome:{" "}
+                  <span className="text-sm font-normal text-gray-600">
+                    {turmaParaAtivar.nome}
+                  </span>
                 </span>
               </>
             ) : (

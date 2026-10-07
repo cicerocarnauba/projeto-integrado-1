@@ -1,5 +1,5 @@
 
-import {MdDelete, MdClear} from "react-icons/md"
+import {MdRemoveCircleOutline, MdClear} from "react-icons/md"
 
 import React from "react";
 
@@ -48,7 +48,7 @@ export default function ModalExcluir({
             onClick={onConfirmar}
             className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-white bg-[#cf4a4a] hover:bg-[#b83a3a] transition-colors cursor-pointer"
           >
-            <MdDelete size={16}/>
+            <MdRemoveCircleOutline size={16}/>
                 Desativar
           </button>
         </div>

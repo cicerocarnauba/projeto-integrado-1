@@ -147,10 +147,7 @@ export default function FormEditarTurma({ turma }: FormEditarTurmaProps) {
         aberto={modalAberto}
         mensagem={
           <>
-            Deseja salvar as alterações da turma:
-            <span className="block font-bold text-[#2e8b45]">
-              {nome}
-            </span>
+            Deseja salvar as alterações realizadas na turma?
           </>
         }
         onCancelar={() => setModalAberto(false)}

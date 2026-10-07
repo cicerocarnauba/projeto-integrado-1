@@ -9,7 +9,7 @@ import { useRouter } from "next/router";
 import { MdAdd } from "react-icons/md";
 
 import ModalExcluir from "../../components/modal/modalExcluir";
-import ModalAtivar from "../../components/modal/modalAtivar";
+import ModalAtivarLivro from "../../components/modal/ModalAtivaLivro";
 import ModalDesativar from "../../components/modal/modalDesativar";
 
 export default function GerenciarLivros() {
@@ -40,7 +40,7 @@ export default function GerenciarLivros() {
   const [ordenacao, setOrdenacao] = useState<TipoOrdenacao>("alfabetica");
 
   const [paginaAtual, setPaginaAtual] = useState(1);
-  const ITENS_POR_PAGINA = 6; // 4 linhas x 3 colunas
+  const ITENS_POR_PAGINA = 9; // 4 linhas x 3 colunas
 
   const [excluindo, setExcluindo] = useState(false);
   const [recarregar, setRecarregar] = useState(0);
@@ -355,15 +355,15 @@ export default function GerenciarLivros() {
             livroParaExcluir ? (
               <div className="text-sm">
                 Tem certeza que deseja excluir a livro?
-                <span className="block text-xs mt-0.75">
+                <span className="block font-bold text-gray-800 text-xs mt-0.75">
                   Título:{" "}
-                  <span className="font-bold text-[#cf4a4a] text-sm">
+                  <span className="text-sm font-normal text-gray-600">
                     {livroParaExcluir.titulo}
                   </span>
                 </span>
-                 <span className="block text-xs">
+                 <span className="block font-bold text-gray-800 text-xs">
                   Editora:{" "}
-                  <span className="font-bold text-[#cf4a4a] text-sm">
+                  <span className="text-sm font-normal text-gray-600">
                     {livroParaExcluir.editora} 
                   </span>
                 </span>
@@ -394,8 +394,17 @@ export default function GerenciarLivros() {
             livroParaDesativar ? (
               <>
                 Tem certeza que deseja desativar o livro:
-                <span className="block font-bold text-[#cf4a4a]">
-                  {livroParaDesativar.titulo}
+                <span className="block font-bold text-gray-800 text-xs mt-0.75">
+                  Título:{" "}
+                  <span className="text-sm font-normal text-gray-600">
+                    {livroParaDesativar.titulo}
+                  </span>
+                </span>
+                 <span className="block font-bold text-gray-800 text-xs">
+                  Editora:{" "}
+                  <span className="text-sm font-normal text-gray-600">
+                    {livroParaDesativar.editora} 
+                  </span>
                 </span>
               </>
             ) : ""
@@ -411,28 +420,47 @@ export default function GerenciarLivros() {
             await handleDesativar(livro)
           }}
         />
+        
+        
 
-        <ModalAtivar
-          aberto={livroParaAtivar !== null}
-          mensagem={
-            livroParaAtivar ? (
-              <>
-                Tem certeza que deseja ativar o livro:
-                <span className="block font-bold text-[#2e8b45]">
-                  {livroParaAtivar.titulo}
-                </span>
-              </>
-            ) : ""
-          }
+        <ModalAtivarLivro
+          livro={livroParaAtivar}
           onCancelar={() => setLivroParaAtivar(null)}
-          onConfirmar={async () => {
+          onConfirmar={async (quantidadeTotal) => {
             if (!livroParaAtivar) return;
 
             const livro = livroParaAtivar;
 
             setLivroParaAtivar(null);
 
-            await handleAtivar(livro)
+            try {
+              const resposta = await window.ipc?.livro?.ativar(
+                livro.id,
+                quantidadeTotal
+              );
+
+              if (!resposta?.success) {
+                setErro(resposta?.error || "Erro ao ativar livro.");
+                return;
+              }
+
+              const atualizada = await window.ipc?.livro?.consultar({
+                termo: termoBusca,
+                incluirInativos: incluirInativos,
+              });
+
+              if (atualizada?.success) {
+                setListaLivros(atualizada.data || []);
+              }
+
+              setFeedback("Livro ativado com sucesso!");
+            } catch (error) {
+              setErro(
+                error instanceof Error
+                  ? error.message
+                  : "Não foi possível ativar o livro."
+              );
+            }
           }}
         />
       </main>

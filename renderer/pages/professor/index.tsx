@@ -63,7 +63,7 @@ export default function GerenciarProfessores() {
   const [ordenacao, setOrdenacao] = useState<TipoOrdenacao>("alfabetica");
 
   const [paginaAtual, setPaginaAtual] = useState(1);
-  const ITENS_POR_PAGINA = 6; // 4 linhas x 3 colunas
+  const ITENS_POR_PAGINA = 9; // 4 linhas x 3 colunas
 
   // Ativação (HU12) - ainda sem modal ligado
   const [professorParaAtivar, setProfessorParaAtivar] = useState<any | null>(

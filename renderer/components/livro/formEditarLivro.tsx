@@ -262,10 +262,7 @@ export default function FormEditarLivro({ livro }: FormEditarLivroProps) {
         aberto={modalAberto}
         mensagem={
           <>
-            Deseja salvar as alterações do livro?
-            <span className="block font-bold text-[#2e8b45]">
-              {titulo}
-            </span>
+            Deseja salvar as alterações realizadas no livro?
           </>
         }
         onCancelar={() => setModalAberto(false)}
