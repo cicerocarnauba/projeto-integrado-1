@@ -1,8 +1,6 @@
 
 import Link from "next/link";
-
 import { useEffect, useState } from "react";
-
 import { useRouter } from "next/router";
 
 import Sidebar from "../../components/Sidebar";
@@ -12,60 +10,9 @@ import CardProfessor from "../../components/professor/cardProfessor";
 import Paginacao from "../../components/Paginacao";
 import ModalDesativar from "../../components/modal/modalDesativar";
 import ModalAtivar from "../../components/modal/modalAtivar";
+import ModalExcluir from "../../components/modal/modalExcluir";
 
 import { MdAdd } from "react-icons/md";
-
-// ===================== INÍCIO MOCK (só para teste) =====================
-// Ajuste o caminho para onde está o seu professoresMock.
-import { professoresMock } from "../../mocks/professores-mock";
-
-// true = usa dados mocados; false = usa o back de verdade (window.ipc)
-const USAR_MOCK = true;
-
-// "banco" em memória: as alterações valem até recarregar o app
-const bancoMock: any[] = professoresMock.map((p) => ({
-  ...p,
-  possuiHistorico: p.statusEmprestimoProf !== "nunca_fez_emprestimo",
-}));
-
-function desativarMock(id: number): {
-  success: boolean;
-  data?: any;
-  error?: string;
-} {
-  const p = bancoMock.find((x) => x.id === id);
-  if (!p) return { success: false, error: "Professor não encontrado." };
-
-  if (p.statusEmprestimoProf === "tem_emprestimo_atualmente") {
-    return {
-      success: false,
-      error:
-        "Não é possível desativar este professor, pois ele possui empréstimos pendentes.",
-    };
-  }
-
-  p.status = "INATIVO";
-  p.ativo = false;
-  return { success: true, data: p };
-}
-
-function ativarMock(id: number): {
-  success: boolean;
-  data?: any;
-  error?: string;
-} {
-  const p = bancoMock.find((x) => x.id === id);
-  if (!p) return { success: false, error: "Professor não encontrado." };
-
-  if (p.status !== "INATIVO") {
-    return { success: false, error: "O professor já está ativo." };
-  }
-
-  p.status = "ATIVO";
-  p.ativo = true;
-  return { success: true, data: p };
-}
-// ====================== FIM MOCK (só para teste) =======================
 
 export default function GerenciarProfessores() {
   const router = useRouter();
@@ -73,7 +20,7 @@ export default function GerenciarProfessores() {
   const sucessoEdicao =
     router.query.sucesso === "editado" || router.query.aviso === "editado";
 
-  const [professores, setPofessores] = useState<any[]>([]);
+  const [professores, setProfessores] = useState<any[]>([]);
   const [carregado, setCarregado] = useState(true);
   const [erro, setErro] = useState("");
 
@@ -82,7 +29,7 @@ export default function GerenciarProfessores() {
   const [ordenacao, setOrdenacao] = useState<TipoOrdenacao>("alfabetica");
 
   const [paginaAtual, setPaginaAtual] = useState(1);
-  const ITENS_POR_PAGINA = 6; // 4 linhas x 3 colunas
+  const ITENS_POR_PAGINA = 6;
 
   // Ativação (HU12)
   const [professorParaAtivar, setProfessorParaAtivar] = useState<any | null>(
@@ -100,12 +47,20 @@ export default function GerenciarProfessores() {
   const [sucessoDesativacao, setSucessoDesativacao] = useState("");
   const [avisoBloqueio, setAvisoBloqueio] = useState("");
 
+  // Exclusão
+  const [professorParaExcluir, setProfessorParaExcluir] = useState<any | null>(
+    null,
+  );
+  const [excluindo, setExcluindo] = useState(false);
+  const [sucessoExclusao, setSucessoExclusao] = useState("");
+
   const [recarregar, setRecarregar] = useState(0);
 
   function limparMensagens() {
     setSucessoAtivacao("");
     setErroAtivacao("");
     setSucessoDesativacao("");
+    setSucessoExclusao("");
     setAvisoBloqueio("");
   }
 
@@ -118,15 +73,6 @@ export default function GerenciarProfessores() {
       try {
         setErro("");
 
-        // MOCK: remover este bloco quando o back real estiver pronto
-        if (USAR_MOCK) {
-          setPofessores(
-            bancoMock.filter((p) => incluirInativos || p.status === "ATIVO"),
-          );
-          return;
-        }
-
-        // REAL: consulta no back
         const resposta = await window.ipc.professor.consultar({
           nome: termoBusca,
           email: termoBusca,
@@ -138,7 +84,7 @@ export default function GerenciarProfessores() {
           return;
         }
 
-        setPofessores(resposta.data || []);
+        setProfessores(resposta.data || []);
       } catch (error) {
         const mensagem =
           error instanceof Error
@@ -161,15 +107,9 @@ export default function GerenciarProfessores() {
     limparMensagens();
 
     try {
-      // MOCK: trocar pela linha REAL quando o back estiver pronto
-      const resposta = USAR_MOCK
-        ? desativarMock(professorParaDesativar.id)
-        : await window.ipc.professor.desativar(professorParaDesativar.id);
-
-      // REAL (versão final, sem mock):
-      // const resposta = await window.ipc.professor.desativar(
-      //   professorParaDesativar.id,
-      // );
+      const resposta = await window.ipc.professor.desativar(
+        professorParaDesativar.id,
+      );
 
       if (!resposta.success) {
         setAvisoBloqueio(
@@ -199,15 +139,9 @@ export default function GerenciarProfessores() {
     limparMensagens();
 
     try {
-      // MOCK: trocar pela linha REAL quando o back estiver pronto
-      const resposta = USAR_MOCK
-        ? ativarMock(professorParaAtivar.id)
-        : await window.ipc.professor.reativar(professorParaAtivar.id);
-
-      // REAL (versão final, sem mock):
-      // const resposta = await window.ipc.professor.reativar(
-      //   professorParaAtivar.id,
-      // );
+      const resposta = await window.ipc.professor.reativar(
+        professorParaAtivar.id,
+      );
 
       if (!resposta.success) {
         setErroAtivacao(
@@ -227,6 +161,38 @@ export default function GerenciarProfessores() {
     } finally {
       setAtivando(false);
       setProfessorParaAtivar(null);
+    }
+  }
+
+  async function handleConfirmarExclusao() {
+    if (!professorParaExcluir || excluindo) return;
+
+    setExcluindo(true);
+    limparMensagens();
+
+    try {
+      const resposta = await window.ipc.professor.excluir(
+        professorParaExcluir.id,
+      );
+
+      if (!resposta.success) {
+        setAvisoBloqueio(
+          resposta.error || "Não foi possível excluir o professor.",
+        );
+        return;
+      }
+
+      setSucessoExclusao("Professor excluído com sucesso!");
+      setRecarregar((n) => n + 1);
+    } catch (error) {
+      setAvisoBloqueio(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível excluir o professor.",
+      );
+    } finally {
+      setExcluindo(false);
+      setProfessorParaExcluir(null);
     }
   }
 
@@ -286,6 +252,12 @@ export default function GerenciarProfessores() {
           </div>
         )}
 
+        {sucessoExclusao && (
+          <div className="bg-[#d8f3dc] text-[#2e8b45] px-4 py-2.5 rounded-xl mb-4 text-sm font-medium flex items-center gap-2">
+            ✓ {sucessoExclusao}
+          </div>
+        )}
+
         {erroAtivacao && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2.5 rounded-xl mb-4 text-sm font-medium flex items-center gap-2">
             ✕ {erroAtivacao}
@@ -304,7 +276,6 @@ export default function GerenciarProfessores() {
           </div>
         )}
 
-        {/* Barra de busca e botão de adicionar */}
         <div className="flex items-start gap-4 mb-5 w-full">
           <SearchBar
             placeholder="Pesquisar professor por nome ou e-mail..."
@@ -361,6 +332,10 @@ export default function GerenciarProfessores() {
                     limparMensagens();
                     setProfessorParaDesativar(p);
                   }}
+                  onExcluir={(p) => {
+                    limparMensagens();
+                    setProfessorParaExcluir(p);
+                  }}
                 />
               ))}
             </div>
@@ -409,6 +384,23 @@ export default function GerenciarProfessores() {
         }
         onConfirmar={handleConfirmarAtivacao}
         onCancelar={() => setProfessorParaAtivar(null)}
+      />
+
+      <ModalExcluir
+        aberto={professorParaExcluir !== null}
+        titulo="Excluir registro?"
+        mensagem={
+          <>
+            Tem certeza que deseja excluir o professor:
+            <br />
+            <span className="font-semibold text-[#cf4a4a]">
+              {professorParaExcluir?.primeiroNome}{" "}
+              {professorParaExcluir?.sobrenome}
+            </span>
+          </>
+        }
+        onConfirmar={handleConfirmarExclusao}
+        onCancelar={() => setProfessorParaExcluir(null)}
       />
     </div>
   );
