@@ -40,7 +40,7 @@ export default function GerenciarLivros() {
   const [ordenacao, setOrdenacao] = useState<TipoOrdenacao>("alfabetica");
 
   const [paginaAtual, setPaginaAtual] = useState(1);
-  const ITENS_POR_PAGINA = 6; // 4 linhas x 3 colunas
+  const ITENS_POR_PAGINA = 9; // 4 linhas x 3 colunas
 
   const [excluindo, setExcluindo] = useState(false);
   const [recarregar, setRecarregar] = useState(0);

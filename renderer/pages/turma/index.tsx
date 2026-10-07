@@ -61,7 +61,7 @@ export default function GerenciarTurmas() {
   }, [router.query.sucesso]);
 
   const [paginaAtual, setPaginaAtual] = useState(1);
-  const ITENS_POR_PAGINA = 6; // 4 linhas x 3 colunas
+  const ITENS_POR_PAGINA = 9; // 4 linhas x 3 colunas
 
   useEffect(() => {
     setPaginaAtual(1);
