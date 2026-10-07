@@ -16,8 +16,8 @@ import ModalDesativar from "../../components/modal/modalDesativar";
 
 import { MdAdd } from "react-icons/md";
 
-import { Turma } from "../../types/turma"
-import { event } from "next/dist/build/output/log";
+import { Turma } from "../../types/turma";
+import ToastFeedback from "../../components/ToastFeedback";
 
 export default function GerenciarTurmas() {
   const router = useRouter();
@@ -243,15 +243,19 @@ export default function GerenciarTurmas() {
         </div>
 
         {feedback && (
-          <div className=" w-[657.5px] fixed top-31.5 left-45 z-50 bg-[#d8f3dc] text-[#2e8b45] px-4 py-2.5 rounded-xl mb-4 text-sm font-medium flex items-center gap-2 animate-fade-in">
-            ✓ {feedback}
-          </div>
+          <ToastFeedback
+            mensagem={feedback}
+            tipo="sucesso"
+            onClose={() => setFeedback("")}
+          />
         )}
 
         {erro && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2.5 rounded-xl mb-4 text-xs font-medium">
-            {erro}
-          </div>
+          <ToastFeedback
+            mensagem={erro}
+            tipo="erro"
+            onClose={() => setErro("")}
+          />
         )}
         
         {carregada ? (

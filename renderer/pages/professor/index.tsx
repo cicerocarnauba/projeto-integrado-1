@@ -11,6 +11,7 @@ import Paginacao from "../../components/Paginacao";
 import ModalDesativar from "../../components/modal/modalDesativar";
 import ModalAtivar from "../../components/modal/modalAtivar";
 import ModalExcluir from "../../components/modal/modalExcluir";
+import ToastFeedback from "../../components/ToastFeedback";
 
 import { MdAdd } from "react-icons/md";
 
@@ -234,47 +235,31 @@ export default function GerenciarProfessores() {
           Gerenciar professores
         </h1>
 
-        {mostrarSucesso && (
-          <div className="bg-[#d8f3dc] text-[#2e8b45] px-4 py-2.5 rounded-xl mb-4 text-sm font-medium flex items-center gap-2">
-            ✓ Professor cadastrado com sucesso!
-          </div>
-        )}
+        <ToastFeedback
+          mensagem={
+            sucessoDesativacao ||
+            sucessoExclusao ||
+            sucessoAtivacao ||
+            (mostrarSucesso ? "Professor cadastrado com sucesso!" : "") ||
+            (sucessoEdicao ? "Professor editado com sucesso!" : "")
+          }
+          tipo="sucesso"
+          onClose={() => {
+            setSucessoDesativacao("");
+            setSucessoExclusao("");
+            setSucessoAtivacao("");
+          }}
+        />
 
-        {sucessoEdicao && (
-          <div className="bg-[#d8f3dc] text-[#2e8b45] px-4 py-2.5 rounded-xl mb-4 text-sm font-medium flex items-center gap-2">
-            ✓ Professor editado com sucesso!
-          </div>
-        )}
-
-        {sucessoAtivacao && (
-          <div className="bg-[#d8f3dc] text-[#2e8b45] px-4 py-2.5 rounded-xl mb-4 text-sm font-medium flex items-center gap-2">
-            ✓ {sucessoAtivacao}
-          </div>
-        )}
-
-        {sucessoExclusao && (
-          <div className="bg-[#d8f3dc] text-[#2e8b45] px-4 py-2.5 rounded-xl mb-4 text-sm font-medium flex items-center gap-2">
-            ✓ {sucessoExclusao}
-          </div>
-        )}
-
-        {erroAtivacao && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2.5 rounded-xl mb-4 text-sm font-medium flex items-center gap-2">
-            ✕ {erroAtivacao}
-          </div>
-        )}
-
-        {sucessoDesativacao && (
-          <div className="bg-[#d8f3dc] text-[#2e8b45] px-4 py-2.5 rounded-xl mb-4 text-sm font-medium flex items-center gap-2">
-            ✓ {sucessoDesativacao}
-          </div>
-        )}
-
-        {avisoBloqueio && (
-          <div className="bg-amber-50 border border-amber-200 text-amber-800 px-4 py-2.5 rounded-xl mb-4 text-sm font-medium flex items-center gap-2">
-            ⚠ {avisoBloqueio}
-          </div>
-        )}
+        <ToastFeedback
+          mensagem={avisoBloqueio || erroAtivacao || erro}
+          tipo="erro"
+          onClose={() => {
+            setAvisoBloqueio("");
+            setErroAtivacao("");
+            setErro("");
+          }}
+        />
 
         <div className="flex items-start gap-4 mb-5 w-full">
           <SearchBar
@@ -296,12 +281,6 @@ export default function GerenciarProfessores() {
             Adicionar professor
           </Link>
         </div>
-
-        {erro && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2.5 rounded-xl mb-4 text-xs font-medium">
-            {erro}
-          </div>
-        )}
 
         {carregado ? (
           <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">

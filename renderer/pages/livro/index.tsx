@@ -11,6 +11,7 @@ import { MdAdd } from "react-icons/md";
 import ModalExcluir from "../../components/modal/modalExcluir";
 import ModalAtivarLivro from "../../components/modal/ModalAtivaLivro";
 import ModalDesativar from "../../components/modal/modalDesativar";
+import ToastFeedback from "../../components/ToastFeedback";
 
 export default function GerenciarLivros() {
   const router = useRouter();
@@ -282,11 +283,17 @@ export default function GerenciarLivros() {
           Gerenciar livros
         </h1>
 
-        {feedback && (
-          <div className=" w-[657.5px] fixed top-31.5 left-45 z-50 bg-[#d8f3dc] text-[#2e8b45] px-4 py-2.5 rounded-xl mb-4 text-sm font-medium flex items-center gap-2 animate-fade-in">
-            ✓ {feedback}
-          </div>
-        )}
+        <ToastFeedback
+          mensagem={feedback}
+          tipo="sucesso"
+          onClose={() => setFeedback("")}
+        />
+
+        <ToastFeedback
+          mensagem={erro}
+          tipo="erro"
+          onClose={() => setErro("")}
+        />
 
         {/* Barra de busca e botão de adicionar */}
         <div className="flex items-start gap-4 mb-5 w-full">
