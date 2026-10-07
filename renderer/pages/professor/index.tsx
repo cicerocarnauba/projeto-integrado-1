@@ -341,14 +341,14 @@ export default function GerenciarProfessores() {
             <span className="block font-bold text-gray-800 text-xs mt-0.75">
               Nome:{" "}
               <span className="text-sm font-normal text-gray-600">
-                {professorParaExcluir?.primeiroNome}{" "}
-                {professorParaExcluir?.sobrenome}
+                {professorParaDesativar?.primeiroNome}{" "}
+                {professorParaDesativar?.sobrenome}
               </span>
             </span>
             <span className="block font-bold text-gray-800 text-xs mt-0.75">
               Email:{" "}
               <span className="text-sm font-normal text-gray-600">
-                {professorParaExcluir?.email}
+                {professorParaDesativar?.email}
               </span>
             </span>
           </>
@@ -367,14 +367,14 @@ export default function GerenciarProfessores() {
             <span className="block font-bold text-gray-800 text-xs mt-0.75">
               Nome:{" "}
               <span className="text-sm font-normal text-gray-600">
-                {professorParaExcluir?.primeiroNome}{" "}
-                {professorParaExcluir?.sobrenome}
+                {professorParaAtivar?.primeiroNome}{" "}
+                {professorParaAtivar?.sobrenome}
               </span>
             </span>
             <span className="block font-bold text-gray-800 text-xs mt-0.75">
               Email:{" "}
               <span className="text-sm font-normal text-gray-600">
-                {professorParaExcluir?.email}
+                {professorParaAtivar?.email}
               </span>
             </span>
           </>
