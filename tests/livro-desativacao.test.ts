@@ -98,11 +98,14 @@ describe('Testes Unitários - HU04 Desativar Livro Manualmente', () => {
       const resultado = livroController.desativar(1);
 
       assert.strictEqual(resultado.livro.status, 'INATIVO');
+      assert.strictEqual(resultado.livro.quantidadeTotal, 0);
+      assert.strictEqual(resultado.livro.saldoDisponivel, 0);
       assert.strictEqual(resultado.mensagem, 'Livro desativado com sucesso.');
 
       const noBanco = livroDAO.buscarPorId(1);
       assert.ok(noBanco);
       assert.strictEqual(noBanco.status, 'INATIVO');
+      assert.strictEqual(noBanco.quantidadeTotal, 0);
     });
 
     it('deve permitir desativação mesmo para livro COM histórico concluído (não depende de histórico)', () => {
@@ -110,11 +113,14 @@ describe('Testes Unitários - HU04 Desativar Livro Manualmente', () => {
       const resultado = livroController.desativar(3);
 
       assert.strictEqual(resultado.livro.status, 'INATIVO');
+      assert.strictEqual(resultado.livro.quantidadeTotal, 0);
+      assert.strictEqual(resultado.livro.saldoDisponivel, 0);
       assert.strictEqual(resultado.mensagem, 'Livro desativado com sucesso.');
 
       const noBanco = livroDAO.buscarPorId(3);
       assert.ok(noBanco);
       assert.strictEqual(noBanco.status, 'INATIVO');
+      assert.strictEqual(noBanco.quantidadeTotal, 0);
     });
 
     it('livro desativado não deve aparecer na consulta padrão, mas deve constar com incluirInativos: true', () => {
@@ -231,11 +237,13 @@ describe('Testes Unitários - HU04 Desativar Livro Manualmente', () => {
       assert.strictEqual(resultadoExclusao.acao, 'DESATIVADO');
       assert.ok(resultadoExclusao.livro);
       assert.strictEqual(resultadoExclusao.livro.status, 'INATIVO');
+      assert.strictEqual(resultadoExclusao.livro.quantidadeTotal, 0);
 
       // Verifica se continua consultável com incluirInativos
       const consulta = livroController.consultar({ termo: 'Capitães da Areia', incluirInativos: true });
       assert.strictEqual(consulta.length, 1);
       assert.strictEqual(consulta[0].status, 'INATIVO');
+      assert.strictEqual(consulta[0].quantidadeTotal, 0);
     });
   });
 });

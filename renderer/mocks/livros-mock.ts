@@ -32,7 +32,7 @@ export const livros: Livro[] = [
     id: 4,
     titulo: "A Bela Adormecida",
     editora: "Quixeramobim",
-    quantidadeTotal: 2,
+    quantidadeTotal: 0,
     status: "INATIVO",
     ativo: false,
     statusEmprestimo: "emprestado_atualmente",
