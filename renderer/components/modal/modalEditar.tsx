@@ -39,7 +39,7 @@ export default function ModalEditar({
           <button
             type="button"
             onClick={onCancelar}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-white bg-[#cf4a4a] hover:bg-[#b83a3a] transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-100 transition-colors cursor-pointer"
           >
             <MdClear size={16} />
             Cancelar

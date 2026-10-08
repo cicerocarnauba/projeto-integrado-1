@@ -190,7 +190,7 @@ export default function ModalAtivarLivro({
             type="button"
             onClick={onCancelar}
             disabled={carregando}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-white bg-[#cf4a4a] hover:bg-[#b83a3a] transition-colors cursor-pointer disabled:opacity-50"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-100 transition-colors cursor-pointer disabled:opacity-50"
           >
             <MdClear size={16} />
             Cancelar
