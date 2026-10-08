@@ -9,6 +9,7 @@ files:
       - package.json
       - app
 linux:
+  maintainer: contato@crechemariadelourdes.com
   target:
     - AppImage
     - deb

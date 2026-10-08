@@ -29,9 +29,9 @@ export default function ModalExcluir({
           {titulo}
         </h2>
 
-        <p className="mt-2 text-sm text-gray-600">
+        <div className="mt-2 text-sm text-gray-600">
           {mensagem}
-        </p>
+        </div>
 
         <div className="flex justify-end gap-3 mt-6">
           <button

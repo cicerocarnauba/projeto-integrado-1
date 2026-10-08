@@ -1,23 +1,23 @@
-
-import {MdRemoveCircleOutline, MdClear} from "react-icons/md"
-
+import { MdRemoveCircleOutline, MdClear, MdWarningAmber } from "react-icons/md";
 import React from "react";
 
-interface ModalExcluirProps {
+interface ModalDesativarProps {
   aberto: boolean;
   titulo?: string;
   mensagem: React.ReactNode;
+  aviso?: React.ReactNode;
   onConfirmar: () => void;
   onCancelar: () => void;
 }
 
-export default function ModalExcluir({
+export default function ModalDesativar({
   aberto,
   titulo = "Desativar registro?",
   mensagem,
+  aviso,
   onConfirmar,
   onCancelar,
-}: ModalExcluirProps) {
+}: ModalDesativarProps) {
   if (!aberto) {
     return null;
   }
@@ -29,9 +29,16 @@ export default function ModalExcluir({
           {titulo}
         </h2>
 
-        <p className="mt-2 text-sm text-gray-600">
+        <div className="mt-2 text-sm text-gray-600">
           {mensagem}
-        </p>
+        </div>
+
+        {aviso && (
+          <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800 flex items-start gap-2.5">
+            <MdWarningAmber size={18} className="text-amber-600 shrink-0 mt-0.5" />
+            <div className="leading-relaxed font-medium">{aviso}</div>
+          </div>
+        )}
 
         <div className="flex justify-end gap-3 mt-6">
           <button
@@ -49,7 +56,7 @@ export default function ModalExcluir({
             className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-white bg-[#cf4a4a] hover:bg-[#b83a3a] transition-colors cursor-pointer"
           >
             <MdRemoveCircleOutline size={16}/>
-                Desativar
+            Desativar
           </button>
         </div>
       </div>

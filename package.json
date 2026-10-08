@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "Sistema de Gerenciamento de Acervo de Biblioteca Escolar - Creche Maria de Lourdes (Nextron + SQLite)",
+  "author": "Creche Maria de Lourdes <contato@crechemariadelourdes.com>",
   "main": "app/main.js",
   "scripts": {
     "dev": "cross-env NODE_OPTIONS=--experimental-transform-types nextron",

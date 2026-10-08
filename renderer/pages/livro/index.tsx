@@ -376,6 +376,7 @@ export default function GerenciarLivros() {
 
         <ModalDesativar
           aberto={livroParaDesativar !== null}
+          aviso="Atenção: ao desativar o livro, a quantidade total de exemplares será zerada."
           mensagem={
             livroParaDesativar ? (
               <>
