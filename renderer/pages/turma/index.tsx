@@ -61,7 +61,7 @@ export default function GerenciarTurmas() {
   }, [router.query.sucesso]);
 
   const [paginaAtual, setPaginaAtual] = useState(1);
-  const ITENS_POR_PAGINA = 9; // 4 linhas x 3 colunas
+  const ITENS_POR_PAGINA = 12; // 4 linhas x 3 colunas
 
   useEffect(() => {
     setPaginaAtual(1);
@@ -214,7 +214,7 @@ export default function GerenciarTurmas() {
     <div className="flex min-h-screen bg-white">
       <Sidebar />
 
-      <main className="flex-1 px-8 pt-6 pb-6 animate-fade-in">
+      <main className="flex-1 min-w-0 px-8 pt-6 pb-6 animate-fade-in">
         <h1 className="text-2xl font-bold text-gray-800 mb-4">
           Gerenciar turmas
         </h1>

@@ -9,7 +9,7 @@ export default function GerenciarTurmas() {
     <div className="flex min-h-screen bg-white">
       <Sidebar />
 
-      <main className="flex-1 p-8">
+      <main className="flex-1 min-w-0 p-8 animate-fade-in">
 
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-black">Adicionar turma</h1>

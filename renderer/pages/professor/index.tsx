@@ -30,7 +30,7 @@ export default function GerenciarProfessores() {
   const [ordenacao, setOrdenacao] = useState<TipoOrdenacao>("alfabetica");
 
   const [paginaAtual, setPaginaAtual] = useState(1);
-  const ITENS_POR_PAGINA = 6;
+  const ITENS_POR_PAGINA = 12; // 4 linhas x 3 colunas
 
   // Ativação (HU12)
   const [professorParaAtivar, setProfessorParaAtivar] = useState<any | null>(
@@ -230,7 +230,7 @@ export default function GerenciarProfessores() {
     <div className="flex min-h-screen bg-white">
       <Sidebar />
 
-      <main className="flex-1 px-8 pt-6 pb-6 animate-fade-in">
+      <main className="flex-1 min-w-0 px-8 pt-6 pb-6 animate-fade-in">
         <h1 className="text-2xl font-bold text-gray-800 mb-4">
           Gerenciar professores
         </h1>
