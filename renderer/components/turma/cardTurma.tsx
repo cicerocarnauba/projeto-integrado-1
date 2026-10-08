@@ -25,7 +25,7 @@ export default function CardTurma({
   onExcluir,
 }: CardTurmasProps) {
   const ativo = turma.status === "ATIVO";
-  const historico: boolean = false
+  const historico: boolean = false;
 
   return (
     <div

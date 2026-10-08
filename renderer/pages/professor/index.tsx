@@ -30,7 +30,7 @@ export default function GerenciarProfessores() {
   const [ordenacao, setOrdenacao] = useState<TipoOrdenacao>("alfabetica");
 
   const [paginaAtual, setPaginaAtual] = useState(1);
-  const ITENS_POR_PAGINA = 6;
+  const ITENS_POR_PAGINA = 12;
 
   // Ativação (HU12)
   const [professorParaAtivar, setProfessorParaAtivar] = useState<any | null>(
@@ -338,9 +338,18 @@ export default function GerenciarProfessores() {
           <>
             Tem certeza que deseja desativar o professor:
             <br />
-            <span className="font-semibold text-[#cf4a4a]">
-              {professorParaDesativar?.primeiroNome}{" "}
-              {professorParaDesativar?.sobrenome}
+            <span className="block font-bold text-gray-800 text-xs mt-0.75">
+              Nome:{" "}
+              <span className="text-sm font-normal text-gray-600">
+                {professorParaDesativar?.primeiroNome}{" "}
+                {professorParaDesativar?.sobrenome}
+              </span>
+            </span>
+            <span className="block font-bold text-gray-800 text-xs mt-0.75">
+              Email:{" "}
+              <span className="text-sm font-normal text-gray-600">
+                {professorParaDesativar?.email}
+              </span>
             </span>
           </>
         }
@@ -355,9 +364,18 @@ export default function GerenciarProfessores() {
           <>
             Tem certeza que deseja ativar o professor:
             <br />
-            <span className="font-semibold text-[#2e8b45]">
-              {professorParaAtivar?.primeiroNome}{" "}
-              {professorParaAtivar?.sobrenome}
+            <span className="block font-bold text-gray-800 text-xs mt-0.75">
+              Nome:{" "}
+              <span className="text-sm font-normal text-gray-600">
+                {professorParaAtivar?.primeiroNome}{" "}
+                {professorParaAtivar?.sobrenome}
+              </span>
+            </span>
+            <span className="block font-bold text-gray-800 text-xs mt-0.75">
+              Email:{" "}
+              <span className="text-sm font-normal text-gray-600">
+                {professorParaAtivar?.email}
+              </span>
             </span>
           </>
         }
@@ -372,9 +390,18 @@ export default function GerenciarProfessores() {
           <>
             Tem certeza que deseja excluir o professor:
             <br />
-            <span className="font-semibold text-[#cf4a4a]">
-              {professorParaExcluir?.primeiroNome}{" "}
-              {professorParaExcluir?.sobrenome}
+            <span className="block font-bold text-gray-800 text-xs mt-0.75">
+              Nome:{" "}
+              <span className="text-sm font-normal text-gray-600">
+                {professorParaExcluir?.primeiroNome}{" "}
+                {professorParaExcluir?.sobrenome}
+              </span>
+            </span>
+            <span className="block font-bold text-gray-800 text-xs mt-0.75">
+              Email:{" "}
+              <span className="text-sm font-normal text-gray-600">
+                {professorParaExcluir?.email}
+              </span>
             </span>
           </>
         }
