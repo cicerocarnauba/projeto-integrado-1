@@ -128,24 +128,52 @@ export class TurmaDAO {
 
   /**
    * HU17 — Verifica se a turma possui algum empréstimo pendente.
-   *
-   * IMPORTANTE: Quando o módulo de Empréstimos for criado, esta consulta
-   * deve ser substituída por uma query real na tabela `emprestimo`.
    */
-  public possuiEmprestimoPendente(_turmaId: number): boolean {
-    // TODO: Substituir por consulta real quando a tabela `emprestimo` existir.
-    return false;
+  public possuiEmprestimoPendente(turmaId: number): boolean {
+    try {
+      const temTabela = this.db
+        .prepare(
+          `SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'emprestimo'`
+        )
+        .get();
+      if (!temTabela) return false;
+
+      const row = this.db
+        .prepare(
+          `SELECT COUNT(*) as count FROM emprestimo WHERE turma_id = ? AND status = 'PENDENTE'`
+        )
+        .get(turmaId) as { count: number } | undefined;
+
+      return !!row && row.count > 0;
+    } catch {
+      return false;
+    }
   }
 
   /**
    * HU17 — Verifica se a turma possui histórico de empréstimos.
-   *
-   * IMPORTANTE: Quando o módulo de Empréstimos for criado, esta consulta
-   * deve ser substituída por uma query real na tabela `emprestimo`.
+   * Uma turma tem histórico se existe qualquer registro em `emprestimo`
+   * associado a ela (independente do status: PENDENTE, CONCLUIDO ou CANCELADO).
    */
-  public possuiHistoricoEmprestimos(_turmaId: number): boolean {
-    // TODO: Substituir por consulta real quando a tabela `emprestimo` existir.
-    return false;
+  public possuiHistoricoEmprestimos(turmaId: number): boolean {
+    try {
+      const temTabela = this.db
+        .prepare(
+          `SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'emprestimo'`
+        )
+        .get();
+      if (!temTabela) return false;
+
+      const row = this.db
+        .prepare(
+          `SELECT COUNT(*) as count FROM emprestimo WHERE turma_id = ?`
+        )
+        .get(turmaId) as { count: number } | undefined;
+
+      return !!row && row.count > 0;
+    } catch {
+      return false;
+    }
   }
 
   private mapRowToEntity(row: TurmaRow): Turma {

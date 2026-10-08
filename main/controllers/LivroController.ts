@@ -31,6 +31,7 @@ export interface LivroConsultaDTO {
   status: 'ATIVO' | 'INATIVO';
   dataCadastro: Date;
   dataAtualizacao: Date;
+  possuiHistorico: boolean;
 }
 
 export interface ResultadoExclusaoLivroDTO {
@@ -113,17 +114,7 @@ export class LivroController {
       incluirInativos: filtro.incluirInativos,
     });
 
-    return livros.map((livro) => ({
-      id: livro.id,
-      titulo: livro.titulo,
-      editora: livro.editora,
-      quantidadeTotal: livro.quantidadeTotal,
-      quantidadeEmprestada: livro.quantidadeEmprestada,
-      saldoDisponivel: livro.getSaldoDisponivel(),
-      status: livro.status,
-      dataCadastro: livro.dataCadastro,
-      dataAtualizacao: livro.dataAtualizacao,
-    }));
+    return livros.map((livro) => this.toDTO(livro));
   }
 
   /**
@@ -184,17 +175,7 @@ export class LivroController {
       throw error;
     }
 
-    return {
-      id: livro.id,
-      titulo: livro.titulo,
-      editora: livro.editora,
-      quantidadeTotal: livro.quantidadeTotal,
-      quantidadeEmprestada: livro.quantidadeEmprestada,
-      saldoDisponivel: livro.getSaldoDisponivel(),
-      status: livro.status,
-      dataCadastro: livro.dataCadastro,
-      dataAtualizacao: livro.dataAtualizacao,
-    };
+    return this.toDTO(livro);
   }
 
   /**
@@ -237,17 +218,7 @@ export class LivroController {
       acao: 'DESATIVADO',
       mensagem: 'Livro possui histórico de empréstimos e foi desativado para preservar os registros.',
       id,
-      livro: {
-        id: livro.id,
-        titulo: livro.titulo,
-        editora: livro.editora,
-        quantidadeTotal: livro.quantidadeTotal,
-        quantidadeEmprestada: livro.quantidadeEmprestada,
-        saldoDisponivel: livro.getSaldoDisponivel(),
-        status: livro.status,
-        dataCadastro: livro.dataCadastro,
-        dataAtualizacao: livro.dataAtualizacao,
-      },
+      livro: this.toDTO(livro),
     };
   }
 
@@ -285,17 +256,7 @@ export class LivroController {
 
     return {
       mensagem: 'Livro desativado com sucesso.',
-      livro: {
-        id: livro.id,
-        titulo: livro.titulo,
-        editora: livro.editora,
-        quantidadeTotal: livro.quantidadeTotal,
-        quantidadeEmprestada: livro.quantidadeEmprestada,
-        saldoDisponivel: livro.getSaldoDisponivel(),
-        status: livro.status,
-        dataCadastro: livro.dataCadastro,
-        dataAtualizacao: livro.dataAtualizacao,
-      },
+      livro: this.toDTO(livro),
     };
   }
 
@@ -338,17 +299,28 @@ export class LivroController {
 
     return {
       mensagem: 'Livro ativado com sucesso.',
-      livro: {
-        id: livro.id,
-        titulo: livro.titulo,
-        editora: livro.editora,
-        quantidadeTotal: livro.quantidadeTotal,
-        quantidadeEmprestada: livro.quantidadeEmprestada,
-        saldoDisponivel: livro.getSaldoDisponivel(),
-        status: livro.status,
-        dataCadastro: livro.dataCadastro,
-        dataAtualizacao: livro.dataAtualizacao,
-      },
+      livro: this.toDTO(livro),
+    };
+  }
+
+  /**
+   * Monta o DTO do livro, incluindo `possuiHistorico` (usado pelo front
+   * para decidir entre habilitar "Desativar" ou "Excluir").
+   */
+  private toDTO(livro: Livro): LivroConsultaDTO {
+    return {
+      id: livro.id,
+      titulo: livro.titulo,
+      editora: livro.editora,
+      quantidadeTotal: livro.quantidadeTotal,
+      quantidadeEmprestada: livro.quantidadeEmprestada,
+      saldoDisponivel: livro.getSaldoDisponivel(),
+      status: livro.status,
+      dataCadastro: livro.dataCadastro,
+      dataAtualizacao: livro.dataAtualizacao,
+      possuiHistorico:
+        livro.id !== null &&
+        this.livroDAO.possuiHistoricoEmprestimos(livro.id),
     };
   }
 }
