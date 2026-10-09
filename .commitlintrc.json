@@ -14,7 +14,8 @@
         "build",
         "ci",
         "chore",
-        "revert"
+        "revert",
+        "merge"
       ]
     ],
     "subject-case": [0],
