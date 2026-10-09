@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 import Sidebar from "../../components/Sidebar";
 import SearchBar, { TipoOrdenacao } from "../../components/Searchbar";
 
-import CardProfessor from "../../components/professor/cardProfessor";
+import ListaProfessor from "../../components/professor/listaProfessor";
 import Paginacao from "../../components/Paginacao";
 import ModalDesativar from "../../components/modal/modalDesativar";
 import ModalAtivar from "../../components/modal/modalAtivar";
@@ -30,7 +30,7 @@ export default function GerenciarProfessores() {
   const [ordenacao, setOrdenacao] = useState<TipoOrdenacao>("alfabetica");
 
   const [paginaAtual, setPaginaAtual] = useState(1);
-  const ITENS_POR_PAGINA = 12; // 4 linhas x 3 colunas
+  const ITENS_POR_PAGINA = 6; // 6 itens por página na visualização em lista para encaixar sem rolagem vertical
 
   // Ativação (HU12)
   const [professorParaAtivar, setProfessorParaAtivar] = useState<any | null>(
@@ -297,27 +297,22 @@ export default function GerenciarProfessores() {
             key={`${termoBusca}-${incluirInativos}-${ordenacao}-${paginaAtual}`}
             className="animate-fade-in duration-300"
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-              {professoresPaginados.map((professor) => (
-                <CardProfessor
-                  key={professor.id}
-                  professor={professor}
-                  onEditar={(p) => router.push(`/professor/${p.id}`)}
-                  onAtivar={(p) => {
-                    limparMensagens();
-                    setProfessorParaAtivar(p);
-                  }}
-                  onDesativar={(p) => {
-                    limparMensagens();
-                    setProfessorParaDesativar(p);
-                  }}
-                  onExcluir={(p) => {
-                    limparMensagens();
-                    setProfessorParaExcluir(p);
-                  }}
-                />
-              ))}
-            </div>
+            <ListaProfessor
+              professores={professoresPaginados}
+              onEditar={(p) => router.push(`/professor/${p.id}`)}
+              onAtivar={(p) => {
+                limparMensagens();
+                setProfessorParaAtivar(p);
+              }}
+              onDesativar={(p) => {
+                limparMensagens();
+                setProfessorParaDesativar(p);
+              }}
+              onExcluir={(p) => {
+                limparMensagens();
+                setProfessorParaExcluir(p);
+              }}
+            />
 
             <Paginacao
               paginaAtual={paginaAtual}

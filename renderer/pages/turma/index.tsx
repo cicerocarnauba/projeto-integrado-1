@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 
 import Sidebar from "../../components/Sidebar";
 import SearchBar, { TipoOrdenacao } from "../../components/Searchbar";
-import CardTurma from "../../components/turma/cardTurma";
+import ListaTurma from "../../components/turma/listaTurma";
 import Paginacao from "../../components/Paginacao";
 
 import ModalExcluir from "../../components/modal/modalExcluir";
@@ -61,7 +61,7 @@ export default function GerenciarTurmas() {
   }, [router.query.sucesso]);
 
   const [paginaAtual, setPaginaAtual] = useState(1);
-  const ITENS_POR_PAGINA = 12; // 4 linhas x 3 colunas
+  const ITENS_POR_PAGINA = 6; // 6 itens por página na visualização em lista para encaixar sem rolagem vertical
 
   useEffect(() => {
     setPaginaAtual(1);
@@ -275,35 +275,19 @@ export default function GerenciarTurmas() {
             key={`${termoBusca}-${incluirInativos}-${ordenacao}-${paginaAtual}`}
             className="animate-fade-in duration-500"
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-              {turmasPaginadas.map((turma) => (
-                <div
-                  key={turma.id}
-                  className={`
-                    transition-transform duration-200 ease-in-out
-                    ${
-                      turmaExcluindo === turma.id
-                        ? "scale-0 opacity-0"
-                        : "scale-100 opacity-100"
-                    }
-                  `}
-                >
-
-                  <CardTurma
-                    turma={turma}
-                    onEditar={ (turma) => {
-                      router.push({
-                        pathname: "/turma/editar_turma",
-                        query: {id: turma.id}
-                      })
-                    }}
-                    onDesativar={(turma) => setTurmaParaDesativar(turma)}
-                    onAtivar={(turma) => setTurmaParaAtivar(turma)}
-                    onExcluir={(turma) => setTurmaParaExcluir(turma)}
-                  />
-                </div>
-              ))}
-            </div>
+            <ListaTurma
+              turmas={turmasPaginadas}
+              turmaExcluindo={turmaExcluindo}
+              onEditar={(turma) => {
+                router.push({
+                  pathname: "/turma/editar_turma",
+                  query: { id: turma.id },
+                });
+              }}
+              onDesativar={(turma) => setTurmaParaDesativar(turma)}
+              onAtivar={(turma) => setTurmaParaAtivar(turma)}
+              onExcluir={(turma) => setTurmaParaExcluir(turma)}
+            />
 
             <Paginacao
               paginaAtual={paginaAtual}
