@@ -26,6 +26,8 @@ export default function CardLivro({
   // considera apenas exemplares emprestados agora.
   const temHistorico = 
     livro.possuiHistorico ?? (livro.quantidadeEmprestada ?? 0) > 0;
+  const naoPodeDesativar =
+    (livro.quantidadeEmprestada ?? 0) > 0 || livro.possuiEmprestimoPendente === true;
 
   return (
     <div
@@ -94,7 +96,15 @@ export default function CardLivro({
                 </button>
 
                 {temHistorico ? (
-                  <DesativarButton onClick={() => onDesativar?.(livro)} />
+                  <DesativarButton
+                    onClick={() => onDesativar?.(livro)}
+                    disabled={naoPodeDesativar}
+                    title={
+                      naoPodeDesativar
+                        ? "Não é possível desativar este livro, pois ele possui empréstimos pendentes."
+                        : undefined
+                    }
+                  />
                 ) : (
                   <ExcluirButton onClick={() => onExcluir?.(livro)} />
                 )}

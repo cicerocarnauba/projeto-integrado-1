@@ -26,6 +26,7 @@ export default function CardTurma({
 }: CardTurmasProps) {
   const ativo = turma.status === "ATIVO";
   const temHistorico = turma.possuiHistorico ?? false;
+  const naoPodeDesativar = turma.possuiEmprestimoPendente === true;
 
   return (
     <div
@@ -79,6 +80,12 @@ export default function CardTurma({
                 {temHistorico ? (
                   <DesativarButton 
                     onClick={() => onDesativar?.(turma)}
+                    disabled={naoPodeDesativar}
+                    title={
+                      naoPodeDesativar
+                        ? "Não é possível desativar esta turma, pois ela possui empréstimos pendentes."
+                        : undefined
+                    }
                   />
                 ) : (
                   <ExcluirButton

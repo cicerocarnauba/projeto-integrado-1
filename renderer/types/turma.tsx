@@ -10,4 +10,5 @@ export interface Turma extends CadastroTurmaDTO {
   dataCadastro: string;
   dataAtualizacao: string;
   possuiHistorico?: boolean;
+  possuiEmprestimoPendente?: boolean;
 }

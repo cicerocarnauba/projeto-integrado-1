@@ -21,6 +21,7 @@ export interface TurmaDTO {
   dataCadastro: Date;
   dataAtualizacao: Date;
   possuiHistorico: boolean;
+  possuiEmprestimoPendente: boolean;
 }
 
 // GRASP Controller: ponto de entrada das operações de Turma
@@ -230,6 +231,9 @@ export class TurmaController {
       possuiHistorico:
         turma.id !== null &&
         this.turmaDAO.possuiHistoricoEmprestimos(turma.id),
+      possuiEmprestimoPendente:
+        turma.id !== null &&
+        this.turmaDAO.possuiEmprestimoPendente(turma.id),
     };
   }
 }

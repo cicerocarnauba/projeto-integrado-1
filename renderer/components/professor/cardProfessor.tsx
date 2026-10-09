@@ -21,10 +21,8 @@ export default function CardProfessor({
   onAtivar,
 }: CardProfessorProps) {
   const ativo = professor.status === "ATIVO" || professor.ativo === true;
-
-  // Se o professor tiver histórico ou vínculos no sistema, usamos a verificação do backend;
-  // Caso não tenha essa lógica de histórico por enquanto, mantemos false para usar ExcluirButton por padrão.
   const temHistorico = professor.possuiHistorico ?? false;
+  const naoPodeDesativar = professor.possuiEmprestimoPendente === true;
 
   return (
     <div
@@ -85,7 +83,15 @@ export default function CardProfessor({
                 </button>
 
                 {temHistorico ? (
-                  <DesativarButton onClick={() => onDesativar?.(professor)} />
+                  <DesativarButton
+                    onClick={() => onDesativar?.(professor)}
+                    disabled={naoPodeDesativar}
+                    title={
+                      naoPodeDesativar
+                        ? "Não é possível desativar este professor, pois ele possui empréstimos pendentes."
+                        : undefined
+                    }
+                  />
                 ) : (
                   <ExcluirButton onClick={() => onExcluir?.(professor)} />
                 )}

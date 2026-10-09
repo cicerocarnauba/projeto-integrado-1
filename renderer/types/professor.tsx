@@ -14,5 +14,6 @@ export interface Professor extends CadastroProfessorDTO {
   ativo?: boolean;
   statusEmprestimoProf?: string;
   possuiHistorico?: boolean;
+  possuiEmprestimoPendente?: boolean;
 }
 
