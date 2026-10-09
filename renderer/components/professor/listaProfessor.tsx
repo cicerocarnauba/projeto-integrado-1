@@ -24,11 +24,11 @@ export default function ListaProfessor({
       <div className="w-full overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-[#f4f9f5] border-b border-[#D3E8D6] text-xs font-semibold text-[#1e582d] uppercase tracking-wider">
-              <th className="py-3 px-3 sm:px-4">Professor</th>
-              <th className="py-3 px-3 sm:px-4 hidden md:table-cell">E-mail</th>
-              <th className="py-3 px-2 sm:px-3 text-center w-24 sm:w-28 shrink-0">Status</th>
-              <th className="py-3 px-3 sm:px-4 text-right w-[175px] sm:w-[190px] shrink-0">Ações</th>
+            <tr className="bg-[#ebf5ed] border-b border-[#c8decb] text-sm font-semibold text-[#23582c]">
+              <th className="py-3.5 px-4 sm:px-6">Professor</th>
+              <th className="py-3.5 px-3 sm:px-4 hidden md:table-cell">E-mail</th>
+              <th className="py-3.5 px-3 text-center w-28 shrink-0">Status</th>
+              <th className="py-3.5 px-4 text-center w-[210px] shrink-0">Ações</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[#E6F0E8]">
@@ -44,11 +44,11 @@ export default function ListaProfessor({
                     ativo ? "bg-white" : "bg-[#fcfdfc]"
                   }`}
                 >
-                  <td className="py-3 px-3 sm:px-4">
+                  <td className="py-3 px-4 sm:px-6">
                     <span
                       title={`${professor.primeiroNome} ${professor.sobrenome}`}
-                      className={`text-sm font-semibold block leading-tight ${
-                        ativo ? "text-[#245B2F]" : "text-gray-700"
+                      className={`text-sm font-medium block leading-tight ${
+                        ativo ? "text-gray-900" : "text-gray-500"
                       }`}
                     >
                       {professor.primeiroNome} {professor.sobrenome}
@@ -63,14 +63,14 @@ export default function ListaProfessor({
                   <td className="py-3 px-3 sm:px-4 hidden md:table-cell">
                     <span
                       title={professor.email}
-                      className={`text-sm block truncate max-w-[200px] lg:max-w-xs ${
-                        ativo ? "text-[#3e7e48]" : "text-gray-500"
+                      className={`text-sm font-medium block truncate max-w-[200px] lg:max-w-xs ${
+                        ativo ? "text-gray-900" : "text-gray-500"
                       }`}
                     >
                       {professor.email}
                     </span>
                   </td>
-                  <td className="py-3 px-2 sm:px-3 text-center">
+                  <td className="py-3 px-3 text-center">
                     <span
                       className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-semibold text-xs shrink-0 transition-colors ${
                         ativo
@@ -86,8 +86,8 @@ export default function ListaProfessor({
                       {ativo ? "Ativo" : "Inativo"}
                     </span>
                   </td>
-                  <td className="py-3 px-3 sm:px-4 text-right">
-                    <div className="flex items-center justify-end gap-1.5 sm:gap-2 shrink-0">
+                  <td className="py-3 px-4 text-center">
+                    <div className="flex items-center justify-center gap-2 shrink-0">
                       {ativo ? (
                         <>
                           <button

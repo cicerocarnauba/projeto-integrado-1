@@ -26,10 +26,10 @@ export default function ListaTurma({
       <div className="w-full overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-[#f4f9f5] border-b border-[#D3E8D6] text-xs font-semibold text-[#1e582d] uppercase tracking-wider">
-              <th className="py-3 px-3 sm:px-4">Turma</th>
-              <th className="py-3 px-2 sm:px-3 text-center w-24 sm:w-28 shrink-0">Status</th>
-              <th className="py-3 px-3 sm:px-4 text-right w-[175px] sm:w-[190px] shrink-0">Ações</th>
+            <tr className="bg-[#ebf5ed] border-b border-[#c8decb] text-sm font-semibold text-[#23582c]">
+              <th className="py-3.5 px-4 sm:px-6">Turma</th>
+              <th className="py-3.5 px-3 text-center w-28 shrink-0">Status</th>
+              <th className="py-3.5 px-4 text-center w-[210px] shrink-0">Ações</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[#E6F0E8]">
@@ -46,17 +46,17 @@ export default function ListaTurma({
                     estaExcluindo ? "opacity-0 scale-95" : "opacity-100 scale-100"
                   } ${ativo ? "bg-white" : "bg-[#fcfdfc]"}`}
                 >
-                  <td className="py-3 px-3 sm:px-4">
+                  <td className="py-3 px-4 sm:px-6">
                     <span
                       title={turma.nome}
-                      className={`text-sm font-semibold whitespace-nowrap ${
-                        ativo ? "text-[#245B2F]" : "text-gray-700"
+                      className={`text-sm font-medium whitespace-nowrap ${
+                        ativo ? "text-gray-900" : "text-gray-500"
                       }`}
                     >
                       {turma.nome}
                     </span>
                   </td>
-                  <td className="py-3 px-2 sm:px-3 text-center">
+                  <td className="py-3 px-3 text-center">
                     <span
                       className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-semibold text-xs shrink-0 transition-colors ${
                         ativo
@@ -72,8 +72,8 @@ export default function ListaTurma({
                       {ativo ? "Ativo" : "Inativo"}
                     </span>
                   </td>
-                  <td className="py-3 px-3 sm:px-4 text-right">
-                    <div className="flex items-center justify-end gap-1.5 sm:gap-2 shrink-0">
+                  <td className="py-3 px-4 text-center">
+                    <div className="flex items-center justify-center gap-2 shrink-0">
                       {ativo ? (
                         <>
                           <button

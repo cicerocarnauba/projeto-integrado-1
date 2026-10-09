@@ -61,7 +61,7 @@ export default function GerenciarTurmas() {
   }, [router.query.sucesso]);
 
   const [paginaAtual, setPaginaAtual] = useState(1);
-  const ITENS_POR_PAGINA = 8; // 8 itens por página na visualização em lista
+  const ITENS_POR_PAGINA = 10; // 10 itens por página na visualização em lista
 
   useEffect(() => {
     setPaginaAtual(1);
