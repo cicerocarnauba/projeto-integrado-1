@@ -214,7 +214,7 @@ export default function GerenciarTurmas() {
     <div className="flex min-h-screen bg-white">
       <Sidebar />
 
-      <main className="flex-1 px-8 pt-6 pb-6 animate-fade-in">
+      <main className="flex-1 min-w-0 px-8 pt-6 pb-6 animate-fade-in">
         <h1 className="text-2xl font-bold text-gray-800 mb-4">
           Gerenciar turmas
         </h1>

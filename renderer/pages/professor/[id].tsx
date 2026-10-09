@@ -53,7 +53,7 @@ export default function EditarProfessor() {
     <div className="flex min-h-screen bg-white">
       <Sidebar />
 
-      <main className="flex-1 p-8 flex flex-col animate-fade-in">
+      <main className="flex-1 min-w-0 p-8 flex flex-col animate-fade-in">
         <p className="text-2xl font-bold text-gray-800 mb-6">
           Gerenciar professores
         </p>

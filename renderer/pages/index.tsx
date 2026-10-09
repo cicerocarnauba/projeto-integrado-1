@@ -109,7 +109,7 @@ export default function Home() {
 
           {/* Sidebar */}
           <div
-            className={`absolute top-0 left-0 w-80 h-full transition-opacity duration-300 delay-150 ${
+            className={`absolute top-0 left-0 h-full transition-opacity duration-300 delay-150 ${
               isTransitioning
                 ? "opacity-100 pointer-events-auto"
                 : "opacity-0 pointer-events-none"

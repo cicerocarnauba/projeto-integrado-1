@@ -9,4 +9,5 @@ export interface Turma extends CadastroTurmaDTO {
   status: StatusCadastro;
   dataCadastro: string;
   dataAtualizacao: string;
+  possuiHistorico?: boolean;
 }

@@ -67,7 +67,7 @@ export default function EditarLivro() {
     <div className="flex min-h-screen bg-white">
       <Sidebar />
 
-      <main className="flex-1 p-8 flex flex-col animate-fade-in">
+      <main className="flex-1 min-w-0 p-8 flex flex-col animate-fade-in">
 
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-black">

@@ -25,11 +25,11 @@ export default function CardTurma({
   onExcluir,
 }: CardTurmasProps) {
   const ativo = turma.status === "ATIVO";
-  const historico: boolean = false;
+  const temHistorico = turma.possuiHistorico ?? false;
 
   return (
     <div
-      className={`rounded-2xl p-5 w-full h-full min-h-[150px] flex flex-col justify-between transition-all ${
+      className={`rounded-2xl p-5 w-full h-full min-h-[150px] flex flex-col justify-between transition-all duration-200 hover:-translate-y-1 hover:shadow-md ${
         ativo ? "bg-[#eef7f0]" : "bg-[#f8faf9] border border-gray-200"
       }`}
     >
@@ -76,17 +76,14 @@ export default function CardTurma({
                   Editar
                 </button>
                 
-                {historico ? (
-                  <>
-                    <DesativarButton 
+                {temHistorico ? (
+                  <DesativarButton 
                     onClick={() => onDesativar?.(turma)}
-                    />
-                  </>
+                  />
                 ) : (
-                  <>
-                    <ExcluirButton
-                      onClick={() => onExcluir?.(turma)}/>
-                  </>
+                  <ExcluirButton
+                    onClick={() => onExcluir?.(turma)}
+                  />
                 )}
                 
               </>

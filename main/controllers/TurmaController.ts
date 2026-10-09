@@ -14,6 +14,15 @@ export interface EditarTurmaInput {
   nome: string;
 }
 
+export interface TurmaDTO {
+  id: number | null;
+  nome: string;
+  status: 'ATIVO' | 'INATIVO';
+  dataCadastro: Date;
+  dataAtualizacao: Date;
+  possuiHistorico: boolean;
+}
+
 // GRASP Controller: ponto de entrada das operações de Turma
 // GRASP Creator: é quem cria instâncias de Turma
 export class TurmaController {
@@ -51,11 +60,12 @@ export class TurmaController {
   /**
    * RF13 — Consultar Turma
    */
-  public consultar(input: ConsultarTurmaInput): Turma[] {
-    return this.turmaDAO.consultar({
+  public consultar(input: ConsultarTurmaInput): TurmaDTO[] {
+    const turmas = this.turmaDAO.consultar({
       nome: input.nome,
       incluirInativos: input.incluirInativos,
     });
+    return turmas.map((t) => this.toDTO(t));
   }
 
   /**
@@ -204,5 +214,22 @@ export class TurmaController {
     // 4. Não possui histórico → exclusão física
     this.turmaDAO.excluir(id);
     return { tipo: 'EXCLUSAO', turma };
+  }
+
+  /**
+   * Monta o DTO da turma, incluindo `possuiHistorico` (usado pelo front
+   * para decidir entre habilitar "Desativar" ou "Excluir").
+   */
+  private toDTO(turma: Turma): TurmaDTO {
+    return {
+      id: turma.id,
+      nome: turma.nome,
+      status: turma.status,
+      dataCadastro: turma.dataCadastro,
+      dataAtualizacao: turma.dataAtualizacao,
+      possuiHistorico:
+        turma.id !== null &&
+        this.turmaDAO.possuiHistoricoEmprestimos(turma.id),
+    };
   }
 }

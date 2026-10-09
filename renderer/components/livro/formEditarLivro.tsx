@@ -260,6 +260,11 @@ export default function FormEditarLivro({ livro }: FormEditarLivroProps) {
 
       <ModalEditar
         aberto={modalAberto}
+        aviso={
+          quantidadeTotal === 0
+            ? "Atenção: ao salvar com 0 exemplares, o livro será desativado automaticamente."
+            : undefined
+        }
         mensagem={
           <>
             Deseja salvar as alterações realizadas no livro?

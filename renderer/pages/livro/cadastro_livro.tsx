@@ -8,7 +8,7 @@ export default function GerenciarLivros() {
     <div className="flex min-h-screen bg-white">
       <Sidebar />
 
-      <main className="flex-1 p-8 animate-fade-in">
+      <main className="flex-1 min-w-0 p-8 animate-fade-in">
         {/* Cabeçalho e botão voltar */}
         <div className="flex items-center justify-between mb-8 w-full">
           <div>

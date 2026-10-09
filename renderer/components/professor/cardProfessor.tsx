@@ -28,7 +28,7 @@ export default function CardProfessor({
 
   return (
     <div
-      className={`rounded-2xl p-5 w-full h-full min-h-[150px] flex flex-col justify-between transition-all ${
+      className={`rounded-2xl p-5 w-full h-full min-h-[150px] flex flex-col justify-between transition-all duration-200 hover:-translate-y-1 hover:shadow-md ${
         ativo ? "bg-[#eef7f0]" : "bg-[#f8faf9] border border-gray-200"
       }`}
     >

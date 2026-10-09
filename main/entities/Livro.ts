@@ -138,6 +138,7 @@ export class Livro {
    */
   public desativar(): void {
     this.status = 'INATIVO';
+    this.quantidadeTotal = 0;
     this.dataAtualizacao = new Date();
   }
 

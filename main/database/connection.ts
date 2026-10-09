@@ -17,6 +17,13 @@ export class DatabaseConnection {
       DatabaseConnection.instance.pragma('foreign_keys = ON');
       DatabaseConnection.createSchema(DatabaseConnection.instance);
       executarSeedSeVazio(DatabaseConnection.instance);
+
+      // Garante integridade cadastral: qualquer livro inativo tem 0 exemplares obrigatoriamente
+      DatabaseConnection.instance.exec(`
+        UPDATE livro 
+        SET quantidade_total = 0, quantidade_emprestada = 0 
+        WHERE status = 'INATIVO' AND quantidade_total > 0;
+      `);
     }
     return DatabaseConnection.instance;
   }

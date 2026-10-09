@@ -80,22 +80,21 @@ export default function GerenciarLivros() {
       const resposta = await window.ipc?.livro?.excluir(livro.id);
 
       if (!resposta?.success) {
-       setErro(resposta?.error || "Erro ao excluir o livro.");
-       return; 
+        setErro(resposta?.error || "Erro ao excluir o livro.");
+        return; 
       }
 
       setListaLivros((livrosAtuais) =>
         livrosAtuais.filter((item) => item.id !== livro.id)
       );
 
-      setFeedback("Livro excluído com successo!")
-
+      setFeedback("Livro excluído com sucesso!");
     } catch (error) {
       setErro(
         error instanceof Error
-        ? error.message
-        : "Não foi possível excluir o livro."
-      )
+          ? error.message
+          : "Não foi possível excluir o livro."
+      );
     }
   };
 
@@ -104,28 +103,18 @@ export default function GerenciarLivros() {
       const resposta = await window.ipc?.livro?.ativar(livro.id, livro.quantidadeTotal);
 
       if (!resposta?.success) {
-       setErro(resposta?.error || "Erro ao ativar livro.");
-       return; 
+        setErro(resposta?.error || "Erro ao ativar livro.");
+        return; 
       }
 
-      const atualizada = await window.ipc?.livro?.consultar({
-        titulo: termoBusca,
-        editora: termoBusca,
-        incluirInativos: incluirInativos,
-      });
-
-      if (atualizada?.success){
-        setListaLivros(atualizada.data || []);
-      }
-
-      setFeedback("livro ativado com successo!")
-      
+      setRecarregar((n) => n + 1);
+      setFeedback("Livro ativado com sucesso!");
     } catch (error) {
       setErro(
         error instanceof Error
           ? error.message
           : "Não foi possível ativar o livro."
-      )
+      );
     }
   };
 
@@ -134,28 +123,18 @@ export default function GerenciarLivros() {
       const resposta = await window.ipc?.livro?.desativar(livro.id);
 
       if (!resposta?.success) {
-       setErro(resposta?.error || "Erro ao desativar livro.");
-       return; 
+        setErro(resposta?.error || "Erro ao desativar livro.");
+        return; 
       }
       
-      const atualizada = await window.ipc?.livro?.consultar({
-        titulo: termoBusca,
-        editora: termoBusca,
-        incluirInativos: incluirInativos,
-      });
-
-      if (atualizada?.success){
-        setListaLivros(atualizada.data || []);
-      }
-
-      setFeedback("Livro deastivado com successo!")
-
+      setRecarregar((n) => n + 1);
+      setFeedback("Livro desativado com sucesso!");
     } catch (error) {
       setErro(
         error instanceof Error
           ? error.message
           : "Não foi possível desativar o livro."
-      )
+      );
     }
   };
 
@@ -278,7 +257,7 @@ export default function GerenciarLivros() {
     <div className="flex min-h-screen bg-white">
       <Sidebar />
 
-      <main className="flex-1 px-8 pt-6 pb-6 animate-fade-in">
+      <main className="flex-1 min-w-0 px-8 pt-6 pb-6 animate-fade-in">
         <h1 className="text-2xl font-bold text-gray-800 mb-4">
           Gerenciar livros
         </h1>
@@ -397,6 +376,7 @@ export default function GerenciarLivros() {
 
         <ModalDesativar
           aberto={livroParaDesativar !== null}
+          aviso="Atenção: ao desativar o livro, a quantidade total de exemplares será zerada."
           mensagem={
             livroParaDesativar ? (
               <>
@@ -451,15 +431,7 @@ export default function GerenciarLivros() {
                 return;
               }
 
-              const atualizada = await window.ipc?.livro?.consultar({
-                termo: termoBusca,
-                incluirInativos: incluirInativos,
-              });
-
-              if (atualizada?.success) {
-                setListaLivros(atualizada.data || []);
-              }
-
+              setRecarregar((n) => n + 1);
               setFeedback("Livro ativado com sucesso!");
             } catch (error) {
               setErro(
