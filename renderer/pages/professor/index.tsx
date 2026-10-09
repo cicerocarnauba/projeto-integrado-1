@@ -30,7 +30,7 @@ export default function GerenciarProfessores() {
   const [ordenacao, setOrdenacao] = useState<TipoOrdenacao>("alfabetica");
 
   const [paginaAtual, setPaginaAtual] = useState(1);
-  const ITENS_POR_PAGINA = 6; // 6 itens por página na visualização em lista para encaixar sem rolagem vertical
+  const ITENS_POR_PAGINA = 8; // 8 itens por página na visualização em lista
 
   // Ativação (HU12)
   const [professorParaAtivar, setProfessorParaAtivar] = useState<any | null>(
