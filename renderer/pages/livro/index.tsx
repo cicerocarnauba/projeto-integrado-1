@@ -3,7 +3,7 @@ import Link from "next/link";
 import Sidebar from "../../components/Sidebar";
 import SearchBar, { TipoOrdenacao } from "../../components/Searchbar";
 import { Livro } from "../../types/livro";
-import CardLivro from "../../components/livro/cardLivro";
+import ListaLivro from "../../components/livro/listaLivro";
 import Paginacao from "../../components/Paginacao";
 import { useRouter } from "next/router";
 import { MdAdd } from "react-icons/md";
@@ -41,7 +41,7 @@ export default function GerenciarLivros() {
   const [ordenacao, setOrdenacao] = useState<TipoOrdenacao>("alfabetica");
 
   const [paginaAtual, setPaginaAtual] = useState(1);
-  const ITENS_POR_PAGINA = 12; // 4 linhas x 3 colunas
+  const ITENS_POR_PAGINA = 10; // 10 itens por página na visualização em lista
 
   const [excluindo, setExcluindo] = useState(false);
   const [recarregar, setRecarregar] = useState(0);
@@ -310,18 +310,14 @@ export default function GerenciarLivros() {
             key={`${termoBusca}-${incluirInativos}-${ordenacao}-${paginaAtual}`}
             className="animate-fade-in duration-300"
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-              {livrosPaginados.map((livro) => (
-                <CardLivro
-                  key={livro.id}
-                  livro={livro}
-                  onEditar={(l) => router.push(`/livro/${l.id}`)}
-                  onDesativar={(livro) => setLivroParaDesativar(livro)}
-                  onAtivar={(livro) => setLivroParaAtivar(livro)}
-                  onExcluir={(livro) => setLivroParaExcluir(livro)}
-                />
-              ))}
-            </div>
+            <ListaLivro
+              livros={livrosPaginados}
+              livroExcluindo={livroExcluindo}
+              onEditar={(l) => router.push(`/livro/${l.id}`)}
+              onDesativar={(livro) => setLivroParaDesativar(livro)}
+              onAtivar={(livro) => setLivroParaAtivar(livro)}
+              onExcluir={(livro) => setLivroParaExcluir(livro)}
+            />
 
             <Paginacao
               paginaAtual={paginaAtual}

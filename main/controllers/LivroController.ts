@@ -32,6 +32,7 @@ export interface LivroConsultaDTO {
   dataCadastro: Date;
   dataAtualizacao: Date;
   possuiHistorico: boolean;
+  possuiEmprestimoPendente: boolean;
 }
 
 export interface ResultadoExclusaoLivroDTO {
@@ -321,6 +322,9 @@ export class LivroController {
       possuiHistorico:
         livro.id !== null &&
         this.livroDAO.possuiHistoricoEmprestimos(livro.id),
+      possuiEmprestimoPendente:
+        livro.id !== null &&
+        this.livroDAO.possuiEmprestimoPendente(livro.id),
     };
   }
 }

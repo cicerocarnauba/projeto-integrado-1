@@ -34,6 +34,7 @@ export interface ProfessorDTO {
   dataCadastro: Date;
   dataAtualizacao: Date;
   possuiHistorico: boolean;
+  possuiEmprestimoPendente: boolean;
 }
 
 // GRASP Controller: ponto de entrada das operações de Professor
@@ -270,6 +271,9 @@ export class ProfessorController {
       possuiHistorico:
         professor.id !== null &&
         this.professorDAO.possuiHistoricoEmprestimos(professor.id),
+      possuiEmprestimoPendente:
+        professor.id !== null &&
+        this.professorDAO.possuiEmprestimoPendente(professor.id),
     };
   }
 }

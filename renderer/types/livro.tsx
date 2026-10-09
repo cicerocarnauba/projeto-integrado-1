@@ -22,4 +22,5 @@ export interface Livro extends CadastroLivroDTO {
   ativo?: boolean;
   statusEmprestimo?: StatusEmprestimo;
   possuiHistorico?: boolean;
+  possuiEmprestimoPendente?: boolean;
 }
