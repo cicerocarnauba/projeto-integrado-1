@@ -134,7 +134,7 @@ export default function FormEditarProfessor({
               limparErro();
               setPrimeiroNome(e.target.value);
             }}
-            className="w-full bg-white border border-[#cde5d3] rounded-xl px-4 py-3 text-sm text-gray-800 placeholder:text-gray-400 outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20 disabled:bg-gray-100 disabled:cursor-not-allowed"
+            className="w-full h-11 bg-white border border-[#cde5d3] rounded-xl px-4 text-sm text-gray-800 placeholder:text-gray-400 outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20 disabled:bg-gray-100 disabled:cursor-not-allowed"
           />
         </div>
 
@@ -150,7 +150,7 @@ export default function FormEditarProfessor({
               limparErro();
               setSobrenome(e.target.value);
             }}
-            className="w-full bg-white border border-[#cde5d3] rounded-xl px-4 py-3 text-sm text-gray-800 placeholder:text-gray-400 outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20 disabled:bg-gray-100 disabled:cursor-not-allowed"
+            className="w-full h-11 bg-white border border-[#cde5d3] rounded-xl px-4 text-sm text-gray-800 placeholder:text-gray-400 outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20 disabled:bg-gray-100 disabled:cursor-not-allowed"
           />
         </div>
 
@@ -166,7 +166,7 @@ export default function FormEditarProfessor({
               limparErro();
               setEmail(e.target.value);
             }}
-            className="w-full bg-white border border-[#cde5d3] rounded-xl px-4 py-3 text-sm text-gray-800 placeholder:text-gray-400 outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20 disabled:bg-gray-100 disabled:cursor-not-allowed"
+            className="w-full h-11 bg-white border border-[#cde5d3] rounded-xl px-4 text-sm text-gray-800 placeholder:text-gray-400 outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20 disabled:bg-gray-100 disabled:cursor-not-allowed"
           />
         </div>
       </div>
@@ -176,7 +176,7 @@ export default function FormEditarProfessor({
           type="button"
           onClick={cancelar}
           disabled={salvando}
-          className="flex items-center gap-1.5 px-6 py-2.5 rounded-xl text-sm font-medium text-white bg-red-500 hover:bg-red-600 transition-colors shadow-xs active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-1.5 px-6 py-2.5 rounded-xl text-sm font-medium text-white bg-[#cf4a4a] hover:bg-[#b83a3a] transition-colors shadow-xs active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <MdClear size={18} />
           Cancelar edição
