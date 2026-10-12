@@ -75,8 +75,8 @@ export default function FormCadastroLivro() {
       )}
 
       {/* Campos do formulário */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-8">
-        <div className="md:col-span-6">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-6">
+        <div className="md:col-span-12">
           <label className="text-sm font-semibold text-[#1e582d] mb-2 block">
             Título do Livro
           </label>
@@ -90,7 +90,7 @@ export default function FormCadastroLivro() {
           />
         </div>
 
-        <div className="md:col-span-4">
+        <div className="md:col-span-8">
           <label className="text-sm font-semibold text-[#1e582d] mb-2 block">
             Editora
           </label>
@@ -104,9 +104,9 @@ export default function FormCadastroLivro() {
           />
         </div>
 
-        <div className="md:col-span-2">
+        <div className="md:col-span-4">
           <label className="text-sm font-semibold text-[#1e582d] mb-2 block whitespace-nowrap">
-            Quantidade
+            Exemplares
           </label>
           <div className="w-full h-11 bg-white border border-[#cde5d3] rounded-xl p-1 flex items-center justify-between shadow-2xs focus-within:border-[#2e8b45] focus-within:ring-2 focus-within:ring-[#2e8b45]/20">
             <button
@@ -145,13 +145,21 @@ export default function FormCadastroLivro() {
         </div>
       </div>
 
+      {/* Efeito em tempo real da quantidade escolhida */}
+      <div className="mb-8 space-y-3">
+        <p className="text-sm text-[#245B2F]">
+          Exemplares disponíveis para empréstimo:{" "}
+          <span className="font-bold">{quantidadeTotal}</span>
+        </p>
+      </div>
+
       {/* Botões de ação */}
       <div className="flex justify-end items-center gap-3">
         <button
           type="button"
           onClick={cancelar}
           disabled={salvando}
-          className="flex items-center gap-1.5 px-6 py-2.5 rounded-xl text-sm font-medium text-white bg-[#cf4a4a] hover:bg-red-600 transition-colors shadow-xs active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-1.5 px-6 py-2.5 rounded-xl text-sm font-medium text-white bg-[#cf4a4a] hover:bg-[#b83a3a] transition-colors shadow-xs active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <MdClear size={18} />
           Cancelar
