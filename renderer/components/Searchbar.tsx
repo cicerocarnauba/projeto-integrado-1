@@ -11,11 +11,6 @@ interface SearchBarProps {
   // Props opcionais para ordenação
   ordenacao?: TipoOrdenacao;
   onChangeOrdenacao?: (ordem: TipoOrdenacao) => void;
-
-  // Props opcionais para inativos (exibido abaixo da barra de busca)
-  incluirInativos?: boolean;
-  onToggleInativos?: (checked: boolean) => void;
-  labelCheckbox?: string;
 }
 
 export default function SearchBar({
@@ -24,9 +19,6 @@ export default function SearchBar({
   onChangeBusca,
   ordenacao = "alfabetica",
   onChangeOrdenacao,
-  incluirInativos = false,
-  onToggleInativos,
-  labelCheckbox = "Incluir inativos",
 }: SearchBarProps) {
   const [dropdownAberto, setDropdownAberto] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -124,39 +116,6 @@ export default function SearchBar({
           </div>
         )}
       </div>
-
-      {/* Opção Incluir Inativos abaixo da barra de busca com toggle harmonioso */}
-      {onToggleInativos && (
-        <div className="mt-2.5 flex items-center">
-          <button
-            type="button"
-            onClick={() => onToggleInativos(!incluirInativos)}
-            className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-xl cursor-pointer select-none transition-all hover:bg-[#eef7f0]/60 active:scale-95 group"
-          >
-            {/* Switch visual compatível com o design system dos cards */}
-            <div
-              className={`w-8 h-4.5 rounded-full p-0.5 transition-colors ${
-                incluirInativos ? "bg-[#389348]" : "bg-gray-300"
-              }`}
-            >
-              <div
-                className={`w-3.5 h-3.5 bg-white rounded-full transition-transform shadow-xs ${
-                  incluirInativos ? "translate-x-3.5" : "translate-x-0"
-                }`}
-              />
-            </div>
-            <span
-              className={`text-xs font-semibold transition-colors ${
-                incluirInativos
-                  ? "text-[#1e582d]"
-                  : "text-gray-500 group-hover:text-gray-700"
-              }`}
-            >
-              {labelCheckbox}
-            </span>
-          </button>
-        </div>
-      )}
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 
 import Sidebar from "../../components/Sidebar";
 import SearchBar, { TipoOrdenacao } from "../../components/Searchbar";
+import AbasStatus, { StatusAba } from "../../components/AbasStatus";
 
 import ListaProfessor from "../../components/professor/listaProfessor";
 import Paginacao from "../../components/Paginacao";
@@ -26,7 +27,7 @@ export default function GerenciarProfessores() {
   const [erro, setErro] = useState("");
 
   const [termoBusca, setTermoBusca] = useState("");
-  const [incluirInativos, setIncluirInativos] = useState<boolean>(false);
+  const [abaAtiva, setAbaAtiva] = useState<StatusAba>("ATIVO");
   const [ordenacao, setOrdenacao] = useState<TipoOrdenacao>("alfabetica");
 
   const [paginaAtual, setPaginaAtual] = useState(1);
@@ -67,7 +68,7 @@ export default function GerenciarProfessores() {
 
   useEffect(() => {
     setPaginaAtual(1);
-  }, [termoBusca]);
+  }, [termoBusca, abaAtiva]);
 
   useEffect(() => {
     async function carregarProfessores() {
@@ -77,7 +78,7 @@ export default function GerenciarProfessores() {
         const resposta = await window.ipc.professor.consultar({
           nome: termoBusca,
           email: termoBusca,
-          incluirInativos: incluirInativos,
+          incluirInativos: true,
         });
 
         if (!resposta.success) {
@@ -99,7 +100,7 @@ export default function GerenciarProfessores() {
     }
 
     carregarProfessores();
-  }, [termoBusca, incluirInativos, recarregar]);
+  }, [termoBusca, recarregar]);
 
   async function handleConfirmarDesativacao() {
     if (!professorParaDesativar || desativando) return;
@@ -197,10 +198,14 @@ export default function GerenciarProfessores() {
     }
   }
 
-  const professoresExibidos = [...professores].sort((a, b) => {
-    if (a.status === "ATIVO" && b.status !== "ATIVO") return -1;
-    if (a.status !== "ATIVO" && b.status === "ATIVO") return 1;
+  const totalAtivos = professores.filter((p) => p.status === "ATIVO").length;
+  const totalInativos = professores.filter((p) => p.status !== "ATIVO").length;
 
+  const professoresFiltradosPorAba = professores.filter((p) =>
+    abaAtiva === "ATIVO" ? p.status === "ATIVO" : p.status !== "ATIVO"
+  );
+
+  const professoresExibidos = [...professoresFiltradosPorAba].sort((a, b) => {
     if (ordenacao === "recentes") {
       return (b.id ?? 0) - (a.id ?? 0);
     }
@@ -261,40 +266,48 @@ export default function GerenciarProfessores() {
           }}
         />
 
-        <div className="flex items-start gap-4 mb-5 w-full">
+        {/* Barra de busca e botão de adicionar */}
+        <div className="flex items-center gap-4 mb-4 w-full">
           <SearchBar
             placeholder="Pesquisar professor por nome ou e-mail..."
             valorBusca={termoBusca}
             onChangeBusca={setTermoBusca}
             ordenacao={ordenacao}
             onChangeOrdenacao={setOrdenacao}
-            incluirInativos={incluirInativos}
-            onToggleInativos={setIncluirInativos}
-            labelCheckbox="Incluir inativos"
           />
 
           <Link
             href="/professor/cadastro_professor"
-            className="h-11 px-6 flex items-center justify-center bg-[#2e8b45] text-white rounded-xl font-medium text-sm hover:bg-[#236c35] transition-all whitespace-nowrap gap-2 shadow-sm cursor-pointer"
+            className="h-11 px-6 flex items-center justify-center bg-[#2e8b45] text-white rounded-xl font-medium text-sm hover:bg-[#236c35] transition-all whitespace-nowrap gap-2 shadow-sm cursor-pointer shrink-0 active:scale-95"
           >
             <MdAdd size={18} />
             Adicionar professor
           </Link>
         </div>
 
+        {/* Abas de status: Ativos e Inativos */}
+        <AbasStatus
+          abaAtiva={abaAtiva}
+          onChangeAba={setAbaAtiva}
+          totalAtivos={totalAtivos}
+          totalInativos={totalInativos}
+        />
+
         {carregado ? (
           <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
             <p className="text-base font-medium">Carregando professores...</p>
           </div>
-        ) : professores.length === 0 ? (
+        ) : professoresExibidos.length === 0 ? (
           <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
             <p className="text-base font-medium">
-              Nenhum professor cadastrado.
+              {termoBusca.trim()
+                ? `Nenhum professor ${abaAtiva === "ATIVO" ? "ativo" : "inativo"} encontrado para "${termoBusca}".`
+                : `Nenhum professor ${abaAtiva === "ATIVO" ? "ativo" : "inativo"} cadastrado.`}
             </p>
           </div>
         ) : (
           <div
-            key={`${termoBusca}-${incluirInativos}-${ordenacao}-${paginaAtual}`}
+            key={`${termoBusca}-${abaAtiva}-${ordenacao}-${paginaAtual}`}
             className="animate-fade-in duration-300"
           >
             <ListaProfessor
@@ -318,8 +331,8 @@ export default function GerenciarProfessores() {
               paginaAtual={paginaAtual}
               totalItens={professoresExibidos.length}
               itensPorPagina={ITENS_POR_PAGINA}
-              nomeEntidade="professores"
-              nomeEntidadeSingular="professor"
+              nomeEntidade={abaAtiva === "ATIVO" ? "professores ativos" : "professores inativos"}
+              nomeEntidadeSingular={abaAtiva === "ATIVO" ? "professor ativo" : "professor inativo"}
               aoMudarPagina={setPaginaAtual}
             />
           </div>

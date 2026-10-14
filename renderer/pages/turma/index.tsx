@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 
 import Sidebar from "../../components/Sidebar";
 import SearchBar, { TipoOrdenacao } from "../../components/Searchbar";
+import AbasStatus, { StatusAba } from "../../components/AbasStatus";
 import ListaTurma from "../../components/turma/listaTurma";
 import Paginacao from "../../components/Paginacao";
 
@@ -28,8 +29,9 @@ export default function GerenciarTurmas() {
   const [erro, setErro] = useState("");
   
   const [termoBusca, setTermoBusca] = useState("");
-  const [incluirInativos, setIncluirInativos] = useState<boolean>(false);
+  const [abaAtiva, setAbaAtiva] = useState<StatusAba>("ATIVO");
   const [ordenacao, setOrdenacao] = useState<TipoOrdenacao>("alfabetica");
+  const [recarregar, setRecarregar] = useState(0);
   
   const [turmaParaExcluir, setTurmaParaExcluir] = useState<Turma | null>(null);
   const [turmaExcluindo, setTurmaExcluindo] = useState<number | null>(null);
@@ -65,7 +67,7 @@ export default function GerenciarTurmas() {
 
   useEffect(() => {
     setPaginaAtual(1);
-  }, [termoBusca]);
+  }, [termoBusca, abaAtiva]);
 
   useEffect(() => {
     async function carregarTurmas() {
@@ -74,7 +76,7 @@ export default function GerenciarTurmas() {
 
         const resposta = await window.ipc?.turma?.consultar({
           nome: termoBusca,
-          incluirInativos: incluirInativos,
+          incluirInativos: true,
         });
 
         if (!resposta) return;
@@ -98,12 +100,16 @@ export default function GerenciarTurmas() {
     }
 
     carregarTurmas();
-  }, [termoBusca, incluirInativos]);
+  }, [termoBusca, recarregar]);
 
-  const turmasExibidas = [...turmas].sort((a, b) => {
-    if (a.status === "ATIVO" && b.status !== "ATIVO") return -1;
-    if (a.status !== "ATIVO" && b.status === "ATIVO") return 1;
+  const totalAtivos = turmas.filter((t) => t.status === "ATIVO").length;
+  const totalInativos = turmas.filter((t) => t.status !== "ATIVO").length;
 
+  const turmasFiltradasPorAba = turmas.filter((t) =>
+    abaAtiva === "ATIVO" ? t.status === "ATIVO" : t.status !== "ATIVO"
+  );
+
+  const turmasExibidas = [...turmasFiltradasPorAba].sort((a, b) => {
     if (ordenacao === "recentes") {
       return (b.id ?? 0) - (a.id ?? 0);
     }
@@ -114,7 +120,7 @@ export default function GerenciarTurmas() {
     1,
     Math.ceil(turmasExibidas.length / ITENS_POR_PAGINA)
   );
-  
+
   useEffect(() => {
     if (paginaAtual > totalPaginas) {
       setPaginaAtual(totalPaginas);
@@ -136,11 +142,8 @@ export default function GerenciarTurmas() {
        return; 
       }
 
-      setTurma((turmasAtuais) =>
-        turmasAtuais.filter((item) => item.id !== turma.id)
-      );
-
-      setFeedback("Turma excluída com successo!")
+      setRecarregar((n) => n + 1);
+      setFeedback("Turma excluída com sucesso!");
 
     } catch (error) {
       setErro(
@@ -161,16 +164,8 @@ export default function GerenciarTurmas() {
        return; 
       }
       
-      const atualizada = await window.ipc?.turma?.consultar({
-        nome: termoBusca,
-        incluirInativos: incluirInativos,
-      });
-
-      if (atualizada?.success){
-        setTurma(atualizada.data || []);
-      }
-
-      setFeedback("Turma deastivada com successo!")
+      setRecarregar((n) => n + 1);
+      setFeedback("Turma desativada com sucesso!");
 
     } catch (error) {
       setErro(
@@ -190,16 +185,8 @@ export default function GerenciarTurmas() {
        return; 
       }
 
-      const atualizada = await window.ipc?.turma?.consultar({
-        nome: termoBusca,
-        incluirInativos: incluirInativos,
-      });
-
-      if (atualizada?.success){
-        setTurma(atualizada.data || []);
-      }
-
-      setFeedback("Turma ativada com successo!")
+      setRecarregar((n) => n + 1);
+      setFeedback("Turma ativada com sucesso!");
       
     } catch (error) {
       setErro(
@@ -221,26 +208,31 @@ export default function GerenciarTurmas() {
 
 
         {/* Barra de busca e botão de adicionar */}
-        <div className="flex items-start gap-4 mb-5 w-full">
+        <div className="flex items-center gap-4 mb-4 w-full">
           <SearchBar 
             placeholder="Pesquisar turmas por nome." 
             valorBusca={termoBusca}
             onChangeBusca={setTermoBusca}
             ordenacao={ordenacao}
             onChangeOrdenacao={setOrdenacao}
-            incluirInativos={incluirInativos}
-            onToggleInativos={setIncluirInativos}
-            labelCheckbox="Incluir inativos"
-            />
+          />
 
           <Link
             href="/turma/cadastro_turma"
-            className="h-11 px-6 flex items-center justify-center bg-[#2e8b45] text-white rounded-xl font-medium text-sm hover:bg-[#236c35] transition-all whitespace-nowrap gap-2 shadow-sm cursor-pointer"
+            className="h-11 px-6 flex items-center justify-center bg-[#2e8b45] text-white rounded-xl font-medium text-sm hover:bg-[#236c35] transition-all whitespace-nowrap gap-2 shadow-sm cursor-pointer shrink-0 active:scale-95"
           >
             <MdAdd size={18} />
             Adicionar turma
           </Link>
         </div>
+
+        {/* Abas de status: Ativos e Inativos */}
+        <AbasStatus
+          abaAtiva={abaAtiva}
+          onChangeAba={setAbaAtiva}
+          totalAtivos={totalAtivos}
+          totalInativos={totalInativos}
+        />
 
         {feedback && (
           <ToastFeedback
@@ -264,15 +256,17 @@ export default function GerenciarTurmas() {
               Carregando turmas...
             </p>
           </div>
-        ): turmas.length === 0 ? (
+        ): turmasExibidas.length === 0 ? (
           <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
             <p className="text-base font-medium">
-              Nenhuma turma cadastrada.
+              {termoBusca.trim()
+                ? `Nenhuma turma ${abaAtiva === "ATIVO" ? "ativa" : "inativa"} encontrada para "${termoBusca}".`
+                : `Nenhuma turma ${abaAtiva === "ATIVO" ? "ativa" : "inativa"} cadastrada.`}
             </p>
           </div>
         ) : (
           <div
-            key={`${termoBusca}-${incluirInativos}-${ordenacao}-${paginaAtual}`}
+            key={`${termoBusca}-${abaAtiva}-${ordenacao}-${paginaAtual}`}
             className="animate-fade-in duration-500"
           >
             <ListaTurma
@@ -293,8 +287,8 @@ export default function GerenciarTurmas() {
               paginaAtual={paginaAtual}
               totalItens={turmasExibidas.length}
               itensPorPagina={ITENS_POR_PAGINA}
-              nomeEntidade="turmas"
-              nomeEntidadeSingular="turma"
+              nomeEntidade={abaAtiva === "ATIVO" ? "turmas ativas" : "turmas inativas"}
+              nomeEntidadeSingular={abaAtiva === "ATIVO" ? "turma ativa" : "turma inativa"}
               aoMudarPagina={setPaginaAtual}
             />
           </div>
