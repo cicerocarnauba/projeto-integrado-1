@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Sidebar from "../../components/Sidebar";
 import SearchBar, { TipoOrdenacao } from "../../components/Searchbar";
+import AbasStatus, { StatusAba } from "../../components/AbasStatus";
 import { Livro } from "../../types/livro";
 import ListaLivro from "../../components/livro/listaLivro";
 import Paginacao from "../../components/Paginacao";
@@ -37,7 +38,7 @@ export default function GerenciarLivros() {
 
 
   const [termoBusca, setTermoBusca] = useState("");
-  const [incluirInativos, setIncluirInativos] = useState<boolean>(false);
+  const [abaAtiva, setAbaAtiva] = useState<StatusAba>("ATIVO");
   const [ordenacao, setOrdenacao] = useState<TipoOrdenacao>("alfabetica");
 
   const [paginaAtual, setPaginaAtual] = useState(1);
@@ -71,6 +72,10 @@ export default function GerenciarLivros() {
 
     if (sucesso === "editado") {
       setFeedback("Livro editado com sucesso!");
+    }
+
+    if (sucesso === "editado_inativo") {
+      setAbaAtiva("INATIVO");
     }
   }, [router.query.sucesso]);
 
@@ -140,14 +145,14 @@ export default function GerenciarLivros() {
 
   useEffect(() => {
     setPaginaAtual(1);
-  }, [termoBusca]);
+  }, [termoBusca, abaAtiva]);
 
   useEffect(() => {
     async function carregarLivros() {
       try {
         const resposta = await window.ipc.livro.consultar({
           termo: termoBusca,
-          incluirInativos: incluirInativos,
+          incluirInativos: true,
         });
 
         if (resposta?.success && Array.isArray(resposta.data)) {
@@ -173,12 +178,23 @@ export default function GerenciarLivros() {
     }
 
     carregarLivros();
-  }, [termoBusca, incluirInativos, recarregar]);
+  }, [termoBusca, recarregar]);
 
-  const livrosExibidos = [...listaLivros].sort((a, b) => {
-    if (a.status === "ATIVO" && b.status !== "ATIVO") return -1;
-    if (a.status !== "ATIVO" && b.status === "ATIVO") return 1;
+  const totalAtivos = listaLivros.filter(
+    (l) => l.status === "ATIVO" || l.ativo === true
+  ).length;
 
+  const totalInativos = listaLivros.filter(
+    (l) => l.status !== "ATIVO" && l.ativo !== true
+  ).length;
+
+  const livrosFiltradosPorAba = listaLivros.filter((livro) =>
+    abaAtiva === "ATIVO"
+      ? livro.status === "ATIVO" || livro.ativo === true
+      : livro.status !== "ATIVO" && livro.ativo !== true
+  );
+
+  const livrosExibidos = [...livrosFiltradosPorAba].sort((a, b) => {
     if (ordenacao === "recentes") {
       return (b.id ?? 0) - (a.id ?? 0);
     }
@@ -216,24 +232,6 @@ export default function GerenciarLivros() {
 
     try {
       const resposta = await window.ipc.livro.excluir(livroParaExcluir.id);
-
-      // if (!resposta.success) {
-      //   setFeedback({
-      //     tipo: "erro",
-      //     texto: resposta.error || "Não foi possível excluir o livro.",
-      //   });
-      //   return;
-      // }
-
-      // O backend decide sozinho entre excluir e desativar, e já manda a mensagem pronta
-      // setFeedback({
-      //   tipo: "sucesso",
-      //   texto:
-      //     resposta.data?.mensagem ||
-      //     (resposta.data?.acao === "DESATIVADO"
-      //       ? "Livro desativado com sucesso."
-      //       : "Livro excluído com sucesso."),
-      // });
       setRecarregar((n) => n + 1);
     } catch (error) {
       setErro(
@@ -275,16 +273,13 @@ export default function GerenciarLivros() {
         />
 
         {/* Barra de busca e botão de adicionar */}
-        <div className="flex items-start gap-4 mb-5 w-full">
+        <div className="flex items-center gap-4 mb-4 w-full">
           <SearchBar
             placeholder="Pesquisar livro por título ou editora..."
             valorBusca={termoBusca}
             onChangeBusca={setTermoBusca}
             ordenacao={ordenacao}
             onChangeOrdenacao={setOrdenacao}
-            incluirInativos={incluirInativos}
-            onToggleInativos={setIncluirInativos}
-            labelCheckbox="Incluir inativos"
           />
 
           <Link
@@ -296,6 +291,14 @@ export default function GerenciarLivros() {
           </Link>
         </div>
 
+        {/* Abas de status: Ativos e Inativos */}
+        <AbasStatus
+          abaAtiva={abaAtiva}
+          onChangeAba={setAbaAtiva}
+          totalAtivos={totalAtivos}
+          totalInativos={totalInativos}
+        />
+
         {/* Lista de livros ou mensagens de estado */}
         {carregando ? (
           <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
@@ -303,11 +306,15 @@ export default function GerenciarLivros() {
           </div>
         ) : livrosExibidos.length === 0 ? (
           <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
-            <p className="text-base font-medium">Nenhum livro cadastrado.</p>
+            <p className="text-base font-medium">
+              {termoBusca.trim()
+                ? `Nenhum livro ${abaAtiva === "ATIVO" ? "ativo" : "inativo"} encontrado para "${termoBusca}".`
+                : `Nenhum livro ${abaAtiva === "ATIVO" ? "ativo" : "inativo"} cadastrado.`}
+            </p>
           </div>
         ) : (
           <div
-            key={`${termoBusca}-${incluirInativos}-${ordenacao}-${paginaAtual}`}
+            key={`${termoBusca}-${abaAtiva}-${ordenacao}-${paginaAtual}`}
             className="animate-fade-in duration-300"
           >
             <ListaLivro
@@ -323,8 +330,8 @@ export default function GerenciarLivros() {
               paginaAtual={paginaAtual}
               totalItens={livrosExibidos.length}
               itensPorPagina={ITENS_POR_PAGINA}
-              nomeEntidade="livros"
-              nomeEntidadeSingular="livro"
+              nomeEntidade={abaAtiva === "ATIVO" ? "livros ativos" : "livros inativos"}
+              nomeEntidadeSingular={abaAtiva === "ATIVO" ? "livro ativo" : "livro inativo"}
               aoMudarPagina={setPaginaAtual}
             />
           </div>
