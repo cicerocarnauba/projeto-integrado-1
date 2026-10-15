@@ -4,6 +4,10 @@ import { EmprestimoDAO } from '../daos/EmprestimoDAO.ts';
 import { LivroDAO } from '../daos/LivroDAO.ts';
 import { ProfessorDAO } from '../daos/ProfessorDAO.ts';
 import { TurmaDAO } from '../daos/TurmaDAO.ts';
+import type {
+  ConsultarEmprestimoInput,
+  ItemEmprestimoConsultaDTO,
+} from '../entities/ConsultaEmprestimo.ts';
 
 export interface RealizarEmprestimoInput {
   professorId: number;
@@ -19,6 +23,31 @@ export class EmprestimoController {
     private professorDAO: ProfessorDAO,
     private turmaDAO: TurmaDAO
   ) {}
+
+  public consultar(input: ConsultarEmprestimoInput = {}): ItemEmprestimoConsultaDTO[] {
+    if (!input || typeof input !== 'object' || Array.isArray(input)) {
+      throw new Error('Filtros do empréstimo inválidos.');
+    }
+
+    for (const [campo, nome] of [
+      ['professorId', 'professor'],
+      ['turmaId', 'turma'],
+      ['livroId', 'livro'],
+    ] as const) {
+      const id = input[campo];
+      if (id !== undefined && (!Number.isSafeInteger(id) || id <= 0)) {
+        throw new Error(`ID de ${nome} inválido para consulta de empréstimos.`);
+      }
+    }
+    if (
+      input.status !== undefined &&
+      !['PENDENTE', 'CONCLUIDO', 'CANCELADO'].includes(input.status)
+    ) {
+      throw new Error('Status do empréstimo inválido. Use PENDENTE, CONCLUIDO ou CANCELADO.');
+    }
+
+    return this.emprestimoDAO.consultar(input);
+  }
 
   /**
    * HU19 — Realizar Empréstimo

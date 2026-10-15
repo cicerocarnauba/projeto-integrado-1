@@ -1,4 +1,7 @@
-export {};
+import type {
+  ConsultarEmprestimoInput,
+  ItemEmprestimoConsultaDTO,
+} from '../../main/entities/ConsultaEmprestimo';
 
 declare global {
   interface Window {
@@ -231,6 +234,32 @@ declare global {
       };
 
       emprestimo: {
+        /**
+         * Consulta uma linha por item de empréstimo, incluindo cadastros associados inativos.
+         * @param input Filtros opcionais: professorId, turmaId e livroId são IDs numéricos
+         * inteiros positivos; status aceita 'PENDENTE', 'CONCLUIDO' ou 'CANCELADO'.
+         * Use qualquer filtro sozinho ou combine vários: todos devem corresponder (AND).
+         * Omita os campos sem filtro; não envie null, string vazia ou IDs como texto.
+         * @returns Em sucesso: { success: true, data: [...] }; sem resultados, data é [].
+         * Em falha: { success: false, error: 'Mensagem' }. Confira success antes de usar data.
+         * @example
+         * // Sem parâmetros: todos os itens, independentemente do status.
+         * await window.ipc.emprestimo.consultar();
+         * @example
+         * // Somente o status; nenhum outro filtro é obrigatório.
+         * await window.ipc.emprestimo.consultar({ status: 'PENDENTE' });
+         * @example
+         * // Filtros combinados. Substitua os IDs pelos existentes no banco.
+         * await window.ipc.emprestimo.consultar({
+         *   professorId: 1, turmaId: 2, livroId: 3, status: 'CONCLUIDO'
+         * });
+         */
+        consultar: (input?: ConsultarEmprestimoInput) => Promise<{
+          success: boolean;
+          data?: ItemEmprestimoConsultaDTO[];
+          error?: string;
+        }>;
+
         realizar: (input: {
           professorId: number;
           turmaId: number;
