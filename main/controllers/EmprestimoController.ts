@@ -110,12 +110,10 @@ export class EmprestimoController {
       );
     }
 
-    // 5. Cria o empréstimo com a data atual
-    const emprestimo = new Emprestimo({
+    // 5. Criação automática com status "PENDENTE" e data atual do sistema (não editável)
+    const emprestimo = Emprestimo.criarNovo({
       professorId: input.professorId,
       turmaId: input.turmaId,
-      dataRetirada: new Date(),
-      status: 'PENDENTE',
       itens,
     });
 
