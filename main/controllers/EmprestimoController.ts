@@ -36,7 +36,14 @@ export class EmprestimoController {
    * Relações: [RF20], [RN01], [RN02], [RN03], [RNF03]
    */
   public realizar(input: RealizarEmprestimoInput): Emprestimo {
-    // 1. Valida o professor
+    if (!input) {
+      throw new Error('Dados do empréstimo não informados.');
+    }
+
+    // 1. Valida o professor (deve existir e estar com status "ATIVO")
+    if (!input.professorId || !Number.isInteger(input.professorId) || input.professorId <= 0) {
+      throw new Error('ID do professor inválido para empréstimo.');
+    }
     const professor = this.professorDAO.buscarPorId(input.professorId);
     if (!professor) {
       throw new Error('Professor não encontrado.');
@@ -45,7 +52,10 @@ export class EmprestimoController {
       throw new Error('Não é possível realizar empréstimo para um professor inativo.');
     }
 
-    // 2. Valida a turma
+    // 2. Valida a turma (deve existir e estar com status "ATIVO")
+    if (!input.turmaId || !Number.isInteger(input.turmaId) || input.turmaId <= 0) {
+      throw new Error('ID da turma inválido para empréstimo.');
+    }
     const turma = this.turmaDAO.buscarPorId(input.turmaId);
     if (!turma) {
       throw new Error('Turma não encontrada.');
@@ -54,8 +64,8 @@ export class EmprestimoController {
       throw new Error('Não é possível realizar empréstimo para uma turma inativa.');
     }
 
-    // 3. Valida se há pelo menos um item
-    if (!input.itens || input.itens.length === 0) {
+    // 3. Valida se há pelo menos um item informado
+    if (!Array.isArray(input.itens) || input.itens.length === 0) {
       throw new Error('É necessário informar pelo menos um livro para o empréstimo.');
     }
 
