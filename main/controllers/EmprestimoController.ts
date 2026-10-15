@@ -59,7 +59,18 @@ export class EmprestimoController {
       throw new Error('É necessário informar pelo menos um livro para o empréstimo.');
     }
 
-    // 4. Valida cada item (livro existe, está ATIVO e tem saldo suficiente)
+    // 4. Valida cada item e acumula quantidades solicitadas por livro para conferência de saldo
+    const quantidadesPorLivro = new Map<number, number>();
+    for (const itemInput of input.itens) {
+      if (!Number.isInteger(itemInput.quantidade) || itemInput.quantidade <= 0) {
+        const livroRef = this.livroDAO.buscarPorId(itemInput.livroId);
+        const nomeLivro = livroRef ? ` do livro "${livroRef.titulo}"` : '';
+        throw new Error(`A quantidade${nomeLivro} deve ser um número inteiro maior que zero.`);
+      }
+      const acumulado = quantidadesPorLivro.get(itemInput.livroId) ?? 0;
+      quantidadesPorLivro.set(itemInput.livroId, acumulado + itemInput.quantidade);
+    }
+
     const itens: ItemEmprestimo[] = [];
 
     for (const itemInput of input.itens) {
@@ -70,14 +81,14 @@ export class EmprestimoController {
       if (livro.status !== 'ATIVO') {
         throw new Error(`O livro "${livro.titulo}" está inativo e não pode ser emprestado.`);
       }
-      if (!Number.isInteger(itemInput.quantidade) || itemInput.quantidade <= 0) {
-        throw new Error(`A quantidade do livro "${livro.titulo}" deve ser um número inteiro maior que zero.`);
-      }
 
-      const saldo = livro.getSaldoDisponivel();
-      if (itemInput.quantidade > saldo) {
+      // Validação do saldo disponível considerando o total solicitado do livro
+      const saldoDisponivel = livro.getSaldoDisponivel();
+      const totalSolicitado = quantidadesPorLivro.get(itemInput.livroId) ?? itemInput.quantidade;
+
+      if (totalSolicitado > saldoDisponivel) {
         throw new Error(
-          `Estoque insuficiente para o livro "${livro.titulo}". Saldo disponível: ${saldo}, solicitado: ${itemInput.quantidade}.`
+          `Estoque insuficiente para o livro "${livro.titulo}". Saldo disponível: ${saldoDisponivel}, solicitado: ${totalSolicitado}.`
         );
       }
 
