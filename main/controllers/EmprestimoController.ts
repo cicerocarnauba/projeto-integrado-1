@@ -117,13 +117,10 @@ export class EmprestimoController {
       itens,
     });
 
-    // 6. Persiste o empréstimo e os itens (transação atômica)
-    const emprestimoSalvo = this.emprestimoDAO.inserir(emprestimo);
-
-    // 7. Atualiza o saldo de cada livro (incrementa quantidade_emprestada)
-    for (const item of emprestimoSalvo.itens) {
-      this.livroDAO.incrementarEmprestada(item.livroId, item.quantidadeRetirada);
-    }
+    // 6. Persiste o empréstimo, itens e realiza a baixa do saldo disponível em transação atômica única
+    const emprestimoSalvo = this.emprestimoDAO.inserir(emprestimo, (livroId, quantidadeRetirada) => {
+      this.livroDAO.incrementarEmprestada(livroId, quantidadeRetirada);
+    });
 
     return emprestimoSalvo;
   }
