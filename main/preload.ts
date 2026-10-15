@@ -1,4 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron';
+import type { ConsultarEmprestimoInput } from './entities/ConsultaEmprestimo.ts';
 
 contextBridge.exposeInMainWorld('ipc', {
   professor: {
@@ -36,7 +37,11 @@ contextBridge.exposeInMainWorld('ipc', {
     ativar: (id: number, quantidadeTotal: number) =>
       ipcRenderer.invoke('livro:ativar', id, quantidadeTotal),
   },
-    emprestimo: {
+  emprestimo: {
+    // input é opcional; sem ele, consulta todos os itens. Os filtros são descritos
+    // em ConsultarEmprestimoInput e os exemplos de uso estão em renderer/types/global.d.ts.
+    consultar: (input?: ConsultarEmprestimoInput) =>
+      ipcRenderer.invoke('emprestimo:consultar', input),
     realizar: (input: {
       professorId: number;
       turmaId: number;
