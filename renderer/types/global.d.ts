@@ -237,7 +237,22 @@ declare global {
           itens: Array<{ livroId: number; quantidade: number }>;
         }) => Promise<{
           success: boolean;
-          data?: any;
+          data?: {
+            id: number | null;
+            professorId: number;
+            turmaId: number;
+            dataRetirada: Date;
+            status: 'PENDENTE' | 'CONCLUIDO' | 'CANCELADO';
+            itens: Array<{
+              id: number | null;
+              emprestimoId: number | null;
+              livroId: number;
+              quantidadeRetirada: number;
+              quantidadeDevolvida: number;
+              quantidadePerdida: number;
+              quantidadeDanificada: number;
+            }>;
+          };
           error?: string;
         }>;
       };

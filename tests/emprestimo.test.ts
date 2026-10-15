@@ -546,4 +546,127 @@ describe('Testes Unitários - Realizar Empréstimo (HU19)', () => {
       assert.match(response.error!, /Professor não encontrado/);
     });
   });
+  // ============================================================
+  // Validações Adicionais e Casos de Borda (HU19)
+  // ============================================================
+  describe('Validações Adicionais e Casos de Borda (HU19)', () => {
+    it('deve rejeitar se o input for nulo ou indefinido', () => {
+      assert.throws(
+        () => (emprestimoController as any).realizar(null),
+        /Dados do empréstimo não informados/
+      );
+    });
+
+    it('deve rejeitar se o ID do professor for menor ou igual a zero ou não inteiro', () => {
+      const turmaId = criarTurma();
+      const livroId = criarLivro();
+
+      assert.throws(
+        () =>
+          emprestimoController.realizar({
+            professorId: 0,
+            turmaId,
+            itens: [{ livroId, quantidade: 1 }],
+          }),
+        /ID do professor inválido/
+      );
+
+      assert.throws(
+        () =>
+          emprestimoController.realizar({
+            professorId: -1,
+            turmaId,
+            itens: [{ livroId, quantidade: 1 }],
+          }),
+        /ID do professor inválido/
+      );
+
+      assert.throws(
+        () =>
+          emprestimoController.realizar({
+            professorId: 1.5,
+            turmaId,
+            itens: [{ livroId, quantidade: 1 }],
+          }),
+        /ID do professor inválido/
+      );
+    });
+
+    it('deve rejeitar se o ID da turma for menor ou igual a zero ou não inteiro', () => {
+      const professorId = criarProfessor();
+      const livroId = criarLivro();
+
+      assert.throws(
+        () =>
+          emprestimoController.realizar({
+            professorId,
+            turmaId: 0,
+            itens: [{ livroId, quantidade: 1 }],
+          }),
+        /ID da turma inválido/
+      );
+
+      assert.throws(
+        () =>
+          emprestimoController.realizar({
+            professorId,
+            turmaId: -2,
+            itens: [{ livroId, quantidade: 1 }],
+          }),
+        /ID da turma inválido/
+      );
+
+      assert.throws(
+        () =>
+          emprestimoController.realizar({
+            professorId,
+            turmaId: 2.7,
+            itens: [{ livroId, quantidade: 1 }],
+          }),
+        /ID da turma inválido/
+      );
+    });
+
+    it('deve rejeitar quando o mesmo livro é informado múltiplas vezes e a soma excede o saldo', () => {
+      const professorId = criarProfessor();
+      const turmaId = criarTurma();
+      const livroId = criarLivro('Livro Acumulado', 5);
+
+      // 3 + 3 = 6 > 5 (saldo disponível)
+      assert.throws(
+        () =>
+          emprestimoController.realizar({
+            professorId,
+            turmaId,
+            itens: [
+              { livroId, quantidade: 3 },
+              { livroId, quantidade: 3 },
+            ],
+          }),
+        /Estoque insuficiente/
+      );
+    });
+
+    it('deve permitir quando o mesmo livro é informado múltiplas vezes e a soma NÃO excede o saldo', () => {
+      const professorId = criarProfessor();
+      const turmaId = criarTurma();
+      const livroId = criarLivro('Livro Fracionado', 5);
+
+      // 2 + 3 = 5 <= 5 (saldo disponível)
+      const emprestimo = emprestimoController.realizar({
+        professorId,
+        turmaId,
+        itens: [
+          { livroId, quantidade: 2 },
+          { livroId, quantidade: 3 },
+        ],
+      });
+
+      assert.strictEqual(emprestimo.status, 'PENDENTE');
+      assert.strictEqual(emprestimo.itens.length, 2);
+      const livro = livroDAO.buscarPorId(livroId);
+      assert.strictEqual(livro?.quantidadeEmprestada, 5);
+      assert.strictEqual(livro?.getSaldoDisponivel(), 0);
+    });
+  });
 });

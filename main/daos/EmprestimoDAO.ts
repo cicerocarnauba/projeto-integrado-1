@@ -30,10 +30,14 @@ export class EmprestimoDAO {
 
   /**
    * HU19 — Realizar Empréstimo.
-   * Insere o empréstimo e todos os itens em uma transação atômica.
-   * Se algo falhar, nada é salvo (rollback).
+   * Insere o empréstimo, todos os itens e realiza a baixa do saldo disponível dos livros
+   * (incrementando quantidade_emprestada) em uma transação atômica única no SQLite.
+   * Se algo falhar, nada é salvo (rollback total).
    */
-  public inserir(emprestimo: Emprestimo): Emprestimo {
+  public inserir(
+    emprestimo: Emprestimo,
+    atualizarEstoque?: (livroId: number, quantidadeRetirada: number) => void
+  ): Emprestimo {
     const inserirEmprestimo = this.db.prepare(`
       INSERT INTO emprestimo
         (professor_id, turma_id, data_retirada, status)
@@ -66,6 +70,11 @@ export class EmprestimoDAO {
         );
         item.id = Number(itemInfo.lastInsertRowid);
         item.emprestimoId = emp.id;
+
+        // Baixa atômica do saldo disponível de cada livro dentro da mesma transação
+        if (atualizarEstoque) {
+          atualizarEstoque(item.livroId, item.quantidadeRetirada);
+        }
       }
 
       return emp;
