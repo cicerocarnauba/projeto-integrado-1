@@ -4,6 +4,10 @@ import { EmprestimoDAO } from '../daos/EmprestimoDAO.ts';
 import { LivroDAO } from '../daos/LivroDAO.ts';
 import { ProfessorDAO } from '../daos/ProfessorDAO.ts';
 import { TurmaDAO } from '../daos/TurmaDAO.ts';
+import type {
+  ConsultarEmprestimoInput,
+  ItemEmprestimoConsultaDTO,
+} from '../entities/ConsultaEmprestimo.ts';
 
 export interface RealizarEmprestimoInput {
   professorId: number;
@@ -19,6 +23,31 @@ export class EmprestimoController {
     private professorDAO: ProfessorDAO,
     private turmaDAO: TurmaDAO
   ) {}
+
+  public consultar(input: ConsultarEmprestimoInput = {}): ItemEmprestimoConsultaDTO[] {
+    if (!input || typeof input !== 'object' || Array.isArray(input)) {
+      throw new Error('Filtros do empréstimo inválidos.');
+    }
+
+    for (const [campo, nome] of [
+      ['professorId', 'professor'],
+      ['turmaId', 'turma'],
+      ['livroId', 'livro'],
+    ] as const) {
+      const id = input[campo];
+      if (id !== undefined && (!Number.isSafeInteger(id) || id <= 0)) {
+        throw new Error(`ID de ${nome} inválido para consulta de empréstimos.`);
+      }
+    }
+    if (
+      input.status !== undefined &&
+      !['PENDENTE', 'CONCLUIDO', 'CANCELADO'].includes(input.status)
+    ) {
+      throw new Error('Status do empréstimo inválido. Use PENDENTE, CONCLUIDO ou CANCELADO.');
+    }
+
+    return this.emprestimoDAO.consultar(input);
+  }
 
   /**
    * HU19 — Realizar Empréstimo
@@ -36,7 +65,14 @@ export class EmprestimoController {
    * Relações: [RF20], [RN01], [RN02], [RN03], [RNF03]
    */
   public realizar(input: RealizarEmprestimoInput): Emprestimo {
-    // 1. Valida o professor
+    if (!input) {
+      throw new Error('Dados do empréstimo não informados.');
+    }
+
+    // 1. Valida o professor (deve existir e estar com status "ATIVO")
+    if (!input.professorId || !Number.isInteger(input.professorId) || input.professorId <= 0) {
+      throw new Error('ID do professor inválido para empréstimo.');
+    }
     const professor = this.professorDAO.buscarPorId(input.professorId);
     if (!professor) {
       throw new Error('Professor não encontrado.');
@@ -45,7 +81,10 @@ export class EmprestimoController {
       throw new Error('Não é possível realizar empréstimo para um professor inativo.');
     }
 
-    // 2. Valida a turma
+    // 2. Valida a turma (deve existir e estar com status "ATIVO")
+    if (!input.turmaId || !Number.isInteger(input.turmaId) || input.turmaId <= 0) {
+      throw new Error('ID da turma inválido para empréstimo.');
+    }
     const turma = this.turmaDAO.buscarPorId(input.turmaId);
     if (!turma) {
       throw new Error('Turma não encontrada.');
@@ -54,12 +93,23 @@ export class EmprestimoController {
       throw new Error('Não é possível realizar empréstimo para uma turma inativa.');
     }
 
-    // 3. Valida se há pelo menos um item
-    if (!input.itens || input.itens.length === 0) {
+    // 3. Valida se há pelo menos um item informado
+    if (!Array.isArray(input.itens) || input.itens.length === 0) {
       throw new Error('É necessário informar pelo menos um livro para o empréstimo.');
     }
 
-    // 4. Valida cada item (livro existe, está ATIVO e tem saldo suficiente)
+    // 4. Valida cada item e acumula quantidades solicitadas por livro para conferência de saldo
+    const quantidadesPorLivro = new Map<number, number>();
+    for (const itemInput of input.itens) {
+      if (!Number.isInteger(itemInput.quantidade) || itemInput.quantidade <= 0) {
+        const livroRef = this.livroDAO.buscarPorId(itemInput.livroId);
+        const nomeLivro = livroRef ? ` do livro "${livroRef.titulo}"` : '';
+        throw new Error(`A quantidade${nomeLivro} deve ser um número inteiro maior que zero.`);
+      }
+      const acumulado = quantidadesPorLivro.get(itemInput.livroId) ?? 0;
+      quantidadesPorLivro.set(itemInput.livroId, acumulado + itemInput.quantidade);
+    }
+
     const itens: ItemEmprestimo[] = [];
 
     for (const itemInput of input.itens) {
@@ -70,14 +120,14 @@ export class EmprestimoController {
       if (livro.status !== 'ATIVO') {
         throw new Error(`O livro "${livro.titulo}" está inativo e não pode ser emprestado.`);
       }
-      if (!Number.isInteger(itemInput.quantidade) || itemInput.quantidade <= 0) {
-        throw new Error(`A quantidade do livro "${livro.titulo}" deve ser um número inteiro maior que zero.`);
-      }
 
-      const saldo = livro.getSaldoDisponivel();
-      if (itemInput.quantidade > saldo) {
+      // Validação do saldo disponível considerando o total solicitado do livro
+      const saldoDisponivel = livro.getSaldoDisponivel();
+      const totalSolicitado = quantidadesPorLivro.get(itemInput.livroId) ?? itemInput.quantidade;
+
+      if (totalSolicitado > saldoDisponivel) {
         throw new Error(
-          `Estoque insuficiente para o livro "${livro.titulo}". Saldo disponível: ${saldo}, solicitado: ${itemInput.quantidade}.`
+          `Estoque insuficiente para o livro "${livro.titulo}". Saldo disponível: ${saldoDisponivel}, solicitado: ${totalSolicitado}.`
         );
       }
 
@@ -89,22 +139,17 @@ export class EmprestimoController {
       );
     }
 
-    // 5. Cria o empréstimo com a data atual
-    const emprestimo = new Emprestimo({
+    // 5. Criação automática com status "PENDENTE" e data atual do sistema (não editável)
+    const emprestimo = Emprestimo.criarNovo({
       professorId: input.professorId,
       turmaId: input.turmaId,
-      dataRetirada: new Date(),
-      status: 'PENDENTE',
       itens,
     });
 
-    // 6. Persiste o empréstimo e os itens (transação atômica)
-    const emprestimoSalvo = this.emprestimoDAO.inserir(emprestimo);
-
-    // 7. Atualiza o saldo de cada livro (incrementa quantidade_emprestada)
-    for (const item of emprestimoSalvo.itens) {
-      this.livroDAO.incrementarEmprestada(item.livroId, item.quantidadeRetirada);
-    }
+    // 6. Persiste o empréstimo, itens e realiza a baixa do saldo disponível em transação atômica única
+    const emprestimoSalvo = this.emprestimoDAO.inserir(emprestimo, (livroId, quantidadeRetirada) => {
+      this.livroDAO.incrementarEmprestada(livroId, quantidadeRetirada);
+    });
 
     return emprestimoSalvo;
   }
