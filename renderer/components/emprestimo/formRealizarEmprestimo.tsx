@@ -1,6 +1,8 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { MdAdd, MdCheck, MdClear } from "react-icons/md";
+import { Professor } from "../../types/professor";
+import { Turma } from "../../types/turma";
 
 // Item da lista "Livros selecionados" (será preenchido na subtarefa 3)
 export interface ItemSelecionado {
@@ -20,6 +22,48 @@ export default function FormRealizarEmprestimo() {
   const [livroId, setLivroId] = useState("");
   const [quantidade, setQuantidade] = useState(1);
   const [itens] = useState<ItemSelecionado[]>([]);
+
+  // Professores e turmas ATIVOS (o consultar já ignora inativos por padrão)
+  const [professores, setProfessores] = useState<Professor[]>([]);
+  const [turmas, setTurmas] = useState<Turma[]>([]);
+  const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState("");
+
+  useEffect(() => {
+    async function carregarOpcoes() {
+      try {
+        const [respProfessores, respTurmas] = await Promise.all([
+          window.ipc.professor.consultar({ incluirInativos: false }),
+          window.ipc.turma.consultar({ incluirInativos: false }),
+        ]);
+
+        if (!respProfessores?.success || !Array.isArray(respProfessores.data)) {
+          setErro(
+            respProfessores?.error || "Não foi possível carregar os professores."
+          );
+          return;
+        }
+
+        if (!respTurmas?.success || !Array.isArray(respTurmas.data)) {
+          setErro(respTurmas?.error || "Não foi possível carregar as turmas.");
+          return;
+        }
+
+        setProfessores(respProfessores.data);
+        setTurmas(respTurmas.data);
+      } catch (error) {
+        setErro(
+          error instanceof Error
+            ? error.message
+            : "Não foi possível carregar professores e turmas."
+        );
+      } finally {
+        setCarregando(false);
+      }
+    }
+
+    carregarOpcoes();
+  }, []);
 
   // A data do empréstimo é sempre a data atual do sistema (não editável).
   // Calculada no cliente para evitar diferença entre servidor e navegador.
@@ -50,6 +94,15 @@ export default function FormRealizarEmprestimo() {
       onSubmit={(e) => e.preventDefault()}
       className="w-full bg-[#eef7f0] rounded-2xl p-8 shadow-xs"
     >
+      {erro && (
+        <div
+          role="alert"
+          className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+        >
+          {erro}
+        </div>
+      )}
+
       {/* Professor, turma e data */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 pb-6 border-b border-[#cde5d3]">
         <div className="md:col-span-5">
@@ -59,9 +112,21 @@ export default function FormRealizarEmprestimo() {
           <select
             value={professorId}
             onChange={(e) => setProfessorId(e.target.value)}
+            disabled={carregando}
             className={inputBase}
           >
-            <option value="">Selecione o professor...</option>
+            <option value="">
+              {carregando
+                ? "Carregando professores..."
+                : professores.length === 0
+                ? "Nenhum professor ativo cadastrado"
+                : "Selecione o professor..."}
+            </option>
+            {professores.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.primeiroNome} {p.sobrenome}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -72,9 +137,21 @@ export default function FormRealizarEmprestimo() {
           <select
             value={turmaId}
             onChange={(e) => setTurmaId(e.target.value)}
+            disabled={carregando}
             className={inputBase}
           >
-            <option value="">Selecione a turma...</option>
+            <option value="">
+              {carregando
+                ? "Carregando turmas..."
+                : turmas.length === 0
+                ? "Nenhuma turma ativa cadastrada"
+                : "Selecione a turma..."}
+            </option>
+            {turmas.map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.nome}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -200,3 +277,4 @@ export default function FormRealizarEmprestimo() {
     </form>
   );
 }
+
