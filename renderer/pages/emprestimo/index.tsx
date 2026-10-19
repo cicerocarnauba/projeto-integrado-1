@@ -1,11 +1,30 @@
 import { useRouter } from "next/router";
+import { useCallback, useEffect, useState } from "react";
 import Sidebar from "../../components/Sidebar";
+import ToastFeedback from "../../components/ToastFeedback";
 import { MdAdd } from "react-icons/md";
 
 // Versão MÍNIMA e provisória de /emprestimo, só para dar acesso ao formulário
-// de "Realizar empréstimo". A listagem completa vai substituir este arquivo.
+// de "Realizar empréstimo" (HU19). A listagem completa é de outra task/dev e
+// vai substituir este arquivo.
 export default function GerenciarEmprestimos() {
   const router = useRouter();
+  const [mensagemSucesso, setMensagemSucesso] = useState("");
+
+  // Mostra o aviso quando chega do formulário (?sucesso=emprestimo_realizado)
+  // e limpa o parâmetro da URL para não reaparecer ao recarregar a página.
+  useEffect(() => {
+    if (!router.isReady) return;
+
+    if (router.query.sucesso === "emprestimo_realizado") {
+      setMensagemSucesso("Empréstimo realizado com sucesso!");
+      router.replace("/emprestimo", undefined, { shallow: true });
+    }
+  }, [router.isReady, router.query.sucesso]);
+
+  // useCallback mantém a função estável: o ToastFeedback usa ela num useEffect
+  // e, sem isso, o tempo de exibição reiniciaria a cada renderização.
+  const fecharToast = useCallback(() => setMensagemSucesso(""), []);
 
   return (
     <div className="flex min-h-screen bg-white">
@@ -33,6 +52,12 @@ export default function GerenciarEmprestimos() {
           </p>
         </div>
       </main>
+
+      <ToastFeedback
+        mensagem={mensagemSucesso}
+        tipo="sucesso"
+        onClose={fecharToast}
+      />
     </div>
   );
 }
