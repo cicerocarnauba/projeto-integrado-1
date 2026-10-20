@@ -29,6 +29,7 @@ contextBridge.exposeInMainWorld('ipc', {
     ativar: (id, quantidadeTotal) => ipcRenderer.invoke('livro:ativar', id, quantidadeTotal),
   },
   emprestimo: {
+    cancelar: (id) => ipcRenderer.invoke('emprestimo:cancelar', id),
     // input opcional: { professorId?, turmaId?, livroId?, status? }. IDs são números;
     // consulte renderer/types/global.d.ts para valores de status e exemplos de uso.
     consultar: (input) => ipcRenderer.invoke('emprestimo:consultar', input),

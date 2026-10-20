@@ -38,6 +38,7 @@ contextBridge.exposeInMainWorld('ipc', {
       ipcRenderer.invoke('livro:ativar', id, quantidadeTotal),
   },
   emprestimo: {
+    cancelar: (id: number) => ipcRenderer.invoke('emprestimo:cancelar', id),
     // input é opcional; sem ele, consulta todos os itens. Os filtros são descritos
     // em ConsultarEmprestimoInput e os exemplos de uso estão em renderer/types/global.d.ts.
     consultar: (input?: ConsultarEmprestimoInput) =>
