@@ -32,6 +32,31 @@ export class EmprestimoDAO {
     this.db = db;
   }
 
+  /** Valida, repõe o saldo e cancela na mesma transação, preservando os itens do histórico. */
+  public cancelar(
+    id: number,
+    reporEstoque: (livroId: number, quantidadeRetirada: number) => void
+  ): Emprestimo {
+    const transacao = this.db.transaction(() => {
+      const emprestimo = this.buscarPorId(id);
+      if (!emprestimo) {
+        throw new Error('Empréstimo não encontrado.');
+      }
+
+      emprestimo.cancelar();
+
+      for (const item of emprestimo.itens) {
+        reporEstoque(item.livroId, item.quantidadeRetirada);
+      }
+
+      this.db.prepare(`UPDATE emprestimo SET status = 'CANCELADO' WHERE id = ?`).run(id);
+      return emprestimo;
+    });
+
+    // Reserva a escrita antes da leitura para impedir cancelamentos concorrentes.
+    return transacao.immediate();
+  }
+
   /** Filtros independentes combinados por AND, sem restringir cadastros a ATIVO. */
   public consultar(filtro: ConsultarEmprestimoInput = {}): ItemEmprestimoConsultaDTO[] {
     let sql = `

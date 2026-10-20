@@ -59,4 +59,20 @@ export class Emprestimo {
     if (this.status === 'CANCELADO') return;
     this.status = this.isTotalmenteConcluido() ? 'CONCLUIDO' : 'PENDENTE';
   }
+
+  public cancelar(): void {
+    if (this.status !== 'PENDENTE') {
+      throw new Error('Apenas empréstimos com status "Pendente" podem ser cancelados.');
+    }
+
+    if (this.itens.some((item) =>
+      item.quantidadeDevolvida !== 0 ||
+      item.quantidadePerdida !== 0 ||
+      item.quantidadeDanificada !== 0
+    )) {
+      throw new Error('Não é possível cancelar um empréstimo com devolução, perda ou avaria registrada.');
+    }
+
+    this.status = 'CANCELADO';
+  }
 }

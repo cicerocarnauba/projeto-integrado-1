@@ -6,7 +6,7 @@
   "author": "Creche Maria de Lourdes <contato@crechemariadelourdes.com>",
   "main": "app/main.js",
   "scripts": {
-    "dev": "cross-env NODE_OPTIONS=--experimental-transform-types nextron",
+    "dev": "cross-env NODE_OPTIONS=--experimental-transform-types nextron --startup-delay 15000",
     "build": "nextron build",
     "build:linux": "nextron build --linux",
     "build:win": "nextron build --win",

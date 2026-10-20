@@ -235,6 +235,33 @@ declare global {
 
       emprestimo: {
         /**
+         * Equivalente ao PATCH /emprestimos/{id}/cancelar via IPC.
+         * Permite apenas PENDENTE sem devolução, perda ou avaria, repondo todo o saldo.
+         * Confira success antes de usar data; em falha, error contém a mensagem.
+         * @example await window.ipc.emprestimo.cancelar(1);
+         */
+        cancelar: (id: number) => Promise<{
+          success: boolean;
+          data?: {
+            id: number | null;
+            professorId: number;
+            turmaId: number;
+            dataRetirada: Date;
+            status: 'CANCELADO';
+            itens: Array<{
+              id: number | null;
+              emprestimoId: number | null;
+              livroId: number;
+              quantidadeRetirada: number;
+              quantidadeDevolvida: number;
+              quantidadePerdida: number;
+              quantidadeDanificada: number;
+            }>;
+          };
+          error?: string;
+        }>;
+
+        /**
          * Consulta uma linha por item de empréstimo, incluindo cadastros associados inativos.
          * @param input Filtros opcionais: professorId, turmaId e livroId são IDs numéricos
          * inteiros positivos; status aceita 'PENDENTE', 'CONCLUIDO' ou 'CANCELADO'.
