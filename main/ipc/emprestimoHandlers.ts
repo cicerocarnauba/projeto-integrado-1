@@ -5,11 +5,21 @@ import type { ConsultarEmprestimoInput } from '../entities/ConsultaEmprestimo.ts
 export const EMPRESTIMO_CHANNELS = {
   REALIZAR: 'emprestimo:realizar',
   CONSULTAR: 'emprestimo:consultar',
+  CANCELAR: 'emprestimo:cancelar',
 } as const;
 
 export function registerEmprestimoHandlers(
   controller: EmprestimoController
 ): void {
+  // Equivalente ao endpoint PATCH /emprestimos/{id}/cancelar na arquitetura IPC.
+  ipcMain.handle(EMPRESTIMO_CHANNELS.CANCELAR, async (_event, id: number) => {
+    try {
+      return { success: true, data: controller.cancelar(id) };
+    } catch (error) {
+      return { success: false, error: (error as Error).message };
+    }
+  });
+
   // Equivalente ao endpoint GET /emprestimos na arquitetura IPC do aplicativo.
   ipcMain.handle(EMPRESTIMO_CHANNELS.CONSULTAR, async (_event, input?: ConsultarEmprestimoInput) => {
     try {

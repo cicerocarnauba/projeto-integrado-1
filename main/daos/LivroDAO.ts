@@ -288,6 +288,24 @@ export class LivroDAO {
       .run(quantidade, new Date().toISOString(), livroId);
   }
 
+  /** Repõe o saldo disponível ao cancelar, sem alterar o total de exemplares. */
+  public decrementarEmprestada(livroId: number, quantidade: number): void {
+    if (!Number.isSafeInteger(quantidade) || quantidade <= 0) {
+      throw new Error('Quantidade inválida para reposição do saldo do livro.');
+    }
+
+    const info = this.db.prepare(`
+      UPDATE livro
+      SET quantidade_emprestada = quantidade_emprestada - ?,
+          data_atualizacao = ?
+      WHERE id = ? AND quantidade_emprestada >= ?
+    `).run(quantidade, new Date().toISOString(), livroId, quantidade);
+
+    if (info.changes !== 1) {
+      throw new Error(`Não foi possível repor o saldo do livro (ID ${livroId}). Verifique a quantidade emprestada.`);
+    }
+  }
+
   private mapRowToEntity(row: LivroRow): Livro {
     return new Livro({
       id: row.id,

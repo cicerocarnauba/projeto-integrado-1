@@ -24,6 +24,16 @@ export class EmprestimoController {
     private turmaDAO: TurmaDAO
   ) {}
 
+  public cancelar(id: number): Emprestimo {
+    if (!Number.isSafeInteger(id) || id <= 0) {
+      throw new Error('ID do empréstimo inválido para cancelamento.');
+    }
+
+    return this.emprestimoDAO.cancelar(id, (livroId, quantidadeRetirada) => {
+      this.livroDAO.decrementarEmprestada(livroId, quantidadeRetirada);
+    });
+  }
+
   public consultar(input: ConsultarEmprestimoInput = {}): ItemEmprestimoConsultaDTO[] {
     if (!input || typeof input !== 'object' || Array.isArray(input)) {
       throw new Error('Filtros do empréstimo inválidos.');
