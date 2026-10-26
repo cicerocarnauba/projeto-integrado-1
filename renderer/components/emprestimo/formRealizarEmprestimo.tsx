@@ -4,6 +4,7 @@ import { MdAdd, MdCheck, MdClear, MdDelete } from "react-icons/md";
 import { Professor } from "../../types/professor";
 import { Turma } from "../../types/turma";
 import SelectPesquisavel from "./selectpesquisavel";
+import ModalConfirmarEmprestimo from "../modal/modalConfirmarEmprestimo";
 
 // Livro ativo disponível para empréstimo (vem de window.ipc.livro.consultar)
 interface LivroOpcao {
@@ -42,6 +43,8 @@ export default function FormRealizarEmprestimo() {
   const [erro, setErro] = useState("");
   const [erroEnvio, setErroEnvio] = useState("");
   const [salvando, setSalvando] = useState(false);
+  const [modalRealizar, setModalRealizar] = useState(false);
+  const [modalCancelar, setModalCancelar] = useState(false);
 
   // A data do empréstimo é sempre a data atual do sistema (não editável).
   // Calculada no cliente para evitar diferença entre servidor e navegador.
@@ -196,12 +199,20 @@ export default function FormRealizarEmprestimo() {
     setItens((atual) => atual.filter((i) => i.livroId !== id));
   }
 
-  async function confirmar(e: React.FormEvent) {
+  // Clicar em "Confirmar Empréstimo" só abre o popup; nada é enviado ainda
+  function abrirModalRealizar(e: React.FormEvent) {
     e.preventDefault();
     setErroEnvio("");
 
     if (!podeConfirmar) return;
 
+    setModalRealizar(true);
+  }
+
+  // Executada quando o usuário confirma no popup
+  async function realizarEmprestimo() {
+    setModalRealizar(false);
+    setErroEnvio("");
     setSalvando(true);
 
     try {
@@ -241,7 +252,7 @@ export default function FormRealizarEmprestimo() {
   return (
     <form
       noValidate
-      onSubmit={confirmar}
+      onSubmit={abrirModalRealizar}
       className="w-full bg-[#eef7f0] rounded-2xl p-8 shadow-xs"
     >
       {erro && (
@@ -482,7 +493,7 @@ export default function FormRealizarEmprestimo() {
       <div className="flex justify-end items-center gap-3 mt-6">
         <button
           type="button"
-          onClick={cancelar}
+          onClick={() => setModalCancelar(true)}
           disabled={salvando}
           className="flex items-center gap-1.5 px-6 py-2.5 rounded-xl text-sm font-medium text-white bg-[#cf4a4a] hover:bg-red-600 transition-colors shadow-xs active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
@@ -499,6 +510,36 @@ export default function FormRealizarEmprestimo() {
           {salvando ? "Confirmando..." : "Confirmar Empréstimo"}
         </button>
       </div>
+
+      <ModalConfirmarEmprestimo
+        aberto={modalRealizar}
+        titulo="Realizar empréstimo?"
+        mensagem={
+          <>
+            Tem certeza que deseja <strong>realizar</strong> o empréstimo dos
+            exemplares dos livros selecionados?
+          </>
+        }
+        textoCancelar="Cancelar"
+        textoConfirmar="Confirmar"
+        onCancelar={() => setModalRealizar(false)}
+        onConfirmar={realizarEmprestimo}
+      />
+
+      <ModalConfirmarEmprestimo
+        aberto={modalCancelar}
+        titulo="Cancelar empréstimo?"
+        mensagem={
+          <>
+            Tem certeza que deseja <strong>cancelar</strong> o empréstimo dos
+            exemplares dos livros selecionados?
+          </>
+        }
+        textoCancelar="Não"
+        textoConfirmar="Sim"
+        onCancelar={() => setModalCancelar(false)}
+        onConfirmar={cancelar}
+      />
     </form>
   );
 }
