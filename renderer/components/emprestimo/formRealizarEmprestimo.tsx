@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { MdAdd, MdCheck, MdClear, MdDelete } from "react-icons/md";
 import { Professor } from "../../types/professor";
 import { Turma } from "../../types/turma";
+import SelectPesquisavel from "./selectpesquisavel";
 
 // Livro ativo disponível para empréstimo (vem de window.ipc.livro.consultar)
 interface LivroOpcao {
@@ -258,50 +259,46 @@ export default function FormRealizarEmprestimo() {
           <label className="text-sm font-semibold text-[#1e582d] mb-2 block">
             Professor <span className="text-red-500">*</span>
           </label>
-          <select
+          <SelectPesquisavel
             value={professorId}
-            onChange={(e) => setProfessorId(e.target.value)}
-            disabled={carregando}
-            className={inputBase}
-          >
-            <option value="">
-              {carregando
+            onChange={setProfessorId}
+            disabled={carregando || salvando}
+            placeholder={
+              carregando
                 ? "Carregando professores..."
                 : professores.length === 0
                 ? "Nenhum professor ativo cadastrado"
-                : "Selecione o professor..."}
-            </option>
-            {professores.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.primeiroNome} {p.sobrenome}
-              </option>
-            ))}
-          </select>
+                : "Selecione o professor..."
+            }
+            mensagemVazia="Nenhum professor encontrado."
+            opcoes={professores.map((p) => ({
+              value: String(p.id),
+              label: `${p.primeiroNome} ${p.sobrenome}`,
+            }))}
+          />
         </div>
 
         <div className="md:col-span-4">
           <label className="text-sm font-semibold text-[#1e582d] mb-2 block">
             Turma <span className="text-red-500">*</span>
           </label>
-          <select
+          <SelectPesquisavel
             value={turmaId}
-            onChange={(e) => setTurmaId(e.target.value)}
-            disabled={carregando}
-            className={inputBase}
-          >
-            <option value="">
-              {carregando
+            onChange={setTurmaId}
+            disabled={carregando || salvando}
+            placeholder={
+              carregando
                 ? "Carregando turmas..."
                 : turmas.length === 0
                 ? "Nenhuma turma ativa cadastrada"
-                : "Selecione a turma..."}
-            </option>
-            {turmas.map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.nome}
-              </option>
-            ))}
-          </select>
+                : "Selecione a turma..."
+            }
+            mensagemVazia="Nenhuma turma encontrada."
+            opcoes={turmas.map((t) => ({
+              value: String(t.id),
+              label: t.nome,
+            }))}
+          />
         </div>
 
         <div className="md:col-span-3">
@@ -313,7 +310,7 @@ export default function FormRealizarEmprestimo() {
             value={dataHoje}
             disabled
             readOnly
-            className={`${inputBase} bg-[#f4faf5] text-gray-700`}
+            className={`${inputBase} bg-[#f4faf5] text-gray-700 text-center`}
           />
         </div>
       </div>
@@ -325,34 +322,33 @@ export default function FormRealizarEmprestimo() {
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
-          <div className="md:col-span-7">
+          <div className="md:col-span-6">
             <label className="text-xs font-semibold text-[#1e582d] mb-2 block">
               Livro
             </label>
-            <select
+            <SelectPesquisavel
               value={livroId}
-              onChange={(e) => selecionarLivro(e.target.value)}
-              disabled={carregando}
-              className={inputBase}
-            >
-              <option value="">
-                {carregando
+              onChange={selecionarLivro}
+              disabled={carregando || salvando}
+              placeholder={
+                carregando
                   ? "Carregando livros..."
                   : livros.length === 0
                   ? "Nenhum livro ativo cadastrado"
-                  : "Selecione o livro..."}
-              </option>
-              {livros.map((l) => (
-                <option
-                  key={l.id}
-                  value={l.id}
-                  disabled={l.saldoDisponivel <= 0}
-                >
-                  {l.titulo} — {l.editora} (saldo: {l.saldoDisponivel})
-                  {l.saldoDisponivel <= 0 ? " · sem saldo" : ""}
-                </option>
-              ))}
-            </select>
+                  : "Selecione o livro..."
+              }
+              mensagemVazia="Nenhum livro encontrado."
+              // A busca olha o texto da opção: título e editora
+              opcoes={livros.map((l) => ({
+                value: String(l.id),
+                label: `${l.titulo} — ${l.editora}`,
+                extra:
+                  l.saldoDisponivel > 0
+                    ? `Saldo: ${l.saldoDisponivel}`
+                    : "Sem saldo",
+                desabilitada: l.saldoDisponivel <= 0,
+              }))}
+            />
           </div>
 
           <div className="md:col-span-2">
@@ -364,7 +360,7 @@ export default function FormRealizarEmprestimo() {
                 type="button"
                 onClick={decrementar}
                 disabled={quantidade <= 1}
-                className="w-8 h-8 rounded-lg bg-[#eef7f0] text-[#1e582d] hover:bg-[#2e8b45] hover:text-white disabled:opacity-30 disabled:hover:bg-[#eef7f0] disabled:hover:text-[#1e582d] disabled:cursor-not-allowed transition-colors flex items-center justify-center font-bold text-base cursor-pointer select-none"
+                className="w-8 h-8 rounded-lg bg-[#2e8b45] text-white hover:bg-[#236c35] disabled:opacity-40 disabled:hover:bg-[#2e8b45] disabled:cursor-not-allowed transition-colors flex items-center justify-center font-bold text-base cursor-pointer select-none"
               >
                 −
               </button>
@@ -381,22 +377,22 @@ export default function FormRealizarEmprestimo() {
                 type="button"
                 onClick={incrementar}
                 disabled={!livroSelecionado || quantidade >= restante}
-                className="w-8 h-8 rounded-lg bg-[#eef7f0] text-[#1e582d] hover:bg-[#2e8b45] hover:text-white disabled:opacity-30 disabled:hover:bg-[#eef7f0] disabled:hover:text-[#1e582d] disabled:cursor-not-allowed transition-colors flex items-center justify-center font-bold text-base cursor-pointer select-none"
+                className="w-8 h-8 rounded-lg bg-[#2e8b45] text-white hover:bg-[#236c35] disabled:opacity-40 disabled:hover:bg-[#2e8b45] disabled:cursor-not-allowed transition-colors flex items-center justify-center font-bold text-base cursor-pointer select-none"
               >
                 +
               </button>
             </div>
           </div>
 
-          <div className="md:col-span-3">
+          <div className="md:col-span-4">
             <button
               type="button"
               onClick={adicionarLivro}
               disabled={!podeAdicionar}
-              className="w-full h-11 flex items-center justify-center gap-1.5 bg-[#2e8b45] hover:bg-[#236c35] text-white rounded-xl text-sm font-medium transition-all active:scale-95 cursor-pointer disabled:bg-[#9cc9a8] disabled:hover:bg-[#9cc9a8] disabled:active:scale-100 disabled:cursor-not-allowed"
+              className="w-full h-11 flex items-center justify-center gap-1.5 whitespace-nowrap bg-[#2e8b45] hover:bg-[#236c35] text-white rounded-xl text-sm font-medium transition-all active:scale-95 cursor-pointer disabled:bg-[#9cc9a8] disabled:hover:bg-[#9cc9a8] disabled:active:scale-100 disabled:cursor-not-allowed"
             >
               <MdAdd size={18} />
-              Adicionar Livro
+              Adicionar ao empréstimo
             </button>
           </div>
         </div>
