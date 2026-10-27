@@ -70,6 +70,7 @@ export class DatabaseConnection {
         professor_id    INTEGER NOT NULL,
         turma_id        INTEGER NOT NULL,
         data_retirada   TEXT NOT NULL,
+        data_devolucao  TEXT,
         status          TEXT NOT NULL DEFAULT 'PENDENTE'
                         CHECK (status IN ('PENDENTE', 'CONCLUIDO', 'CANCELADO')),
         FOREIGN KEY (professor_id) REFERENCES professor(id),
@@ -92,5 +93,12 @@ export class DatabaseConnection {
       CREATE UNIQUE INDEX IF NOT EXISTS idx_livro_titulo_editora_unique
         ON livro(LOWER(TRIM(titulo)), LOWER(TRIM(editora)));
     `);
+
+    // Migração retrocompatível: garante coluna data_devolucao caso o banco já existisse
+    try {
+      db.exec(`ALTER TABLE emprestimo ADD COLUMN data_devolucao TEXT;`);
+    } catch {
+      // Ignora se a coluna já existir
+    }
   }
 }
