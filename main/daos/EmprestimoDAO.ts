@@ -5,6 +5,9 @@ import type { StatusEmprestimo } from '../entities/Emprestimo.ts';
 import type {
   ConsultarEmprestimoInput,
   ItemEmprestimoConsultaDTO,
+  EmprestimoDetalhesDTO,
+  ItemEmprestimoDetalheDTO,
+  StatusItemEmprestimo,
 } from '../entities/ConsultaEmprestimo.ts';
 
 interface EmprestimoRow {
@@ -191,5 +194,102 @@ export class EmprestimoDAO {
       status: row.status,
       itens,
     });
+  }
+
+  /**
+   * Busca um empréstimo por ID com todos os dados associados:
+   * dados do professor (nome completo), turma (nome), datas (retirada e devolução),
+   * status geral, quantidade total de exemplares e o agrupamento detalhado dos itens
+   * contendo as informações completas de cada livro (título, editora, quantidade de exemplares, etc).
+   */
+  public buscarDetalhesPorId(id: number): EmprestimoDetalhesDTO | null {
+    const row = this.db
+      .prepare(`
+        SELECT
+          e.*,
+          TRIM(p.primeiro_nome) || ' ' || TRIM(p.sobrenome) AS professor_nome,
+          t.nome AS turma_nome
+        FROM emprestimo e
+        LEFT JOIN professor p ON p.id = e.professor_id
+        LEFT JOIN turma t ON t.id = e.turma_id
+        WHERE e.id = ?
+      `)
+      .get(id) as (EmprestimoRow & { professor_nome?: string; turma_nome?: string; data_devolucao?: string | null }) | undefined;
+
+    if (!row) return null;
+
+    // Detecta se a coluna editora existe na tabela livro (retrocompatibilidade com schemas parciais de testes)
+    const colunasLivro = (this.db.pragma('table_info(livro)') as Array<{ name: string }>).map((c) => c.name);
+    const temEditora = colunasLivro.includes('editora');
+    const selectEditora = temEditora ? 'l.editora AS editora' : "'' AS editora";
+
+    const itensRows = this.db
+      .prepare(`
+        SELECT
+          i.id,
+          i.livro_id AS livroId,
+          l.titulo AS livroTitulo,
+          ${selectEditora},
+          i.quantidade_retirada AS quantidadeRetirada,
+          i.quantidade_devolvida AS quantidadeDevolvida,
+          i.quantidade_perdida AS quantidadePerdida,
+          i.quantidade_danificada AS quantidadeDanificada
+        FROM item_emprestimo i
+        LEFT JOIN livro l ON l.id = i.livro_id
+        WHERE i.emprestimo_id = ?
+        ORDER BY i.id ASC
+      `)
+      .all(id) as Array<{
+        id: number;
+        livroId: number;
+        livroTitulo: string | null;
+        editora: string | null;
+        quantidadeRetirada: number;
+        quantidadeDevolvida: number;
+        quantidadePerdida: number;
+        quantidadeDanificada: number;
+      }>;
+
+    let totalExemplares = 0;
+    const itens: ItemEmprestimoDetalheDTO[] = itensRows.map((item) => {
+      totalExemplares += item.quantidadeRetirada;
+      const baixados = (item.quantidadeDevolvida ?? 0) + (item.quantidadePerdida ?? 0) + (item.quantidadeDanificada ?? 0);
+      const pendente = item.quantidadeRetirada > baixados;
+      const statusItem: StatusItemEmprestimo = pendente ? 'PENDENTE' : 'CONCLUIDO';
+      const titulo = item.livroTitulo ?? '';
+      const editora = item.editora ?? '';
+
+      return {
+        id: item.id,
+        livroId: item.livroId,
+        livroTitulo: titulo,
+        titulo: titulo,
+        editora: editora,
+        quantidadeExemplar: item.quantidadeRetirada,
+        quantidadeEmprestada: item.quantidadeRetirada,
+        quantidadeRetirada: item.quantidadeRetirada,
+        quantidadeDevolvida: item.quantidadeDevolvida ?? 0,
+        quantidadePerdida: item.quantidadePerdida ?? 0,
+        quantidadeDanificada: item.quantidadeDanificada ?? 0,
+        status: statusItem,
+      };
+    });
+
+    const dataDevolucao = ('data_devolucao' in row && row.data_devolucao)
+      ? new Date(row.data_devolucao)
+      : null;
+
+    return {
+      id: row.id,
+      professorId: row.professor_id,
+      professorNome: row.professor_nome ?? '',
+      turmaId: row.turma_id,
+      turmaNome: row.turma_nome ?? '',
+      dataRetirada: new Date(row.data_retirada),
+      dataDevolucao,
+      quantidadeExemplares: totalExemplares,
+      status: row.status,
+      itens,
+    };
   }
 }

@@ -37,3 +37,41 @@ export interface ItemEmprestimoConsultaDTO {
   quantidadePerdida: number;
   quantidadeDanificada: number;
 }
+
+export type StatusItemEmprestimo = 'PENDENTE' | 'CONCLUIDO';
+
+/**
+ * Item de empréstimo detalhado com metadados do livro (título, editora, quantidade).
+ * Fornece aliases compatíveis com as convenções do frontend (livroTitulo, titulo, quantidadeExemplar, etc).
+ */
+export interface ItemEmprestimoDetalheDTO {
+  id: number;
+  livroId: number;
+  livroTitulo: string;
+  titulo: string;
+  editora: string;
+  quantidadeExemplar: number;
+  quantidadeEmprestada: number;
+  quantidadeRetirada: number;
+  quantidadeDevolvida: number;
+  quantidadePerdida: number;
+  quantidadeDanificada: number;
+  status: StatusItemEmprestimo;
+}
+
+/**
+ * DTO completo de retorno da busca por ID do empréstimo.
+ * Retorna os dados gerais (professor, turma, datas, status) e a lista agrupada de itens com detalhes dos livros.
+ */
+export interface EmprestimoDetalhesDTO {
+  id: number;
+  professorId: number;
+  professorNome: string;
+  turmaId: number;
+  turmaNome: string;
+  dataRetirada: Date;
+  dataDevolucao: Date | null;
+  quantidadeExemplares: number;
+  status: StatusEmprestimo;
+  itens: ItemEmprestimoDetalheDTO[];
+}

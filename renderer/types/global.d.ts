@@ -1,6 +1,7 @@
 import type {
   ConsultarEmprestimoInput,
   ItemEmprestimoConsultaDTO,
+  EmprestimoDetalhesDTO,
 } from '../../main/entities/ConsultaEmprestimo';
 
 declare global {
@@ -284,6 +285,21 @@ declare global {
         consultar: (input?: ConsultarEmprestimoInput) => Promise<{
           success: boolean;
           data?: ItemEmprestimoConsultaDTO[];
+          error?: string;
+        }>;
+
+        /**
+         * Busca os detalhes completos de um empréstimo pelo seu ID.
+         * Retorna os dados gerais (professorNome, turmaNome, dataRetirada, dataDevolucao, quantidadeExemplares, status)
+         * e a lista de itens com os dados dos livros (livroTitulo, titulo, editora, quantidadeExemplar, quantidadeEmprestada, etc).
+         * @param id ID numérico positivo do empréstimo.
+         * @returns Em sucesso: { success: true, data: EmprestimoDetalhesDTO }.
+         * Em falha: { success: false, error: 'Mensagem' }.
+         * @example await window.ipc.emprestimo.buscarPorId(1);
+         */
+        buscarPorId: (id: number) => Promise<{
+          success: boolean;
+          data?: EmprestimoDetalhesDTO;
           error?: string;
         }>;
 
