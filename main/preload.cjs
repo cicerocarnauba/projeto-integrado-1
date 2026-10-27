@@ -33,6 +33,7 @@ contextBridge.exposeInMainWorld('ipc', {
     // input opcional: { professorId?, turmaId?, livroId?, status? }. IDs são números;
     // consulte renderer/types/global.d.ts para valores de status e exemplos de uso.
     consultar: (input) => ipcRenderer.invoke('emprestimo:consultar', input),
+    buscarPorId: (id) => ipcRenderer.invoke('emprestimo:buscarPorId', id),
     realizar: (input) => ipcRenderer.invoke('emprestimo:realizar', input),
   },
 });

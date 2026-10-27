@@ -43,6 +43,8 @@ contextBridge.exposeInMainWorld('ipc', {
     // em ConsultarEmprestimoInput e os exemplos de uso estão em renderer/types/global.d.ts.
     consultar: (input?: ConsultarEmprestimoInput) =>
       ipcRenderer.invoke('emprestimo:consultar', input),
+    buscarPorId: (id: number) =>
+      ipcRenderer.invoke('emprestimo:buscarPorId', id),
     realizar: (input: {
       professorId: number;
       turmaId: number;
