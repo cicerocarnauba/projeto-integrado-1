@@ -7,6 +7,7 @@ import { TurmaDAO } from '../daos/TurmaDAO.ts';
 import type {
   ConsultarEmprestimoInput,
   ItemEmprestimoConsultaDTO,
+  EmprestimoDetalhesDTO,
 } from '../entities/ConsultaEmprestimo.ts';
 
 export interface RealizarEmprestimoInput {
@@ -23,6 +24,24 @@ export class EmprestimoController {
     private professorDAO: ProfessorDAO,
     private turmaDAO: TurmaDAO
   ) {}
+
+  /**
+   * Busca os detalhes completos de um empréstimo pelo seu ID.
+   * Retorna os dados do empréstimo (professor, turma, datas, status)
+   * e o agrupamento detalhado dos itens com informações dos livros (título, editora, quantidade).
+   */
+  public buscarPorId(id: number): EmprestimoDetalhesDTO {
+    if (!Number.isSafeInteger(id) || id <= 0) {
+      throw new Error('ID do empréstimo inválido para consulta.');
+    }
+
+    const emprestimo = this.emprestimoDAO.buscarDetalhesPorId(id);
+    if (!emprestimo) {
+      throw new Error('Empréstimo não encontrado.');
+    }
+
+    return emprestimo;
+  }
 
   public cancelar(id: number): Emprestimo {
     if (!Number.isSafeInteger(id) || id <= 0) {
