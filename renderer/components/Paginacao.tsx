@@ -4,6 +4,7 @@ import { MdChevronLeft, MdChevronRight } from "react-icons/md";
 export interface PaginacaoProps {
   paginaAtual: number;
   totalItens: number;
+  totalBalao?: number;
   itensPorPagina?: number;
   nomeEntidade?: string;
   nomeEntidadeSingular?: string;
@@ -24,6 +25,7 @@ function formatarEntidade(total: number, plural: string, singular?: string): str
 export default function Paginacao({
   paginaAtual,
   totalItens,
+  totalBalao,
   itensPorPagina = 12,
   nomeEntidade = "itens",
   nomeEntidadeSingular,
@@ -36,6 +38,8 @@ export default function Paginacao({
   }
 
   const totalPaginas = Math.max(1, Math.ceil(totalItens / itensPorPagina));
+
+  const totalResumo = totalBalao ?? totalItens;
 
   const obterPaginasVisiveis = () => {
     const paginas: (number | string)[] = [];
@@ -81,7 +85,7 @@ export default function Paginacao({
         </span>
         <span className="text-gray-300">•</span>
         <span className="bg-[#eef7f0] text-[#1e582d] text-xs font-semibold px-3 py-1 rounded-full border border-[#cde5d4]">
-          {totalItens} {formatarEntidade(totalItens, nomeEntidade, nomeEntidadeSingular)}
+          {totalResumo} {formatarEntidade(totalResumo, nomeEntidade, nomeEntidadeSingular)}
         </span>
       </div>
 

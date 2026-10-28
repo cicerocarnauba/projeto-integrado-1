@@ -99,11 +99,19 @@ export default function ListaEmprestimo({
                   {e.turmaNome}
                 </td>
                 <td className="py-3 px-3 hidden lg:table-cell text-sm text-gray-700 tabular-nums">
-                  {formatarData(e.dataRetirada)}
+                  {formatarData(  
+                      e.dataRetirada instanceof Date
+                      ? e.dataRetirada.toISOString()
+                      : e.dataRetirada
+                    )}
                 </td>
                 {historico && (
                   <td className="py-3 px-3 hidden lg:table-cell text-sm text-gray-700 tabular-nums">
-                    {formatarData(e.dataDevolucao)}
+                    {formatarData(  
+                      e.dataDevolucao instanceof Date
+                      ? e.dataDevolucao.toISOString()
+                      : e.dataDevolucao
+                    )}
                   </td>
                 )}
                 <td className="py-3 px-3 text-center text-sm font-medium text-gray-900">
