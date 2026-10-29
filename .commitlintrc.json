@@ -18,6 +18,7 @@
         "merge"
       ]
     ],
+    "header-max-length": [0],
     "subject-case": [0],
     "subject-empty": [2, "never"],
     "type-empty": [2, "never"]
