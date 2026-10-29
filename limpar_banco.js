@@ -11,52 +11,43 @@ const targets = [
   { nome: 'Produção (app empacotado)', caminho: prodPath }
 ];
 
-console.log('Limpando dados do banco de dados SQLite...\n');
+console.log('Limpando bancos de dados (removendo todos os registros)...\n');
 
 targets.forEach(target => {
   try {
     if (!fs.existsSync(target.caminho)) {
-      console.log(`- ${target.nome}: arquivo não encontrado (${target.caminho})\n`);
+      console.log(`- ${target.nome}: Arquivo de banco ainda não existe (${target.caminho}).`);
       return;
     }
 
     const db = new Database(target.caminho);
+    db.pragma('journal_mode = WAL');
     db.pragma('foreign_keys = OFF');
 
-    // Identifica todas as tabelas criadas pelo sistema
-    const tables = db
-      .prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")
-      .all();
-
-    if (tables.length === 0) {
-      console.log(`- ${target.nome}: nenhuma tabela encontrada.`);
-      db.close();
-      return;
-    }
-
-    // Remove todos os registros de cada tabela
-    tables.forEach(({ name }) => {
-      db.exec(`DELETE FROM "${name}";`);
-    });
-
-    // Reseta os IDs auto-incrementáveis
-    const hasSeq = db
-      .prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='sqlite_sequence'")
-      .get();
-    if (hasSeq) {
-      db.exec("DELETE FROM sqlite_sequence;");
-    }
+    db.exec(`
+      DELETE FROM item_emprestimo;
+      DELETE FROM emprestimo;
+      DELETE FROM livro;
+      DELETE FROM turma;
+      DELETE FROM professor;
+      DELETE FROM sqlite_sequence WHERE name IN ('item_emprestimo', 'emprestimo', 'livro', 'turma', 'professor');
+    `);
 
     db.pragma('foreign_keys = ON');
-    db.exec('VACUUM;');
+
+    const profs = db.prepare('SELECT count(*) as c FROM professor').get().c;
+    const turmas = db.prepare('SELECT count(*) as c FROM turma').get().c;
+    const livros = db.prepare('SELECT count(*) as c FROM livro').get().c;
+    const emprestimos = db.prepare('SELECT count(*) as c FROM emprestimo').get().c;
+    const itensEmp = db.prepare('SELECT count(*) as c FROM item_emprestimo').get().c;
 
     console.log(`✓ ${target.nome}:`);
     console.log(`  Arquivo: ${target.caminho}`);
-    tables.forEach(({ name }) => {
-      const count = db.prepare(`SELECT count(*) as c FROM "${name}"`).get().c;
-      console.log(`  - ${name}: ${count} registros`);
-    });
-    console.log('');
+    console.log(`  - Professores: ${profs}`);
+    console.log(`  - Turmas: ${turmas}`);
+    console.log(`  - Livros: ${livros}`);
+    console.log(`  - Empréstimos: ${emprestimos}`);
+    console.log(`  - Itens de Empréstimo: ${itensEmp}\n`);
 
     db.close();
   } catch (err) {
@@ -64,4 +55,4 @@ targets.forEach(target => {
   }
 });
 
-console.log('Banco de dados limpo com sucesso!');
+console.log('Bancos de dados esvaziados com sucesso!');
