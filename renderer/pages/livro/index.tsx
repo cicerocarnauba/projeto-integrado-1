@@ -180,14 +180,6 @@ export default function GerenciarLivros() {
     carregarLivros();
   }, [termoBusca, recarregar]);
 
-  const totalAtivos = listaLivros.filter(
-    (l) => l.status === "ATIVO" || l.ativo === true
-  ).length;
-
-  const totalInativos = listaLivros.filter(
-    (l) => l.status !== "ATIVO" && l.ativo !== true
-  ).length;
-
   const livrosFiltradosPorAba = listaLivros.filter((livro) =>
     abaAtiva === "ATIVO"
       ? livro.status === "ATIVO" || livro.ativo === true
@@ -272,6 +264,13 @@ export default function GerenciarLivros() {
           onClose={() => setErro("")}
         />
 
+        {/* Abas de status: Ativos e Inativos */}
+        <AbasStatus
+          abaAtiva={abaAtiva}
+          onChangeAba={setAbaAtiva}
+        />
+
+
         {/* Barra de busca e botão de adicionar */}
         <div className="flex items-center gap-4 mb-4 w-full">
           <SearchBar
@@ -290,14 +289,6 @@ export default function GerenciarLivros() {
             Adicionar Livro
           </Link>
         </div>
-
-        {/* Abas de status: Ativos e Inativos */}
-        <AbasStatus
-          abaAtiva={abaAtiva}
-          onChangeAba={setAbaAtiva}
-          totalAtivos={totalAtivos}
-          totalInativos={totalInativos}
-        />
 
         {/* Lista de livros ou mensagens de estado */}
         {carregando ? (
