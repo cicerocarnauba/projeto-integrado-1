@@ -184,37 +184,62 @@ export default function DetalhesEmprestimo() {
           </div>
         ) : (
           <>
-            {/* Cabeçalho do empréstimo */}
-            <section className="flex flex-wrap items-start justify-between gap-3 bg-[#ebf5ed] rounded-2xl px-6 py-5 mb-4">
-              <div>
-                <h2 className="text-xl font-bold text-[#23582c]">
-                  Prof. {emprestimo.professorNome}
-                </h2>
+            {/* Cabeçalho do empréstimo fiel ao protótipo */}
+            <section className="bg-[#EEF7F0] rounded-2xl px-6 py-4 mb-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div>
+                  <h2 className="text-xl font-bold text-[#245B2F]">
+                    Prof. {emprestimo.professorNome}
+                  </h2>
 
-                <p className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-sm text-[#4a9a5a]">
-                  <span className="flex items-center gap-1.5">
-                    <MdCalendarToday size={16} />
-                    Retirada: {formatarData(  
-                      emprestimo.dataRetirada instanceof Date
-                      ? emprestimo.dataRetirada.toISOString()
-                      : emprestimo.dataRetirada
-                    )}
-                  </span>
+                  <div className="flex flex-wrap items-center gap-2 mt-1 text-sm text-[#5AA365]">
+                    <span className="flex items-center gap-1.5">
+                      <MdCalendarToday size={15} className="text-[#5AA365] shrink-0" />
+                      <span>
+                        Retirada:{" "}
+                        {formatarData(
+                          emprestimo.dataRetirada instanceof Date
+                            ? emprestimo.dataRetirada.toISOString()
+                            : emprestimo.dataRetirada
+                        )}
+                      </span>
+                    </span>
 
-                  <span className="flex items-center gap-1.5">
-                    <MdMenuBook size={16} />
-                    {emprestimo.quantidadeExemplares}{" "}
-                    {emprestimo.quantidadeExemplares === 1
-                      ? "exemplar"
-                      : "exemplares"}
+                    {emprestimo.dataDevolucao ? (
+                      <>
+                        <span className="text-[#5AA365] opacity-40">•</span>
+                        <span>
+                          Devolução:{" "}
+                          {formatarData(
+                            emprestimo.dataDevolucao instanceof Date
+                              ? emprestimo.dataDevolucao.toISOString()
+                              : emprestimo.dataDevolucao
+                          )}
+                        </span>
+                      </>
+                    ) : null}
+
+                    <span className="text-[#5AA365] opacity-40">•</span>
+
+                    <span className="flex items-center gap-1.5">
+                      <MdMenuBook size={15} className="text-[#5AA365] shrink-0" />
+                      <span>
+                        {emprestimo.quantidadeExemplares}{" "}
+                        {emprestimo.quantidadeExemplares === 1
+                          ? "exemplar"
+                          : "exemplares"}
+                      </span>
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center">
+                  <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#EAF5ED] border border-[#D0E6D6] text-sm font-medium text-[#245B2F]">
+                    <MdOutlineSchool size={16} className="text-[#245B2F] shrink-0" />
+                    {emprestimo.turmaNome}
                   </span>
-                </p>
+                </div>
               </div>
-
-              <span className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/70 border border-[#D3E8D6] text-sm font-medium text-[#23582c]">
-                <MdOutlineSchool size={18} />
-                {emprestimo.turmaNome}
-              </span>
             </section>
 
             {/* Busca e botão visual de devolver todos */}
