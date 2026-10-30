@@ -30,7 +30,10 @@ targets.forEach(target => {
 
     const db = new Database(target.caminho);
     db.pragma('journal_mode = WAL');
-    db.pragma('foreign_keys = ON');
+    // Garante coluna data_devolucao caso o banco já existisse em versão anterior
+    try {
+      db.exec('ALTER TABLE emprestimo ADD COLUMN data_devolucao TEXT;');
+    } catch (_) {}
 
     // Executa a carga do seed
     db.exec(sql);
@@ -57,8 +60,18 @@ targets.forEach(target => {
 });
 
 console.log('Banco de dados populado com sucesso cobrindo todos os cenários de teste!');
-console.log('Cenários disponíveis em cada entidade:');
-console.log('  1. SEM histórico (Excluir físico)');
-console.log('  2. COM histórico concluído (Desativar com sucesso)');
-console.log('  3. COM empréstimo pendente (Bloqueio de desativação)');
-console.log('  4. INATIVO (Ativar)\n');
+console.log('Cenários disponíveis para teste:');
+console.log('  [Cadastros Base - Professor, Turma, Livro]:');
+console.log('    1. SEM histórico (Excluir físico)');
+console.log('    2. COM histórico concluído (Desativar com sucesso)');
+console.log('    3. COM empréstimo pendente (Bloqueio de desativação)');
+console.log('    4. INATIVO (Ativar e bloqueio na seleção de empréstimos)');
+console.log('  [Empréstimos]:');
+console.log('    5. Realizar Empréstimo: Livros com amplo estoque vs Estoque esgotado (saldo 0)');
+console.log('    6. Cancelar Empréstimo Simples: Pendente 100% intacto (cancela e devolve estoque)');
+console.log('    7. Cancelar Empréstimo Múltiplos Livros: Devolve estoque de todos os livros');
+console.log('    8. Devolução Parcial (ID 5): Bloqueio de cancelamento com erro amigável');
+console.log('    9. Avaria Registrada (ID 8): Bloqueio de cancelamento e badge de avaria');
+console.log('    10. Itens Mistos (ID 7): Livro concluído e livro pendente no mesmo empréstimo');
+console.log('    11. Histórico: Concluídos normais, concluídos com perda/avaria e cancelados');
+console.log('    12. Paginação e Busca: 12 pendentes (> 10 por página) e datas/nomes diversificados\n');

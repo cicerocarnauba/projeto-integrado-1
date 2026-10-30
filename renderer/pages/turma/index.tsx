@@ -102,9 +102,6 @@ export default function GerenciarTurmas() {
     carregarTurmas();
   }, [termoBusca, recarregar]);
 
-  const totalAtivos = turmas.filter((t) => t.status === "ATIVO").length;
-  const totalInativos = turmas.filter((t) => t.status !== "ATIVO").length;
-
   const turmasFiltradasPorAba = turmas.filter((t) =>
     abaAtiva === "ATIVO" ? t.status === "ATIVO" : t.status !== "ATIVO"
   );
@@ -206,6 +203,12 @@ export default function GerenciarTurmas() {
           Gerenciar turmas
         </h1>
 
+        {/* Abas de status: Ativos e Inativos */}
+        <AbasStatus
+          abaAtiva={abaAtiva}
+          onChangeAba={setAbaAtiva}
+        />
+
 
         {/* Barra de busca e botão de adicionar */}
         <div className="flex items-center gap-4 mb-4 w-full">
@@ -225,14 +228,6 @@ export default function GerenciarTurmas() {
             Adicionar turma
           </Link>
         </div>
-
-        {/* Abas de status: Ativos e Inativos */}
-        <AbasStatus
-          abaAtiva={abaAtiva}
-          onChangeAba={setAbaAtiva}
-          totalAtivos={totalAtivos}
-          totalInativos={totalInativos}
-        />
 
         {feedback && (
           <ToastFeedback

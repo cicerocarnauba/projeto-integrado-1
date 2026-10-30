@@ -198,9 +198,6 @@ export default function GerenciarProfessores() {
     }
   }
 
-  const totalAtivos = professores.filter((p) => p.status === "ATIVO").length;
-  const totalInativos = professores.filter((p) => p.status !== "ATIVO").length;
-
   const professoresFiltradosPorAba = professores.filter((p) =>
     abaAtiva === "ATIVO" ? p.status === "ATIVO" : p.status !== "ATIVO"
   );
@@ -266,6 +263,13 @@ export default function GerenciarProfessores() {
           }}
         />
 
+        {/* Abas de status: Ativos e Inativos */}
+        <AbasStatus
+          abaAtiva={abaAtiva}
+          onChangeAba={setAbaAtiva}
+        />
+
+
         {/* Barra de busca e botão de adicionar */}
         <div className="flex items-center gap-4 mb-4 w-full">
           <SearchBar
@@ -284,14 +288,6 @@ export default function GerenciarProfessores() {
             Adicionar professor
           </Link>
         </div>
-
-        {/* Abas de status: Ativos e Inativos */}
-        <AbasStatus
-          abaAtiva={abaAtiva}
-          onChangeAba={setAbaAtiva}
-          totalAtivos={totalAtivos}
-          totalInativos={totalInativos}
-        />
 
         {carregado ? (
           <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
