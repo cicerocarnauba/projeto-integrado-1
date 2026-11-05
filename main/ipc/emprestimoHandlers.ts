@@ -1,12 +1,16 @@
 import { ipcMain } from 'electron';
 import { EmprestimoController } from '../controllers/EmprestimoController.ts';
-import type { ConsultarEmprestimoInput } from '../entities/ConsultaEmprestimo.ts';
+import type {
+  ConsultarEmprestimoInput,
+  RegistrarDevolucaoItemInput,
+} from '../entities/ConsultaEmprestimo.ts';
 
 export const EMPRESTIMO_CHANNELS = {
   REALIZAR: 'emprestimo:realizar',
   CONSULTAR: 'emprestimo:consultar',
   BUSCAR_POR_ID: 'emprestimo:buscarPorId',
   CANCELAR: 'emprestimo:cancelar',
+  DEVOLVER_ITEM: 'emprestimo:devolverItem',
 } as const;
 
 export function registerEmprestimoHandlers(
@@ -55,4 +59,36 @@ export function registerEmprestimoHandlers(
       };
     }
   });
+
+  // Equivalente ao endpoint POST /emprestimos/{id}/itens/{itemId}/devolucao na arquitetura IPC.
+  ipcMain.handle(
+    EMPRESTIMO_CHANNELS.DEVOLVER_ITEM,
+    async (
+      _event,
+      arg1: number | { emprestimoId: number; itemId: number; quantidadeDevolvida: number },
+      arg2?: number,
+      arg3?: RegistrarDevolucaoItemInput | number
+    ) => {
+      try {
+        let emprestimoId: number;
+        let itemId: number;
+        let input: RegistrarDevolucaoItemInput | number;
+
+        if (typeof arg1 === 'object' && arg1 !== null) {
+          emprestimoId = arg1.emprestimoId;
+          itemId = arg1.itemId;
+          input = { quantidadeDevolvida: arg1.quantidadeDevolvida };
+        } else {
+          emprestimoId = arg1;
+          itemId = arg2 as number;
+          input = arg3 as RegistrarDevolucaoItemInput | number;
+        }
+
+        const resultado = controller.devolverItem(emprestimoId, itemId, input);
+        return { success: true, data: resultado };
+      } catch (error) {
+        return { success: false, error: (error as Error).message };
+      }
+    }
+  );
 }
