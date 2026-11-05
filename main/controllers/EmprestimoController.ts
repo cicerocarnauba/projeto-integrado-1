@@ -8,6 +8,8 @@ import type {
   ConsultarEmprestimoInput,
   ItemEmprestimoConsultaDTO,
   EmprestimoDetalhesDTO,
+  RegistrarDevolucaoItemInput,
+  ItemDevolucaoResultadoDTO,
 } from '../entities/ConsultaEmprestimo.ts';
 
 export interface RealizarEmprestimoInput {
@@ -51,6 +53,72 @@ export class EmprestimoController {
     return this.emprestimoDAO.cancelar(id, (livroId, quantidadeRetirada) => {
       this.livroDAO.decrementarEmprestada(livroId, quantidadeRetirada);
     });
+  }
+
+  /**
+   * Registra a devolução total ou parcial de um item de empréstimo.
+   * Valida os identificadores e a quantidade devolvida em relação à quantidade pendente do item,
+   * atualiza o registro do item e repõe o saldo disponível do livro (decrementando quantidade_emprestada).
+   */
+  public devolverItem(
+    emprestimoId: number,
+    itemId: number,
+    input: RegistrarDevolucaoItemInput | number
+  ): ItemDevolucaoResultadoDTO {
+    if (!Number.isSafeInteger(emprestimoId) || emprestimoId <= 0) {
+      throw new Error('ID do empréstimo inválido para devolução.');
+    }
+
+    if (!Number.isSafeInteger(itemId) || itemId <= 0) {
+      throw new Error('ID do item de empréstimo inválido para devolução.');
+    }
+
+    const quantidade =
+      typeof input === 'object' && input !== null ? input.quantidadeDevolvida : input;
+
+    if (!Number.isSafeInteger(quantidade) || (quantidade as number) <= 0) {
+      throw new Error('A quantidade devolvida deve ser um número inteiro maior que zero.');
+    }
+
+    const emprestimo = this.emprestimoDAO.buscarPorId(emprestimoId);
+    if (!emprestimo) {
+      throw new Error('Empréstimo não encontrado.');
+    }
+
+    const item = emprestimo.itens.find((i) => i.id === itemId);
+    if (!item) {
+      throw new Error('Item de empréstimo não encontrado.');
+    }
+
+    const pendente = item.getQuantidadePendente();
+    if (pendente <= 0) {
+      throw new Error('Este item já foi totalmente devolvido ou baixado.');
+    }
+
+    if ((quantidade as number) > pendente) {
+      throw new Error(
+        `A quantidade devolvida (${quantidade}) não pode ser maior que a quantidade pendente (${pendente}).`
+      );
+    }
+
+    const itemAtualizado = this.emprestimoDAO.registrarDevolucaoItem(
+      emprestimoId,
+      itemId,
+      quantidade as number,
+      (livroId, qtd) => this.livroDAO.decrementarEmprestada(livroId, qtd)
+    );
+
+    return {
+      id: itemAtualizado.id!,
+      emprestimoId: itemAtualizado.emprestimoId!,
+      livroId: itemAtualizado.livroId,
+      quantidadeRetirada: itemAtualizado.quantidadeRetirada,
+      quantidadeDevolvida: itemAtualizado.quantidadeDevolvida,
+      quantidadePerdida: itemAtualizado.quantidadePerdida,
+      quantidadeDanificada: itemAtualizado.quantidadeDanificada,
+      quantidadePendente: itemAtualizado.getQuantidadePendente(),
+      status: itemAtualizado.isTotalmenteBaixado() ? 'CONCLUIDO' : 'PENDENTE',
+    };
   }
 
   public consultar(input: ConsultarEmprestimoInput = {}): ItemEmprestimoConsultaDTO[] {
