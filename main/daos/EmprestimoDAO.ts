@@ -271,6 +271,7 @@ export class EmprestimoDAO {
         quantidadeDevolvida: item.quantidadeDevolvida ?? 0,
         quantidadePerdida: item.quantidadePerdida ?? 0,
         quantidadeDanificada: item.quantidadeDanificada ?? 0,
+        quantidadePendente: Math.max(0, item.quantidadeRetirada - baixados),
         status: statusItem,
       };
     });
@@ -291,5 +292,64 @@ export class EmprestimoDAO {
       status: row.status,
       itens,
     };
+  }
+
+  public buscarItemPorId(itemId: number): ItemEmprestimo | null {
+    const row = this.db
+      .prepare(`SELECT * FROM item_emprestimo WHERE id = ?`)
+      .get(itemId) as ItemEmprestimoRow | undefined;
+
+    if (!row) return null;
+
+    return new ItemEmprestimo({
+      id: row.id,
+      emprestimoId: row.emprestimo_id,
+      livroId: row.livro_id,
+      quantidadeRetirada: row.quantidade_retirada,
+      quantidadeDevolvida: row.quantidade_devolvida,
+      quantidadePerdida: row.quantidade_perdida,
+      quantidadeDanificada: row.quantidade_danificada,
+    });
+  }
+
+  /**
+   * Registra a devolução total ou parcial de um item de empréstimo.
+   * Executa a atualização de quantidade_devolvida no item_emprestimo e a reposição
+   * do saldo disponível do livro (decrementando quantidade_emprestada) dentro de uma
+   * mesma transação atômica no SQLite.
+   */
+  public registrarDevolucaoItem(
+    emprestimoId: number,
+    itemId: number,
+    quantidadeDevolvida: number,
+    atualizarSaldoLivro: (livroId: number, quantidadeDevolvida: number) => void
+  ): ItemEmprestimo {
+    const transacao = this.db.transaction(() => {
+      const emprestimo = this.buscarPorId(emprestimoId);
+      if (!emprestimo) {
+        throw new Error('Empréstimo não encontrado.');
+      }
+
+      const item = emprestimo.itens.find((i) => i.id === itemId);
+      if (!item) {
+        throw new Error('Item de empréstimo não encontrado.');
+      }
+
+      item.devolver(quantidadeDevolvida);
+
+      this.db
+        .prepare(
+          `UPDATE item_emprestimo
+           SET quantidade_devolvida = ?
+           WHERE id = ?`
+        )
+        .run(item.quantidadeDevolvida, item.id);
+
+      atualizarSaldoLivro(item.livroId, quantidadeDevolvida);
+
+      return item;
+    });
+
+    return transacao.immediate();
   }
 }

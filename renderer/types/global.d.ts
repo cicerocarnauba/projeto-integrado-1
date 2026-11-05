@@ -2,6 +2,8 @@ import type {
   ConsultarEmprestimoInput,
   ItemEmprestimoConsultaDTO,
   EmprestimoDetalhesDTO,
+  RegistrarDevolucaoItemInput,
+  ItemDevolucaoResultadoDTO,
 } from '../../main/entities/ConsultaEmprestimo';
 
 declare global {
@@ -325,6 +327,28 @@ declare global {
               quantidadeDanificada: number;
             }>;
           };
+          error?: string;
+        }>;
+
+        /**
+         * Registra a devolução total ou parcial de um item de empréstimo.
+         * Equivalente ao endpoint POST /emprestimos/{id}/itens/{itemId}/devolucao.
+         * Atualiza a quantidade devolvida e repõe o saldo disponível do livro.
+         * @param emprestimoId ID numérico positivo do empréstimo.
+         * @param itemId ID numérico positivo do item do empréstimo.
+         * @param input Objeto { quantidadeDevolvida: number } ou número direto da quantidade devolvida.
+         * @returns Em sucesso: { success: true, data: ItemDevolucaoResultadoDTO }.
+         * Em falha: { success: false, error: 'Mensagem' }.
+         * @example await window.ipc.emprestimo.devolverItem(1, 2, { quantidadeDevolvida: 1 });
+         * @example await window.ipc.emprestimo.devolverItem(1, 2, 1);
+         */
+        devolverItem: (
+          emprestimoId: number,
+          itemId: number,
+          input: RegistrarDevolucaoItemInput | number
+        ) => Promise<{
+          success: boolean;
+          data?: ItemDevolucaoResultadoDTO;
           error?: string;
         }>;
       };

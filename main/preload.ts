@@ -50,6 +50,12 @@ contextBridge.exposeInMainWorld('ipc', {
       turmaId: number;
       itens: Array<{ livroId: number; quantidade: number }>;
     }) => ipcRenderer.invoke('emprestimo:realizar', input),
+    devolverItem: (
+      emprestimoId: number,
+      itemId: number,
+      input: { quantidadeDevolvida: number } | number
+    ) =>
+      ipcRenderer.invoke('emprestimo:devolverItem', emprestimoId, itemId, input),
   },
 });
 

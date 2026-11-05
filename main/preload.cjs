@@ -35,6 +35,8 @@ contextBridge.exposeInMainWorld('ipc', {
     consultar: (input) => ipcRenderer.invoke('emprestimo:consultar', input),
     buscarPorId: (id) => ipcRenderer.invoke('emprestimo:buscarPorId', id),
     realizar: (input) => ipcRenderer.invoke('emprestimo:realizar', input),
+    devolverItem: (emprestimoId, itemId, input) =>
+      ipcRenderer.invoke('emprestimo:devolverItem', emprestimoId, itemId, input),
   },
 });
 
