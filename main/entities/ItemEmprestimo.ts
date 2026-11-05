@@ -42,4 +42,26 @@ export class ItemEmprestimo {
   public isTotalmenteBaixado(): boolean {
     return this.getQuantidadePendente() === 0;
   }
+
+  /**
+   * Registra a devolução total ou parcial do item.
+   * Regras:
+   * - A quantidade devolvida deve ser um número inteiro maior que zero.
+   * - A quantidade devolvida não pode exceder a quantidade ainda pendente do item
+   *   (considerando cópias retiradas menos devoluções, perdas e avarias já computadas).
+   */
+  public devolver(quantidade: number): void {
+    if (!Number.isSafeInteger(quantidade) || quantidade <= 0) {
+      throw new Error('A quantidade devolvida deve ser um número inteiro maior que zero.');
+    }
+
+    const pendente = this.getQuantidadePendente();
+    if (quantidade > pendente) {
+      throw new Error(
+        `A quantidade devolvida (${quantidade}) não pode ser maior que a quantidade pendente (${pendente}).`
+      );
+    }
+
+    this.quantidadeDevolvida += quantidade;
+  }
 }

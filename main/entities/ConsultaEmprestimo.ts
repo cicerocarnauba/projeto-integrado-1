@@ -56,6 +56,7 @@ export interface ItemEmprestimoDetalheDTO {
   quantidadeDevolvida: number;
   quantidadePerdida: number;
   quantidadeDanificada: number;
+  quantidadePendente?: number;
   status: StatusItemEmprestimo;
 }
 
@@ -74,4 +75,26 @@ export interface EmprestimoDetalhesDTO {
   quantidadeExemplares: number;
   status: StatusEmprestimo;
   itens: ItemEmprestimoDetalheDTO[];
+}
+
+/**
+ * Entrada para a operação de registrar devolução de um item de empréstimo.
+ */
+export interface RegistrarDevolucaoItemInput {
+  quantidadeDevolvida: number;
+}
+
+/**
+ * Retorno detalhado após registrar a devolução total ou parcial de um item de empréstimo.
+ */
+export interface ItemDevolucaoResultadoDTO {
+  id: number;
+  emprestimoId: number;
+  livroId: number;
+  quantidadeRetirada: number;
+  quantidadeDevolvida: number;
+  quantidadePerdida: number;
+  quantidadeDanificada: number;
+  quantidadePendente: number;
+  status: StatusItemEmprestimo;
 }
