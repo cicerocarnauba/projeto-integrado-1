@@ -12,10 +12,10 @@ import SearchBar, { TipoOrdenacao } from "../../components/Searchbar";
 import Paginacao from "../../components/Paginacao";
 import ToastFeedback from "../../components/ToastFeedback";
 import ListaItensEmprestimo from "../../components/emprestimo/listaItensEmprestimo";
-import { formatarData } from "../../components/emprestimo/listaEmprestimo";
-import { calcularPendente } from "../../utils/emprestimoItem";
-import { EmprestimoDetalhe, ItemEmprestimo } from "../../types/emprestimo";
 import ModalDevolverExemplares from "../../components/modal/modalDevolverExemplares";
+import { formatarData } from "../../components/emprestimo/listaEmprestimo";
+import { EmprestimoDetalhe, ItemEmprestimo } from "../../types/emprestimo";
+import { calcularPendente } from "../../utils/emprestimoItem";
 
 const ITENS_POR_PAGINA = 10;
 
@@ -24,16 +24,22 @@ export default function DetalhesEmprestimo() {
 
   const id = Number(router.query.id);
 
-  const [emprestimo, setEmprestimo] = useState<EmprestimoDetalhe | null>(null);
+  const [emprestimo, setEmprestimo] =
+    useState<EmprestimoDetalhe | null>(null);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
   const [feedback, setFeedback] = useState("");
-  const [itemParaDevolver, setItemParaDevolver] =
-    useState<ItemEmprestimo | null>(null);
 
   const [termoBusca, setTermoBusca] = useState("");
-  const [ordenacao, setOrdenacao] = useState<TipoOrdenacao>("alfabetica");
+  const [ordenacao, setOrdenacao] =
+    useState<TipoOrdenacao>("alfabetica");
   const [paginaAtual, setPaginaAtual] = useState(1);
+
+  // Devolução de exemplares (modal)
+  const [itemParaDevolver, setItemParaDevolver] =
+    useState<ItemEmprestimo | null>(null);
+  const [salvandoDevolucao, setSalvandoDevolucao] = useState(false);
+  const [erroDevolucao, setErroDevolucao] = useState("");
 
   const fecharFeedback = useCallback(() => setFeedback(""), []);
   const fecharErro = useCallback(() => setErro(""), []);
@@ -67,7 +73,9 @@ export default function DetalhesEmprestimo() {
           setEmprestimo(resposta.data);
         } else {
           setEmprestimo(null);
-          setErro(resposta?.error || "Não foi possível carregar o empréstimo.");
+          setErro(
+            resposta?.error || "Não foi possível carregar o empréstimo."
+          );
         }
       } catch (error) {
         if (cancelado) return;
@@ -89,13 +97,78 @@ export default function DetalhesEmprestimo() {
     };
   }, [router.isReady, id]);
 
+  function abrirDevolucao(item: ItemEmprestimo) {
+    setErroDevolucao("");
+    setItemParaDevolver(item);
+  }
+
+  function fecharDevolucao() {
+    if (salvandoDevolucao) return;
+    setErroDevolucao("");
+    setItemParaDevolver(null);
+  }
+
+  async function confirmarDevolucao(quantidade: number) {
+    if (!itemParaDevolver || !emprestimo) return;
+
+    setErroDevolucao("");
+    setSalvandoDevolucao(true);
+
+    try {
+      const resposta = await window.ipc.emprestimo.devolverItem(
+        emprestimo.id,
+        itemParaDevolver.id,
+        { quantidadeDevolvida: quantidade }
+      );
+
+      // Erros de regra do back (quantidade acima do pendente, item já baixado etc.)
+      // aparecem dentro do próprio modal.
+      if (!resposta?.success) {
+        setErroDevolucao(
+          resposta?.error || "Não foi possível registrar a devolução."
+        );
+        return;
+      }
+
+      const devolucaoTotal = resposta.data?.quantidadePendente === 0;
+
+      setItemParaDevolver(null);
+      setFeedback(
+        devolucaoTotal
+          ? "Devolução total do item registrada com sucesso!"
+          : "Devolução parcial registrada com sucesso!"
+      );
+
+      // Recarrega o empréstimo sem trocar a tela por "Carregando...",
+      // para atualizar itens, contador de pendentes e status do empréstimo.
+      const atualizado = await window.ipc.emprestimo.buscarPorId(emprestimo.id);
+
+      if (atualizado?.success && atualizado.data) {
+        setEmprestimo(atualizado.data);
+      } else {
+        setErro(
+          "Devolução registrada, mas não foi possível atualizar a tela. Recarregue a página."
+        );
+      }
+    } catch (error) {
+      console.error("Erro ao registrar devolução:", error);
+      setErroDevolucao(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível registrar a devolução."
+      );
+    } finally {
+      setSalvandoDevolucao(false);
+    }
+  }
+
   const termo = termoBusca.trim().toLocaleLowerCase("pt-BR");
 
   const itensFiltrados = (emprestimo?.itens ?? []).filter(
     (item) =>
       !termo ||
       item.livroTitulo.toLocaleLowerCase("pt-BR").includes(termo) ||
-      item.editora.toLocaleLowerCase("pt-BR").includes(termo),
+      item.editora.toLocaleLowerCase("pt-BR").includes(termo)
   );
 
   const itensExibidos = [...itensFiltrados].sort((a, b) => {
@@ -103,12 +176,15 @@ export default function DetalhesEmprestimo() {
       return (b.id ?? 0) - (a.id ?? 0);
     }
 
-    return (a.livroTitulo || "").localeCompare(b.livroTitulo || "", "pt-BR");
+    return (a.livroTitulo || "").localeCompare(
+      b.livroTitulo || "",
+      "pt-BR"
+    );
   });
 
   const totalPaginas = Math.max(
     1,
-    Math.ceil(itensExibidos.length / ITENS_POR_PAGINA),
+    Math.ceil(itensExibidos.length / ITENS_POR_PAGINA)
   );
 
   useEffect(() => {
@@ -119,7 +195,10 @@ export default function DetalhesEmprestimo() {
 
   const inicio = (paginaAtual - 1) * ITENS_POR_PAGINA;
 
-  const itensPaginados = itensExibidos.slice(inicio, inicio + ITENS_POR_PAGINA);
+  const itensPaginados = itensExibidos.slice(
+    inicio,
+    inicio + ITENS_POR_PAGINA
+  );
 
   const exemplaresPendentes =
     emprestimo?.status === "PENDENTE"
@@ -134,17 +213,6 @@ export default function DetalhesEmprestimo() {
   return (
     <div className="flex min-h-screen bg-white">
       <Sidebar />
-
-      <ModalDevolverExemplares
-        aberto={itemParaDevolver !== null}
-        item={itemParaDevolver}
-        onCancelar={() => setItemParaDevolver(null)}
-        onConfirmar={(quantidade) => {
-          // TODO subtarefa 6: chamar window.ipc.emprestimo.devolverItem e recarregar
-          console.info("Devolver", itemParaDevolver?.id, quantidade);
-          setItemParaDevolver(null);
-        }}
-      />
 
       <main className="flex-1 min-w-0 px-8 pt-6 pb-6 animate-fade-in">
         <div className="flex items-center justify-between mb-4">
@@ -168,11 +236,17 @@ export default function DetalhesEmprestimo() {
           onClose={fecharFeedback}
         />
 
-        <ToastFeedback mensagem={erro} tipo="erro" onClose={fecharErro} />
+        <ToastFeedback
+          mensagem={erro}
+          tipo="erro"
+          onClose={fecharErro}
+        />
 
         {carregando ? (
           <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
-            <p className="text-base font-medium">Carregando empréstimo...</p>
+            <p className="text-base font-medium">
+              Carregando empréstimo...
+            </p>
           </div>
         ) : !emprestimo ? (
           <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
@@ -192,16 +266,13 @@ export default function DetalhesEmprestimo() {
 
                   <div className="flex flex-wrap items-center gap-2 mt-1 text-sm text-[#5AA365]">
                     <span className="flex items-center gap-1.5">
-                      <MdCalendarToday
-                        size={15}
-                        className="text-[#5AA365] shrink-0"
-                      />
+                      <MdCalendarToday size={15} className="text-[#5AA365] shrink-0" />
                       <span>
                         Retirada:{" "}
                         {formatarData(
                           emprestimo.dataRetirada instanceof Date
                             ? emprestimo.dataRetirada.toISOString()
-                            : emprestimo.dataRetirada,
+                            : emprestimo.dataRetirada
                         )}
                       </span>
                     </span>
@@ -214,7 +285,7 @@ export default function DetalhesEmprestimo() {
                           {formatarData(
                             emprestimo.dataDevolucao instanceof Date
                               ? emprestimo.dataDevolucao.toISOString()
-                              : emprestimo.dataDevolucao,
+                              : emprestimo.dataDevolucao
                           )}
                         </span>
                       </>
@@ -223,10 +294,7 @@ export default function DetalhesEmprestimo() {
                     <span className="text-[#5AA365] opacity-40">•</span>
 
                     <span className="flex items-center gap-1.5">
-                      <MdMenuBook
-                        size={15}
-                        className="text-[#5AA365] shrink-0"
-                      />
+                      <MdMenuBook size={15} className="text-[#5AA365] shrink-0" />
                       <span>
                         {emprestimo.quantidadeExemplares}{" "}
                         {emprestimo.quantidadeExemplares === 1
@@ -239,10 +307,7 @@ export default function DetalhesEmprestimo() {
 
                 <div className="flex items-center">
                   <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#EAF5ED] border border-[#D0E6D6] text-sm font-medium text-[#245B2F]">
-                    <MdOutlineSchool
-                      size={16}
-                      className="text-[#245B2F] shrink-0"
-                    />
+                    <MdOutlineSchool size={16} className="text-[#245B2F] shrink-0" />
                     {emprestimo.turmaNome}
                   </span>
                 </div>
@@ -289,7 +354,7 @@ export default function DetalhesEmprestimo() {
                 <ListaItensEmprestimo
                   itens={itensPaginados}
                   statusEmprestimo={emprestimo.status}
-                  onDevolver={setItemParaDevolver}
+                  onDevolver={abrirDevolucao}
                 />
 
                 <Paginacao
@@ -305,6 +370,15 @@ export default function DetalhesEmprestimo() {
             )}
           </>
         )}
+
+        <ModalDevolverExemplares
+          aberto={itemParaDevolver !== null}
+          item={itemParaDevolver}
+          salvando={salvandoDevolucao}
+          erroExterno={erroDevolucao}
+          onCancelar={fecharDevolucao}
+          onConfirmar={confirmarDevolucao}
+        />
       </main>
     </div>
   );
