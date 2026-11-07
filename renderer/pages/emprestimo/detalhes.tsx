@@ -1,4 +1,3 @@
-
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import {
@@ -15,6 +14,7 @@ import ToastFeedback from "../../components/ToastFeedback";
 import ListaItensEmprestimo from "../../components/emprestimo/listaItensEmprestimo";
 import { formatarData } from "../../components/emprestimo/listaEmprestimo";
 import { EmprestimoDetalhe } from "../../types/emprestimo";
+import { calcularPendente } from "../../utils/emprestimoItem";
 
 const ITENS_POR_PAGINA = 10;
 
@@ -23,15 +23,13 @@ export default function DetalhesEmprestimo() {
 
   const id = Number(router.query.id);
 
-  const [emprestimo, setEmprestimo] =
-    useState<EmprestimoDetalhe | null>(null);
+  const [emprestimo, setEmprestimo] = useState<EmprestimoDetalhe | null>(null);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
   const [feedback, setFeedback] = useState("");
 
   const [termoBusca, setTermoBusca] = useState("");
-  const [ordenacao, setOrdenacao] =
-    useState<TipoOrdenacao>("alfabetica");
+  const [ordenacao, setOrdenacao] = useState<TipoOrdenacao>("alfabetica");
   const [paginaAtual, setPaginaAtual] = useState(1);
 
   const fecharFeedback = useCallback(() => setFeedback(""), []);
@@ -66,9 +64,7 @@ export default function DetalhesEmprestimo() {
           setEmprestimo(resposta.data);
         } else {
           setEmprestimo(null);
-          setErro(
-            resposta?.error || "Não foi possível carregar o empréstimo."
-          );
+          setErro(resposta?.error || "Não foi possível carregar o empréstimo.");
         }
       } catch (error) {
         if (cancelado) return;
@@ -96,7 +92,7 @@ export default function DetalhesEmprestimo() {
     (item) =>
       !termo ||
       item.livroTitulo.toLocaleLowerCase("pt-BR").includes(termo) ||
-      item.editora.toLocaleLowerCase("pt-BR").includes(termo)
+      item.editora.toLocaleLowerCase("pt-BR").includes(termo),
   );
 
   const itensExibidos = [...itensFiltrados].sort((a, b) => {
@@ -104,15 +100,12 @@ export default function DetalhesEmprestimo() {
       return (b.id ?? 0) - (a.id ?? 0);
     }
 
-    return (a.livroTitulo || "").localeCompare(
-      b.livroTitulo || "",
-      "pt-BR"
-    );
+    return (a.livroTitulo || "").localeCompare(b.livroTitulo || "", "pt-BR");
   });
 
   const totalPaginas = Math.max(
     1,
-    Math.ceil(itensExibidos.length / ITENS_POR_PAGINA)
+    Math.ceil(itensExibidos.length / ITENS_POR_PAGINA),
   );
 
   useEffect(() => {
@@ -123,20 +116,17 @@ export default function DetalhesEmprestimo() {
 
   const inicio = (paginaAtual - 1) * ITENS_POR_PAGINA;
 
-  const itensPaginados = itensExibidos.slice(
-    inicio,
-    inicio + ITENS_POR_PAGINA
-  );
+  const itensPaginados = itensExibidos.slice(inicio, inicio + ITENS_POR_PAGINA);
 
   const exemplaresPendentes =
     emprestimo?.status === "PENDENTE"
       ? (emprestimo.itens ?? [])
           .filter((item) => item.status === "PENDENTE")
-          .reduce((total, item) => total + item.quantidadeEmprestada, 0)
+          .reduce((total, item) => total + calcularPendente(item), 0)
       : 0;
 
   const devolverTodosDesabilitado =
-    emprestimo?.status !== "PENDENTE" ||exemplaresPendentes === 0;
+    emprestimo?.status !== "PENDENTE" || exemplaresPendentes === 0;
 
   return (
     <div className="flex min-h-screen bg-white">
@@ -164,17 +154,11 @@ export default function DetalhesEmprestimo() {
           onClose={fecharFeedback}
         />
 
-        <ToastFeedback
-          mensagem={erro}
-          tipo="erro"
-          onClose={fecharErro}
-        />
+        <ToastFeedback mensagem={erro} tipo="erro" onClose={fecharErro} />
 
         {carregando ? (
           <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
-            <p className="text-base font-medium">
-              Carregando empréstimo...
-            </p>
+            <p className="text-base font-medium">Carregando empréstimo...</p>
           </div>
         ) : !emprestimo ? (
           <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
@@ -194,13 +178,16 @@ export default function DetalhesEmprestimo() {
 
                   <div className="flex flex-wrap items-center gap-2 mt-1 text-sm text-[#5AA365]">
                     <span className="flex items-center gap-1.5">
-                      <MdCalendarToday size={15} className="text-[#5AA365] shrink-0" />
+                      <MdCalendarToday
+                        size={15}
+                        className="text-[#5AA365] shrink-0"
+                      />
                       <span>
                         Retirada:{" "}
                         {formatarData(
                           emprestimo.dataRetirada instanceof Date
                             ? emprestimo.dataRetirada.toISOString()
-                            : emprestimo.dataRetirada
+                            : emprestimo.dataRetirada,
                         )}
                       </span>
                     </span>
@@ -213,7 +200,7 @@ export default function DetalhesEmprestimo() {
                           {formatarData(
                             emprestimo.dataDevolucao instanceof Date
                               ? emprestimo.dataDevolucao.toISOString()
-                              : emprestimo.dataDevolucao
+                              : emprestimo.dataDevolucao,
                           )}
                         </span>
                       </>
@@ -222,7 +209,10 @@ export default function DetalhesEmprestimo() {
                     <span className="text-[#5AA365] opacity-40">•</span>
 
                     <span className="flex items-center gap-1.5">
-                      <MdMenuBook size={15} className="text-[#5AA365] shrink-0" />
+                      <MdMenuBook
+                        size={15}
+                        className="text-[#5AA365] shrink-0"
+                      />
                       <span>
                         {emprestimo.quantidadeExemplares}{" "}
                         {emprestimo.quantidadeExemplares === 1
@@ -235,7 +225,10 @@ export default function DetalhesEmprestimo() {
 
                 <div className="flex items-center">
                   <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#EAF5ED] border border-[#D0E6D6] text-sm font-medium text-[#245B2F]">
-                    <MdOutlineSchool size={16} className="text-[#245B2F] shrink-0" />
+                    <MdOutlineSchool
+                      size={16}
+                      className="text-[#245B2F] shrink-0"
+                    />
                     {emprestimo.turmaNome}
                   </span>
                 </div>
@@ -279,9 +272,9 @@ export default function DetalhesEmprestimo() {
                 key={`${termoBusca}-${ordenacao}-${paginaAtual}`}
                 className="animate-fade-in duration-300"
               >
-                <ListaItensEmprestimo 
-                  itens={itensPaginados} 
-                  statusEmprestimo={emprestimo.status} 
+                <ListaItensEmprestimo
+                  itens={itensPaginados}
+                  statusEmprestimo={emprestimo.status}
                 />
 
                 <Paginacao

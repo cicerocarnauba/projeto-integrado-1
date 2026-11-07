@@ -1,6 +1,6 @@
 export type StatusEmprestimo = "PENDENTE" | "CONCLUIDO" | "CANCELADO";
 export type StatusItemEmprestimo = "PENDENTE" | "CONCLUIDO" | "CANCELADO";
- 
+
 export interface Emprestimo {
   id: number;
   professorNome: string;
@@ -10,7 +10,7 @@ export interface Emprestimo {
   quantidadeExemplares: number;
   status: StatusEmprestimo;
 }
- 
+
 export interface ItemEmprestimo {
   id: number;
   livroTitulo: string;
@@ -19,8 +19,10 @@ export interface ItemEmprestimo {
   quantidadePerdida: number;
   quantidadeDanificada: number;
   status: StatusItemEmprestimo;
+  quantidadeDevolvida: number;
+  quantidadePendente?: number;
 }
- 
+
 export interface EmprestimoDetalhe extends Emprestimo {
   itens: ItemEmprestimo[];
 }
