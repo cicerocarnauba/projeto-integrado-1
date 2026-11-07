@@ -13,8 +13,8 @@ import Paginacao from "../../components/Paginacao";
 import ToastFeedback from "../../components/ToastFeedback";
 import ListaItensEmprestimo from "../../components/emprestimo/listaItensEmprestimo";
 import { formatarData } from "../../components/emprestimo/listaEmprestimo";
-import { EmprestimoDetalhe } from "../../types/emprestimo";
 import { calcularPendente } from "../../utils/emprestimoItem";
+import { EmprestimoDetalhe, ItemEmprestimo } from "../../types/emprestimo";
 
 const ITENS_POR_PAGINA = 10;
 
@@ -27,6 +27,8 @@ export default function DetalhesEmprestimo() {
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
   const [feedback, setFeedback] = useState("");
+  const [itemParaDevolver, setItemParaDevolver] =
+    useState<ItemEmprestimo | null>(null);
 
   const [termoBusca, setTermoBusca] = useState("");
   const [ordenacao, setOrdenacao] = useState<TipoOrdenacao>("alfabetica");
@@ -275,6 +277,7 @@ export default function DetalhesEmprestimo() {
                 <ListaItensEmprestimo
                   itens={itensPaginados}
                   statusEmprestimo={emprestimo.status}
+                  onDevolver={setItemParaDevolver}
                 />
 
                 <Paginacao
