@@ -1,4 +1,3 @@
-
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import {
@@ -13,8 +12,10 @@ import SearchBar, { TipoOrdenacao } from "../../components/Searchbar";
 import Paginacao from "../../components/Paginacao";
 import ToastFeedback from "../../components/ToastFeedback";
 import ListaItensEmprestimo from "../../components/emprestimo/listaItensEmprestimo";
+import ModalDevolverExemplares from "../../components/modal/modalDevolverExemplares";
 import { formatarData } from "../../components/emprestimo/listaEmprestimo";
-import { EmprestimoDetalhe } from "../../types/emprestimo";
+import { EmprestimoDetalhe, ItemEmprestimo } from "../../types/emprestimo";
+import { calcularPendente } from "../../utils/emprestimoItem";
 
 const ITENS_POR_PAGINA = 10;
 
@@ -33,6 +34,12 @@ export default function DetalhesEmprestimo() {
   const [ordenacao, setOrdenacao] =
     useState<TipoOrdenacao>("alfabetica");
   const [paginaAtual, setPaginaAtual] = useState(1);
+
+  // Devolução de exemplares (modal)
+  const [itemParaDevolver, setItemParaDevolver] =
+    useState<ItemEmprestimo | null>(null);
+  const [salvandoDevolucao, setSalvandoDevolucao] = useState(false);
+  const [erroDevolucao, setErroDevolucao] = useState("");
 
   const fecharFeedback = useCallback(() => setFeedback(""), []);
   const fecharErro = useCallback(() => setErro(""), []);
@@ -90,6 +97,71 @@ export default function DetalhesEmprestimo() {
     };
   }, [router.isReady, id]);
 
+  function abrirDevolucao(item: ItemEmprestimo) {
+    setErroDevolucao("");
+    setItemParaDevolver(item);
+  }
+
+  function fecharDevolucao() {
+    if (salvandoDevolucao) return;
+    setErroDevolucao("");
+    setItemParaDevolver(null);
+  }
+
+  async function confirmarDevolucao(quantidade: number) {
+    if (!itemParaDevolver || !emprestimo) return;
+
+    setErroDevolucao("");
+    setSalvandoDevolucao(true);
+
+    try {
+      const resposta = await window.ipc.emprestimo.devolverItem(
+        emprestimo.id,
+        itemParaDevolver.id,
+        { quantidadeDevolvida: quantidade }
+      );
+
+      // Erros de regra do back (quantidade acima do pendente, item já baixado etc.)
+      // aparecem dentro do próprio modal.
+      if (!resposta?.success) {
+        setErroDevolucao(
+          resposta?.error || "Não foi possível registrar a devolução."
+        );
+        return;
+      }
+
+      const devolucaoTotal = resposta.data?.quantidadePendente === 0;
+
+      setItemParaDevolver(null);
+      setFeedback(
+        devolucaoTotal
+          ? "Devolução total do item registrada com sucesso!"
+          : "Devolução parcial registrada com sucesso!"
+      );
+
+      // Recarrega o empréstimo sem trocar a tela por "Carregando...",
+      // para atualizar itens, contador de pendentes e status do empréstimo.
+      const atualizado = await window.ipc.emprestimo.buscarPorId(emprestimo.id);
+
+      if (atualizado?.success && atualizado.data) {
+        setEmprestimo(atualizado.data);
+      } else {
+        setErro(
+          "Devolução registrada, mas não foi possível atualizar a tela. Recarregue a página."
+        );
+      }
+    } catch (error) {
+      console.error("Erro ao registrar devolução:", error);
+      setErroDevolucao(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível registrar a devolução."
+      );
+    } finally {
+      setSalvandoDevolucao(false);
+    }
+  }
+
   const termo = termoBusca.trim().toLocaleLowerCase("pt-BR");
 
   const itensFiltrados = (emprestimo?.itens ?? []).filter(
@@ -132,11 +204,11 @@ export default function DetalhesEmprestimo() {
     emprestimo?.status === "PENDENTE"
       ? (emprestimo.itens ?? [])
           .filter((item) => item.status === "PENDENTE")
-          .reduce((total, item) => total + item.quantidadeEmprestada, 0)
+          .reduce((total, item) => total + calcularPendente(item), 0)
       : 0;
 
   const devolverTodosDesabilitado =
-    emprestimo?.status !== "PENDENTE" ||exemplaresPendentes === 0;
+    emprestimo?.status !== "PENDENTE" || exemplaresPendentes === 0;
 
   return (
     <div className="flex min-h-screen bg-white">
@@ -279,9 +351,10 @@ export default function DetalhesEmprestimo() {
                 key={`${termoBusca}-${ordenacao}-${paginaAtual}`}
                 className="animate-fade-in duration-300"
               >
-                <ListaItensEmprestimo 
-                  itens={itensPaginados} 
-                  statusEmprestimo={emprestimo.status} 
+                <ListaItensEmprestimo
+                  itens={itensPaginados}
+                  statusEmprestimo={emprestimo.status}
+                  onDevolver={abrirDevolucao}
                 />
 
                 <Paginacao
@@ -297,6 +370,15 @@ export default function DetalhesEmprestimo() {
             )}
           </>
         )}
+
+        <ModalDevolverExemplares
+          aberto={itemParaDevolver !== null}
+          item={itemParaDevolver}
+          salvando={salvandoDevolucao}
+          erroExterno={erroDevolucao}
+          onCancelar={fecharDevolucao}
+          onConfirmar={confirmarDevolucao}
+        />
       </main>
     </div>
   );

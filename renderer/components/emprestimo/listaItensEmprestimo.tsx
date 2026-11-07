@@ -4,11 +4,14 @@ import {
   StatusEmprestimo,
   StatusItemEmprestimo,
 } from "../../types/emprestimo";
+import { calcularPendente } from "../../utils/emprestimoItem";
 
 interface ListaItensEmprestimoProps {
   itens: ItemEmprestimo[];
   /** Se o empréstimo estiver cancelado, todos os itens são exibidos como cancelados. */
   statusEmprestimo?: StatusEmprestimo;
+  /** Chamado ao clicar em "Devolver" de um item pendente. */
+  onDevolver?: (item: ItemEmprestimo) => void;
 }
 
 const STATUS_ITEM_STYLE: Record<
@@ -57,6 +60,7 @@ function AvariaBadges({ item }: { item: ItemEmprestimo }) {
 export default function ListaItensEmprestimo({
   itens,
   statusEmprestimo,
+  onDevolver,
 }: ListaItensEmprestimoProps) {
   const btnBase =
     "flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg font-medium shrink-0 transition-colors";
@@ -88,8 +92,14 @@ export default function ListaItensEmprestimo({
               const estilo =
                 STATUS_ITEM_STYLE[statusEfetivo] ?? STATUS_ITEM_STYLE.PENDENTE;
 
+              const pendente = calcularPendente(item);
+              const devolvida = item.quantidadeDevolvida ?? 0;
+
               // Só itens pendentes podem ser devolvidos / ter avaria registrada
               const acoesDesabilitadas = statusEfetivo !== "PENDENTE";
+
+              // Devolver também fica bloqueado se não sobrou nada pendente
+              const devolverDesabilitado = acoesDesabilitadas || pendente === 0;
 
               return (
                 <tr
@@ -109,6 +119,15 @@ export default function ListaItensEmprestimo({
                     {item.quantidadeEmprestada === 1
                       ? "exemplar"
                       : "exemplares"}
+
+                    {/* Aparece quando já houve devolução (parcial ou total) */}
+                    {devolvida > 0 && (
+                      <span className="block text-xs font-normal text-[#5AA365] mt-0.5">
+                        {devolvida} {devolvida === 1 ? "devolvido" : "devolvidos"}
+                        {" · "}
+                        {pendente} {pendente === 1 ? "pendente" : "pendentes"}
+                      </span>
+                    )}
                   </td>
 
                   <td className="py-3 px-3 text-center">
@@ -128,11 +147,12 @@ export default function ListaItensEmprestimo({
                     <div className="flex items-center justify-center gap-2">
                       <button
                         type="button"
-                        disabled={acoesDesabilitadas}
+                        disabled={devolverDesabilitado}
+                        onClick={() => onDevolver?.(item)}
                         className={
-                          acoesDesabilitadas
+                          devolverDesabilitado
                             ? btnInativo
-                            : `${btnBase} bg-[#389348] text-white cursor-pointer`
+                            : `${btnBase} bg-[#389348] text-white hover:bg-[#2e7d3d] cursor-pointer`
                         }
                       >
                         <MdReplay size={15} />
