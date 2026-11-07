@@ -15,6 +15,7 @@ import ListaItensEmprestimo from "../../components/emprestimo/listaItensEmpresti
 import { formatarData } from "../../components/emprestimo/listaEmprestimo";
 import { calcularPendente } from "../../utils/emprestimoItem";
 import { EmprestimoDetalhe, ItemEmprestimo } from "../../types/emprestimo";
+import ModalDevolverExemplares from "../../components/modal/modalDevolverExemplares";
 
 const ITENS_POR_PAGINA = 10;
 
@@ -133,6 +134,17 @@ export default function DetalhesEmprestimo() {
   return (
     <div className="flex min-h-screen bg-white">
       <Sidebar />
+
+      <ModalDevolverExemplares
+        aberto={itemParaDevolver !== null}
+        item={itemParaDevolver}
+        onCancelar={() => setItemParaDevolver(null)}
+        onConfirmar={(quantidade) => {
+          // TODO subtarefa 6: chamar window.ipc.emprestimo.devolverItem e recarregar
+          console.info("Devolver", itemParaDevolver?.id, quantidade);
+          setItemParaDevolver(null);
+        }}
+      />
 
       <main className="flex-1 min-w-0 px-8 pt-6 pb-6 animate-fade-in">
         <div className="flex items-center justify-between mb-4">
