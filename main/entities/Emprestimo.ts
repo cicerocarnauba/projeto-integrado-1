@@ -60,6 +60,24 @@ export class Emprestimo {
     this.status = this.isTotalmenteConcluido() ? 'CONCLUIDO' : 'PENDENTE';
   }
 
+  public devolverItem(itemId: number, quantidade: number): ItemEmprestimo {
+    if (this.status !== 'PENDENTE') {
+      throw new Error('Apenas empréstimos com status "Pendente" podem receber devoluções.');
+    }
+
+    const item = this.itens.find((item) => item.id === itemId);
+    if (!item) {
+      throw new Error('Item de empréstimo não encontrado.');
+    }
+    if (item.getQuantidadePendente() <= 0) {
+      throw new Error('Este item já foi totalmente devolvido ou baixado.');
+    }
+
+    item.devolver(quantidade);
+    this.recalcularStatus();
+    return item;
+  }
+
   public cancelar(): void {
     if (this.status !== 'PENDENTE') {
       throw new Error('Apenas empréstimos com status "Pendente" podem ser cancelados.');

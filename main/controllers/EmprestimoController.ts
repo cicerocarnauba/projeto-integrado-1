@@ -57,8 +57,7 @@ export class EmprestimoController {
 
   /**
    * Registra a devolução total ou parcial de um item de empréstimo.
-   * Valida os identificadores e a quantidade devolvida em relação à quantidade pendente do item,
-   * atualiza o registro do item e repõe o saldo disponível do livro (decrementando quantidade_emprestada).
+   * Valida a entrada e devolve os dados atualizados do item.
    */
   public devolverItem(
     emprestimoId: number,
@@ -78,27 +77,6 @@ export class EmprestimoController {
 
     if (!Number.isSafeInteger(quantidade) || (quantidade as number) <= 0) {
       throw new Error('A quantidade devolvida deve ser um número inteiro maior que zero.');
-    }
-
-    const emprestimo = this.emprestimoDAO.buscarPorId(emprestimoId);
-    if (!emprestimo) {
-      throw new Error('Empréstimo não encontrado.');
-    }
-
-    const item = emprestimo.itens.find((i) => i.id === itemId);
-    if (!item) {
-      throw new Error('Item de empréstimo não encontrado.');
-    }
-
-    const pendente = item.getQuantidadePendente();
-    if (pendente <= 0) {
-      throw new Error('Este item já foi totalmente devolvido ou baixado.');
-    }
-
-    if ((quantidade as number) > pendente) {
-      throw new Error(
-        `A quantidade devolvida (${quantidade}) não pode ser maior que a quantidade pendente (${pendente}).`
-      );
     }
 
     const itemAtualizado = this.emprestimoDAO.registrarDevolucaoItem(
