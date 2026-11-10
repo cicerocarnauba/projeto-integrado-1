@@ -313,10 +313,8 @@ export class EmprestimoDAO {
   }
 
   /**
-   * Registra a devolução total ou parcial de um item de empréstimo.
-   * Executa a atualização de quantidade_devolvida no item_emprestimo e a reposição
-   * do saldo disponível do livro (decrementando quantidade_emprestada) dentro de uma
-   * mesma transação atômica no SQLite.
+   * HU22.1 — Valida a baixa, atualiza o item e repõe o estoque na mesma transação.
+   * Conclui o empréstimo quando todos os itens ficam sem pendências.
    */
   public registrarDevolucaoItem(
     emprestimoId: number,
@@ -330,12 +328,7 @@ export class EmprestimoDAO {
         throw new Error('Empréstimo não encontrado.');
       }
 
-      const item = emprestimo.itens.find((i) => i.id === itemId);
-      if (!item) {
-        throw new Error('Item de empréstimo não encontrado.');
-      }
-
-      item.devolver(quantidadeDevolvida);
+      const item = emprestimo.devolverItem(itemId, quantidadeDevolvida);
 
       this.db
         .prepare(
@@ -346,6 +339,10 @@ export class EmprestimoDAO {
         .run(item.quantidadeDevolvida, item.id);
 
       atualizarSaldoLivro(item.livroId, quantidadeDevolvida);
+
+      if (emprestimo.status === 'CONCLUIDO') {
+        this.db.prepare(`UPDATE emprestimo SET status = 'CONCLUIDO' WHERE id = ?`).run(emprestimoId);
+      }
 
       return item;
     });

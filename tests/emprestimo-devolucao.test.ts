@@ -173,7 +173,7 @@ describe('Devolução de item de empréstimo - Banco de Dados e Controller', () 
     db.close();
   });
 
-  it('Dado um item Pendente, devolução total aumenta o saldo disponível na mesma quantidade', () => {
+  it('encerra o item e repõe seu saldo, mantendo o empréstimo pendente enquanto houver outro item', () => {
     // Livro 1 tem total = 10, emprestada = 4 => saldo disponível = 6
     assert.equal(livroDAO.buscarPorId(1)!.getSaldoDisponivel(), 6);
 
@@ -192,9 +192,63 @@ describe('Devolução de item de empréstimo - Banco de Dados e Controller', () 
     assert.equal(livroAtualizado.quantidadeEmprestada, 0);
     assert.equal(livroAtualizado.getSaldoDisponivel(), 10);
 
-    // O status do empréstimo NÃO deve ser concluído automaticamente nesta feature
     const emprestimo = emprestimoDAO.buscarPorId(1)!;
     assert.equal(emprestimo.status, 'PENDENTE');
+    assert.equal(emprestimo.getTotalPendente(), 2);
+  });
+
+  it('conclui o empréstimo na última devolução, considerando perdas e avarias já registradas', () => {
+    db.prepare(`
+      UPDATE item_emprestimo SET quantidade_perdida = 1, quantidade_danificada = 1 WHERE id = 1
+    `).run();
+    db.prepare('UPDATE livro SET quantidade_total = 8, quantidade_emprestada = 2 WHERE id = 1').run();
+
+    controller.devolverItem(1, 1, 2);
+    controller.devolverItem(1, 2, 1);
+    assert.equal(controller.buscarPorId(1).status, 'PENDENTE');
+    assert.equal(emprestimoDAO.buscarPorId(1)!.getTotalPendente(), 1);
+
+    const ultimoItem = controller.devolverItem(1, 2, 1);
+
+    assert.equal(ultimoItem.status, 'CONCLUIDO');
+    assert.equal(ultimoItem.quantidadePendente, 0);
+    assert.equal(controller.buscarPorId(1).status, 'CONCLUIDO');
+    assert.equal(emprestimoDAO.buscarPorId(1)!.getTotalPendente(), 0);
+    assert.equal(livroDAO.buscarPorId(1)!.getSaldoDisponivel(), 8);
+    assert.equal(livroDAO.buscarPorId(2)!.getSaldoDisponivel(), 5);
+  });
+
+  for (const status of ['CONCLUIDO', 'CANCELADO'] as const) {
+    it(`bloqueia devolução em empréstimo ${status} sem alterar o banco`, () => {
+      // O bloqueio deve ocorrer mesmo quando o histórico ainda tem saldo pendente no item.
+      db.prepare('UPDATE emprestimo SET status = ? WHERE id = 1').run(status);
+      const antes = db.serialize();
+
+      assert.throws(
+        () => controller.devolverItem(1, 1, 1),
+        /Apenas empréstimos com status "Pendente" podem receber devoluções\./
+      );
+      assert.deepEqual(db.serialize(), antes);
+    });
+  }
+
+  it('bloqueia cancelamento após a primeira devolução parcial registrada (RN08)', () => {
+    controller.devolverItem(1, 1, 1);
+    assert.equal(controller.buscarPorId(1).status, 'PENDENTE');
+    const antes = db.serialize();
+
+    assert.throws(
+      () => controller.cancelar(1),
+      /Não é possível cancelar um empréstimo com devolução, perda ou avaria registrada\./
+    );
+    assert.deepEqual(db.serialize(), antes);
+  });
+
+  it('permite cancelar um empréstimo pendente sem baixas e repõe todo o estoque (HU20)', () => {
+    assert.equal(controller.cancelar(1).status, 'CANCELADO');
+    assert.equal(controller.buscarPorId(1).status, 'CANCELADO');
+    assert.equal(livroDAO.buscarPorId(1)!.getSaldoDisponivel(), 10);
+    assert.equal(livroDAO.buscarPorId(2)!.getSaldoDisponivel(), 5);
   });
 
   it('Dado um item Pendente, devolução parcial aumenta o saldo proporcionalmente e o restante continua pendente', () => {
@@ -356,6 +410,19 @@ describe('Devolução de item de empréstimo - Banco de Dados e Controller', () 
     const itemNoBanco = emprestimoDAO.buscarItemPorId(1)!;
     assert.equal(itemNoBanco.quantidadeDevolvida, 0);
   });
+
+  it('desfaz a última baixa e a reposição do estoque se a conclusão falhar', () => {
+    controller.devolverItem(1, 1, 4);
+    db.exec(`
+      CREATE TRIGGER simular_erro_conclusao BEFORE UPDATE OF status ON emprestimo
+      WHEN NEW.status = 'CONCLUIDO'
+      BEGIN SELECT RAISE(ABORT, 'Falha simulada na conclusão'); END;
+    `);
+    const antes = db.serialize();
+
+    assert.throws(() => controller.devolverItem(1, 2, 2), /Falha simulada na conclusão/);
+    assert.deepEqual(db.serialize(), antes);
+  });
 });
 
 describe('Devolução de item de empréstimo - Endpoint IPC e Preload', () => {
@@ -472,10 +539,14 @@ describe('Devolução de item de empréstimo - Endpoint IPC e Preload', () => {
     assert.equal(resObjeto.data.quantidadePendente, 0);
     assert.equal(resObjeto.data.status, 'CONCLUIDO');
 
-    // 3. Rejeição com erro amigável quando quantidade excede o pendente
-    const resErroExcede = await devolverHandler({}, 1, 1, { quantidadeDevolvida: 1 });
-    assert.equal(resErroExcede.success, false);
-    assert.match(resErroExcede.error, /Este item já foi totalmente devolvido ou baixado\./);
+    // 3. O status geral é atualizado no canal de detalhes e uma nova devolução é bloqueada.
+    const buscarHandler = handlers.get(modulo.EMPRESTIMO_CHANNELS.BUSCAR_POR_ID)!;
+    const detalhes = await buscarHandler({}, 1);
+    assert.equal(detalhes.success, true);
+    assert.equal(detalhes.data.status, 'CONCLUIDO');
+    const resBloqueio = await devolverHandler({}, 1, 1, { quantidadeDevolvida: 1 });
+    assert.equal(resBloqueio.success, false);
+    assert.equal(resBloqueio.error, 'Apenas empréstimos com status "Pendente" podem receber devoluções.');
 
     // 4. Rejeição com erro amigável para ID inexistente
     const resErroId = await devolverHandler({}, 999, 1, { quantidadeDevolvida: 1 });
