@@ -24,12 +24,17 @@ export default function ListaTurma({
   return (
     <div className="w-full bg-white border border-[#D3E8D6] rounded-2xl overflow-hidden shadow-sm">
       <div className="w-full overflow-x-auto">
-        <table className="w-full text-left border-collapse">
+        <table className="w-full min-w-[560px] text-left border-collapse table-fixed">
+          <colgroup>
+            <col />
+            <col style={{ width: "220px" }} />
+            <col style={{ width: "240px" }} />
+          </colgroup>
           <thead>
             <tr className="bg-[#ebf5ed] border-b border-[#c8decb] text-sm font-semibold text-[#23582c]">
-              <th className="py-3.5 px-4 sm:px-6">Turma</th>
-              <th className="py-3.5 px-3 text-center w-28 shrink-0">Status</th>
-              <th className="py-3.5 px-4 text-center w-[210px] shrink-0">Ações</th>
+              <th className="py-3.5 px-6 text-left">Nome da turma</th>
+              <th className="py-3.5 px-4 text-center">Status da turma</th>
+              <th className="py-3.5 px-4 text-center">Ações</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[#E6F0E8]">
@@ -46,7 +51,7 @@ export default function ListaTurma({
                     estaExcluindo ? "opacity-0 scale-95" : "opacity-100 scale-100"
                   } ${ativo ? "bg-white" : "bg-[#fcfdfc]"}`}
                 >
-                  <td className="py-3 px-4 sm:px-6">
+                  <td className="py-3 px-6 text-left">
                     <span
                       title={turma.nome}
                       className={`text-sm font-medium whitespace-nowrap ${
@@ -72,7 +77,7 @@ export default function ListaTurma({
                       {ativo ? "Ativo" : "Inativo"}
                     </span>
                   </td>
-                  <td className="py-3 px-4 text-center">
+                  <td className="py-3 px-2 text-center">
                     <div className="flex items-center justify-center gap-2 shrink-0">
                       {ativo ? (
                         <>

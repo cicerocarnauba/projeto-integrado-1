@@ -22,13 +22,19 @@ export default function ListaProfessor({
   return (
     <div className="w-full bg-white border border-[#D3E8D6] rounded-2xl overflow-hidden shadow-sm">
       <div className="w-full overflow-x-auto">
-        <table className="w-full text-left border-collapse">
+        <table className="w-full min-w-[800px] text-left border-collapse table-fixed">
+          <colgroup>
+            <col style={{ width: "35%" }} />
+            <col className="hidden md:table-column" />
+            <col style={{ width: "180px" }} />
+            <col style={{ width: "240px" }} />
+          </colgroup>
           <thead>
             <tr className="bg-[#ebf5ed] border-b border-[#c8decb] text-sm font-semibold text-[#23582c]">
-              <th className="py-3.5 px-4 sm:px-6">Professor</th>
-              <th className="py-3.5 px-3 sm:px-4 hidden md:table-cell">E-mail</th>
-              <th className="py-3.5 px-3 text-center w-28 shrink-0">Status</th>
-              <th className="py-3.5 px-4 text-center w-[210px] shrink-0">Ações</th>
+              <th className="py-3.5 px-6 text-left">Nome do professor</th>
+              <th className="py-3.5 px-4 hidden md:table-cell text-left">E-mail</th>
+              <th className="py-3.5 px-3 text-center">Status do professor</th>
+              <th className="py-3.5 px-4 text-center">Ações</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[#E6F0E8]">
@@ -44,10 +50,10 @@ export default function ListaProfessor({
                     ativo ? "bg-white" : "bg-[#fcfdfc]"
                   }`}
                 >
-                  <td className="py-3 px-4 sm:px-6">
+                  <td className="py-3 px-6 text-left">
                     <span
                       title={`${professor.primeiroNome} ${professor.sobrenome}`}
-                      className={`text-sm font-medium block leading-tight ${
+                      className={`text-sm font-medium block leading-tight truncate max-w-full ${
                         ativo ? "text-gray-900" : "text-gray-500"
                       }`}
                     >
@@ -60,10 +66,10 @@ export default function ListaProfessor({
                       {professor.email}
                     </span>
                   </td>
-                  <td className="py-3 px-3 sm:px-4 hidden md:table-cell">
+                  <td className="py-3 px-4 hidden md:table-cell text-left">
                     <span
                       title={professor.email}
-                      className={`text-sm font-medium block truncate max-w-[200px] lg:max-w-xs ${
+                      className={`text-sm font-medium block truncate max-w-full ${
                         ativo ? "text-gray-900" : "text-gray-500"
                       }`}
                     >
@@ -86,7 +92,7 @@ export default function ListaProfessor({
                       {ativo ? "Ativo" : "Inativo"}
                     </span>
                   </td>
-                  <td className="py-3 px-4 text-center">
+                  <td className="py-3 px-2 text-center">
                     <div className="flex items-center justify-center gap-2 shrink-0">
                       {ativo ? (
                         <>
