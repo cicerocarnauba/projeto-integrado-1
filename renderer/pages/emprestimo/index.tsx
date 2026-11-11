@@ -10,7 +10,7 @@ import ModalConfirmarAcao from "../../components/modal/ModalConfirmacaoEmprestim
 import { Emprestimo } from "../../types/emprestimo";
 import type { ItemEmprestimoConsultaDTO } from "../../../main/entities/ConsultaEmprestimo";
 
-type Aba = "pendentes" | "historico";
+type Aba = "pendentes" | "concluidos" | "cancelados";
 
 const ITENS_POR_PAGINA = 10;
 interface GrupoEmprestimo {
@@ -168,7 +168,9 @@ const filtradosPorAba = emprestimosAgrupados
   .filter(({ emprestimo }) =>
     aba === "pendentes"
       ? emprestimo.status === "PENDENTE"
-      : emprestimo.status !== "PENDENTE"
+      : aba === "concluidos"
+        ? emprestimo.status === "CONCLUIDO"
+        : emprestimo.status === "CANCELADO"
   )
   .filter(({ emprestimo }) => {
     if (!termo) return true;
@@ -206,7 +208,7 @@ const filtradosPorAba = emprestimosAgrupados
 
   const emprestimosExibidos = [...filtradosPorAba].sort((a, b) => {
     if (ordenacao === "recentes") {
-      if (aba === "historico") {
+      if (aba !== "pendentes") {
         const dataA = a.dataDevolucao ? new Date(a.dataDevolucao).getTime() : 0;
         const dataB = b.dataDevolucao ? new Date(b.dataDevolucao).getTime() : 0;
         return dataB - dataA || b.id - a.id;
@@ -240,7 +242,12 @@ const filtradosPorAba = emprestimosAgrupados
         : "text-gray-500 border-transparent hover:text-gray-700"
     }`;
 
-  const nomeAba = aba === "pendentes" ? "pendente" : "concluído ou cancelado";
+  const nomeAba =
+    aba === "pendentes"
+      ? "pendente"
+      : aba === "concluidos"
+        ? "concluído"
+        : "cancelado";
 
   return (
     <div className="flex min-h-screen bg-white">
@@ -264,10 +271,17 @@ const filtradosPorAba = emprestimosAgrupados
           </button>
           <button
             type="button"
-            className={abaClass(aba === "historico")}
-            onClick={() => setAba("historico")}
+            className={abaClass(aba === "concluidos")}
+            onClick={() => setAba("concluidos")}
           >
-            Concluídos e Cancelados
+            Concluídos
+          </button>
+          <button
+            type="button"
+            className={abaClass(aba === "cancelados")}
+            onClick={() => setAba("cancelados")}
+          >
+            Cancelados
           </button>
         </div>
 
@@ -319,8 +333,14 @@ const filtradosPorAba = emprestimosAgrupados
               paginaAtual={paginaAtual}
               totalItens={emprestimosExibidos.length}
               itensPorPagina={ITENS_POR_PAGINA}
-              nomeEntidade={aba === "pendentes" ? "empréstimos pendentes" : "empréstimos"}
-              nomeEntidadeSingular={aba === "pendentes" ? "empréstimo pendente" : "empréstimo"}
+              nomeEntidade={
+                aba === "pendentes"
+                  ? "empréstimos pendentes"
+                  : aba === "concluidos"
+                    ? "empréstimos concluídos"
+                    : "empréstimos cancelados"
+              }
+              nomeEntidadeSingular={`empréstimo ${nomeAba}`}
               aoMudarPagina={setPaginaAtual}
             />
           </div>

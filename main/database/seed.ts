@@ -173,7 +173,7 @@ export function executarSeedSeVazio(db: Database.Database): void {
 
       -- Histórico (IDs 15 e 16)
       INSERT OR IGNORE INTO emprestimo (id, professor_id, turma_id, data_retirada, data_devolucao, status)
-      VALUES (15, 10, 10, '2026-09-25T10:00:00.000Z', NULL, 'CANCELADO');
+      VALUES (15, 10, 10, '2026-09-25T10:00:00.000Z', '2026-09-25T10:15:00.000Z', 'CANCELADO');
       INSERT OR IGNORE INTO emprestimo (id, professor_id, turma_id, data_retirada, data_devolucao, status)
       VALUES (16, 9, 9, '2026-09-28T14:30:00.000Z', '2026-10-04T11:00:00.000Z', 'CONCLUIDO');
 

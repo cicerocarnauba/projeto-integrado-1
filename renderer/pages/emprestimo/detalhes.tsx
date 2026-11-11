@@ -365,7 +365,9 @@ export default function DetalhesEmprestimo() {
                     <span className="flex items-center gap-1.5">
                       <MdCalendarToday size={15} className="text-[#5AA365] shrink-0" />
                       <span>
-                        Retirada:{" "}
+                        {emprestimo.status === "CANCELADO"
+                          ? "Solicitação: "
+                          : "Retirada: "}
                         {formatarData(
                           emprestimo.dataRetirada instanceof Date
                             ? emprestimo.dataRetirada.toISOString()
@@ -378,7 +380,9 @@ export default function DetalhesEmprestimo() {
                       <>
                         <span className="text-[#5AA365] opacity-40">•</span>
                         <span>
-                          Devolução:{" "}
+                          {emprestimo.status === "CANCELADO"
+                            ? "Cancelamento: "
+                            : "Devolução: "}
                           {formatarData(
                             emprestimo.dataDevolucao instanceof Date
                               ? emprestimo.dataDevolucao.toISOString()
