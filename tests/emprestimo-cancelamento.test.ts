@@ -78,6 +78,7 @@ describe('Cancelar empréstimo - PATCH /emprestimos/{id}/cancelar via IPC', () =
         professor_id INTEGER NOT NULL REFERENCES professor(id),
         turma_id INTEGER NOT NULL REFERENCES turma(id),
         data_retirada TEXT NOT NULL,
+        data_devolucao TEXT,
         status TEXT NOT NULL CHECK (status IN ('PENDENTE', 'CONCLUIDO', 'CANCELADO'))
       );
       CREATE TABLE item_emprestimo (

@@ -31,6 +31,7 @@ export interface ItemEmprestimoConsultaDTO {
   livroId: number;
   livroTitulo: string;
   dataRetirada: Date;
+  dataDevolucao: Date | null;
   status: StatusEmprestimo;
   quantidadeRetirada: number;
   quantidadeDevolvida: number;
