@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import { MdAdd } from "react-icons/md";
 import Sidebar from "../../components/Sidebar";
@@ -212,6 +212,14 @@ const filtradosPorAba = emprestimosAgrupados
     return (a.professorNome || "").localeCompare(b.professorNome || "", "pt-BR");
   });
 
+  const totalPendentes = useMemo(
+    () =>
+      emprestimosAgrupados.filter(
+        ({ emprestimo }) => emprestimo.status === "PENDENTE"
+      ).length,
+    [emprestimosAgrupados]
+  );
+
   const totalPaginas = Math.max(
     1,
     Math.ceil(emprestimosExibidos.length / ITENS_POR_PAGINA)
@@ -230,7 +238,7 @@ const filtradosPorAba = emprestimosAgrupados
   );
 
   const abaClass = (ativa: boolean) =>
-    `pb-3 px-1 text-sm font-semibold border-b-2 transition-colors cursor-pointer ${
+    `pb-3 px-1 text-sm font-semibold border-b-2 transition-colors cursor-pointer flex items-center gap-2 ${
       ativa
         ? "text-[#389348] border-[#389348]"
         : "text-gray-500 border-transparent hover:text-gray-700"
@@ -261,21 +269,32 @@ const filtradosPorAba = emprestimosAgrupados
             className={abaClass(aba === "pendentes")}
             onClick={() => setAba("pendentes")}
           >
-            Empréstimos Pendentes
+            <span>Empréstimos Pendentes</span>
+            {totalPendentes > 0 && (
+              <span
+                className={`inline-flex items-center justify-center text-xs font-bold px-2 py-0.5 rounded-full ${
+                  aba === "pendentes"
+                    ? "bg-[#389348] text-white"
+                    : "bg-gray-100 text-gray-600"
+                }`}
+              >
+                {totalPendentes}
+              </span>
+            )}
           </button>
           <button
             type="button"
             className={abaClass(aba === "concluidos")}
             onClick={() => setAba("concluidos")}
           >
-            Concluídos
+            Empréstimos Concluídos
           </button>
           <button
             type="button"
             className={abaClass(aba === "cancelados")}
             onClick={() => setAba("cancelados")}
           >
-            Cancelados
+            Empréstimos Cancelados
           </button>
         </div>
 
