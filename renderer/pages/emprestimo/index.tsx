@@ -117,6 +117,7 @@ const gruposPorEmprestimo = lista.reduce<Map<number, GrupoEmprestimo>>(
           quantidadeExemplares: 0,
           status: item.status,
           dataDevolucao: null,
+          possuiDevolucao: false,
         },
         itens: [],
       };
@@ -125,6 +126,11 @@ const gruposPorEmprestimo = lista.reduce<Map<number, GrupoEmprestimo>>(
     }
 
     grupo.emprestimo.quantidadeExemplares += item.quantidadeRetirada;
+
+    if ((item.quantidadeDevolvida ?? 0) > 0) {
+      grupo.emprestimo.possuiDevolucao = true;
+    }
+
     grupo.itens.push(item);
 
     return grupos;
