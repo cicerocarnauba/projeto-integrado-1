@@ -116,8 +116,6 @@ const gruposPorEmprestimo = lista.reduce<Map<number, GrupoEmprestimo>>(
           dataRetirada: new Date(item.dataRetirada).toISOString(),
           quantidadeExemplares: 0,
           status: item.status,
-          // dataDevolucao: null,
-          possuiDevolucao: false,
           dataDevolucao: item.dataDevolucao,
         },
         itens: [],
@@ -127,10 +125,6 @@ const gruposPorEmprestimo = lista.reduce<Map<number, GrupoEmprestimo>>(
     }
 
     grupo.emprestimo.quantidadeExemplares += item.quantidadeRetirada;
-
-    if ((item.quantidadeDevolvida ?? 0) > 0) {
-      grupo.emprestimo.possuiDevolucao = true;
-    }
 
     grupo.itens.push(item);
 

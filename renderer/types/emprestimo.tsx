@@ -9,7 +9,6 @@ export interface Emprestimo {
   dataDevolucao?: Date | string | null;
   quantidadeExemplares: number;
   status: StatusEmprestimo;
-  possuiDevolucao?: boolean;
 }
 
 export interface ItemEmprestimo {

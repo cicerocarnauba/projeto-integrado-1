@@ -142,15 +142,17 @@ export default function ListaEmprestimo({
                     {!historico && (
                       <button
                         type="button"
-                        disabled={e.possuiDevolucao}
+                        disabled={emprestimosComBaixas.has(e.id) || e.status !== "PENDENTE"}
                         title={
-                          e.possuiDevolucao
-                            ? "Não é possível cancelar: já há exemplares devolvidos"
-                            : undefined
+                          emprestimosComBaixas.has(e.id)
+                            ? "Não é possível cancelar: já há baixas registradas neste empréstimo"
+                            : e.status !== "PENDENTE"
+                              ? "Apenas empréstimos pendentes podem ser cancelados"
+                              : undefined
                         }
                         onClick={() => onCancelar?.(e)}
                         className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg font-medium shrink-0 transition-colors ${
-                          e.possuiDevolucao
+                          emprestimosComBaixas.has(e.id) || e.status !== "PENDENTE"
                             ? "bg-gray-200 text-gray-400 cursor-not-allowed"
                             : "bg-[#dc3b3b] text-white hover:bg-[#c42e2e] cursor-pointer"
                         }`}
