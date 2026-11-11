@@ -218,6 +218,30 @@ describe('Devolução de item de empréstimo - Banco de Dados e Controller', () 
     assert.equal(livroDAO.buscarPorId(2)!.getSaldoDisponivel(), 5);
   });
 
+  it('grava a data da devolução mais recente e preserva a data quando uma devolução é rejeitada', (t) => {
+    const primeiraDevolucao = new Date('2026-11-09T14:30:00.000Z');
+    const ultimaDevolucao = new Date('2026-11-10T15:45:00.000Z');
+    t.mock.timers.enable({ apis: ['Date'], now: primeiraDevolucao });
+
+    assert.equal(controller.buscarPorId(1).dataDevolucao, null);
+    controller.devolverItem(1, 1, 4);
+    assert.deepEqual(controller.buscarPorId(1).dataDevolucao, primeiraDevolucao);
+    assert.equal(controller.buscarPorId(1).status, 'PENDENTE');
+
+    t.mock.timers.setTime(ultimaDevolucao.getTime());
+    assert.throws(() => controller.devolverItem(1, 2, 3), /maior que a quantidade pendente/);
+    assert.deepEqual(controller.buscarPorId(1).dataDevolucao, primeiraDevolucao);
+
+    controller.devolverItem(1, 2, 2);
+    assert.deepEqual(controller.buscarPorId(1).dataDevolucao, ultimaDevolucao);
+    assert.equal(controller.buscarPorId(1).status, 'CONCLUIDO');
+    const itensConcluidos = controller.consultar({ status: 'CONCLUIDO' });
+    assert.equal(itensConcluidos.length, 2);
+    for (const item of itensConcluidos) {
+      assert.deepEqual(item.dataDevolucao, ultimaDevolucao);
+    }
+  });
+
   for (const status of ['CONCLUIDO', 'CANCELADO'] as const) {
     it(`bloqueia devolução em empréstimo ${status} sem alterar o banco`, () => {
       // O bloqueio deve ocorrer mesmo quando o histórico ainda tem saldo pendente no item.
@@ -411,8 +435,11 @@ describe('Devolução de item de empréstimo - Banco de Dados e Controller', () 
     assert.equal(itemNoBanco.quantidadeDevolvida, 0);
   });
 
-  it('desfaz a última baixa e a reposição do estoque se a conclusão falhar', () => {
+  it('preserva a data anterior e desfaz a última baixa e a reposição do estoque se a conclusão falhar', (t) => {
+    const primeiraDevolucao = new Date('2026-11-09T14:30:00.000Z');
+    t.mock.timers.enable({ apis: ['Date'], now: primeiraDevolucao });
     controller.devolverItem(1, 1, 4);
+    t.mock.timers.tick(60_000);
     db.exec(`
       CREATE TRIGGER simular_erro_conclusao BEFORE UPDATE OF status ON emprestimo
       WHEN NEW.status = 'CONCLUIDO'
@@ -421,6 +448,7 @@ describe('Devolução de item de empréstimo - Banco de Dados e Controller', () 
     const antes = db.serialize();
 
     assert.throws(() => controller.devolverItem(1, 2, 2), /Falha simulada na conclusão/);
+    assert.deepEqual(controller.buscarPorId(1).dataDevolucao, primeiraDevolucao);
     assert.deepEqual(db.serialize(), antes);
   });
 });

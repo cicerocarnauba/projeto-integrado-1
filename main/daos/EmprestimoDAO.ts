@@ -69,7 +69,7 @@ export class EmprestimoDAO {
         TRIM(p.primeiro_nome) || ' ' || TRIM(p.sobrenome) AS professorNome,
         e.turma_id AS turmaId, t.nome AS turmaNome,
         i.livro_id AS livroId, l.titulo AS livroTitulo,
-        e.data_retirada AS dataRetirada, e.status,
+        e.data_retirada AS dataRetirada, e.data_devolucao AS dataDevolucao, e.status,
         i.quantidade_retirada AS quantidadeRetirada,
         i.quantidade_devolvida AS quantidadeDevolvida,
         i.quantidade_perdida AS quantidadePerdida,
@@ -102,9 +102,16 @@ export class EmprestimoDAO {
 
     sql += ` ORDER BY e.data_retirada DESC, e.id DESC, i.id ASC`;
     const rows = this.db.prepare(sql).all(...params) as Array<
-      Omit<ItemEmprestimoConsultaDTO, 'dataRetirada'> & { dataRetirada: string }
+      Omit<ItemEmprestimoConsultaDTO, 'dataRetirada' | 'dataDevolucao'> & {
+        dataRetirada: string;
+        dataDevolucao: string | null;
+      }
     >;
-    return rows.map((row) => ({ ...row, dataRetirada: new Date(row.dataRetirada) }));
+    return rows.map((row) => ({
+      ...row,
+      dataRetirada: new Date(row.dataRetirada),
+      dataDevolucao: row.dataDevolucao ? new Date(row.dataDevolucao) : null,
+    }));
   }
 
   /**
@@ -340,9 +347,9 @@ export class EmprestimoDAO {
 
       atualizarSaldoLivro(item.livroId, quantidadeDevolvida);
 
-      if (emprestimo.status === 'CONCLUIDO') {
-        this.db.prepare(`UPDATE emprestimo SET status = 'CONCLUIDO' WHERE id = ?`).run(emprestimoId);
-      }
+      this.db
+        .prepare(`UPDATE emprestimo SET data_devolucao = ?, status = ? WHERE id = ?`)
+        .run(new Date().toISOString(), emprestimo.status, emprestimoId);
 
       return item;
     });

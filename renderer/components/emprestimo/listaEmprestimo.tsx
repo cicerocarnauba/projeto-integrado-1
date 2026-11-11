@@ -3,6 +3,7 @@ import { Emprestimo, StatusEmprestimo } from "../../types/emprestimo";
 
 interface ListaEmprestimoProps {
   emprestimos: Emprestimo[];
+  emprestimosComBaixas: ReadonlySet<number>;
   modo: "pendentes" | "historico";
   onVerDetalhes?: (emprestimo: Emprestimo) => void;
   onCancelar?: (emprestimo: Emprestimo) => void;
@@ -43,6 +44,7 @@ export function StatusBadge({ status }: { status: StatusEmprestimo }) {
 
 export default function ListaEmprestimo({
   emprestimos,
+  emprestimosComBaixas,
   modo,
   onVerDetalhes,
   onCancelar,
