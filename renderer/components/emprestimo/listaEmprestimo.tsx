@@ -137,9 +137,18 @@ export default function ListaEmprestimo({
                     {!historico && (
                       <button
                         type="button"
-                        disabled={e.status !== "PENDENTE" || emprestimosComBaixas.has(e.id)}
+                        disabled={e.possuiDevolucao}
+                        title={
+                          e.possuiDevolucao
+                            ? "Não é possível cancelar: já há exemplares devolvidos"
+                            : undefined
+                        }
                         onClick={() => onCancelar?.(e)}
-                        className="flex items-center gap-1.5 bg-[#dc3b3b] text-white px-3 py-1.5 text-xs rounded-lg font-medium enabled:hover:bg-[#c42e2e] transition-colors cursor-pointer shrink-0 disabled:bg-gray-200 disabled:text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg font-medium shrink-0 transition-colors ${
+                          e.possuiDevolucao
+                            ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                            : "bg-[#dc3b3b] text-white hover:bg-[#c42e2e] cursor-pointer"
+                        }`}
                       >
                         <MdClose size={15} />
                         Cancelar

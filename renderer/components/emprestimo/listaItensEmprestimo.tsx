@@ -96,7 +96,9 @@ export default function ListaItensEmprestimo({
               const devolvida = item.quantidadeDevolvida ?? 0;
 
               // Só itens pendentes podem ser devolvidos / ter avaria registrada
-              const acoesDesabilitadas = statusEfetivo !== "PENDENTE";
+              const emprestimoFinalizado = statusEmprestimo !== undefined && statusEmprestimo !== "PENDENTE";
+
+              const acoesDesabilitadas = emprestimoFinalizado || statusEfetivo !== "PENDENTE";
 
               // Devolver também fica bloqueado se não sobrou nada pendente
               const devolverDesabilitado = acoesDesabilitadas || pendente === 0;
