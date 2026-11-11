@@ -245,6 +245,14 @@ export default function FormRealizarEmprestimo() {
     }
   }
 
+  function tentarCancelar() {
+    if (itens.length > 0) {
+      setModalCancelar(true);
+    } else {
+      cancelar();
+    }
+  }
+
   function cancelar() {
     router.push("/emprestimo");
   }
@@ -493,7 +501,7 @@ export default function FormRealizarEmprestimo() {
       <div className="flex justify-end items-center gap-3 mt-6">
         <button
           type="button"
-          onClick={() => setModalCancelar(true)}
+          onClick={tentarCancelar}
           disabled={salvando}
           className="flex items-center gap-1.5 px-6 py-2.5 rounded-xl text-sm font-medium text-white bg-[#cf4a4a] hover:bg-red-600 transition-colors shadow-xs active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
