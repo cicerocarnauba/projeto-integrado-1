@@ -16,6 +16,7 @@ import ModalDevolverExemplares from "../../components/modal/modalDevolverExempla
 import { formatarData } from "../../components/emprestimo/listaEmprestimo";
 import { EmprestimoDetalhe, ItemEmprestimo } from "../../types/emprestimo";
 import { calcularPendente } from "../../utils/emprestimoItem";
+import ModalDevolverTodos from "../../components/modal/modalDevolverTodosEmprestimo";
 
 const ITENS_POR_PAGINA = 10;
 
@@ -40,6 +41,10 @@ export default function DetalhesEmprestimo() {
     useState<ItemEmprestimo | null>(null);
   const [salvandoDevolucao, setSalvandoDevolucao] = useState(false);
   const [erroDevolucao, setErroDevolucao] = useState("");
+
+  const [modalDevolverTodosAberto, setModalDevolverTodosAberto] = useState(false);
+  const [salvandoDevolverTodos, setSalvandoDevolverTodos] = useState(false);
+  const [erroDevolverTodos, setErroDevolverTodos] = useState("");
 
   const fecharFeedback = useCallback(() => setFeedback(""), []);
   const fecharErro = useCallback(() => setErro(""), []);
@@ -108,6 +113,106 @@ export default function DetalhesEmprestimo() {
     setItemParaDevolver(null);
   }
 
+  async function recarregarEmprestimo(idEmprestimo: number, mensagemPadrao: string) {
+    const atualizado = await window.ipc.emprestimo.buscarPorId(idEmprestimo);
+
+    if (atualizado?.success && atualizado.data) {
+      setEmprestimo(atualizado.data);
+      setFeedback(
+        atualizado.data.status === "CONCLUIDO"
+          ? "Todos os exemplares foram devolvidos. Empréstimo concluído e movido para o histórico!"
+          : mensagemPadrao
+      );
+    } else {
+      setErro(
+        "Devolução registrada, mas não foi possível atualizar a tela. Recarregue a página."
+      );
+    }
+  }
+
+  function abrirDevolverTodos() {
+    setErroDevolverTodos("");
+    setModalDevolverTodosAberto(true);
+  }
+
+  function fecharDevolverTodos() {
+    if (salvandoDevolverTodos) return;
+    setModalDevolverTodosAberto(false);
+  }
+
+  async function confirmarDevolverTodos() {
+    if (!emprestimo) return;
+
+    setErroDevolverTodos("");
+    setSalvandoDevolverTodos(true);
+
+    try {
+      const pendentes = (emprestimo.itens ?? []).filter(
+        (item) => item.status === "PENDENTE" && calcularPendente(item) > 0
+      );
+
+      // Sequencial (e não Promise.all) para evitar condição de corrida
+      // na conclusão automática do empréstimo no back.
+      for (const item of pendentes) {
+        const resposta = await window.ipc.emprestimo.devolverItem(
+          emprestimo.id,
+          item.id,
+          { quantidadeDevolvida: calcularPendente(item) }
+        );
+
+        if (!resposta?.success) {
+          // Atualiza a tela para refletir o que já foi devolvido antes da falha
+          await recarregarEmprestimo(emprestimo.id, "Devolução parcial realizada.");
+          setErroDevolverTodos(
+            `Falha ao devolver "${item.livroTitulo}": ${
+              resposta?.error || "erro desconhecido"
+            }`
+          );
+          return;
+        }
+      }
+
+      setModalDevolverTodosAberto(false);
+      await recarregarEmprestimo(
+        emprestimo.id,
+        "Todos os exemplares devolvidos com sucesso!"
+      );
+    } catch (error) {
+      console.error("Erro ao devolver todos:", error);
+      setErroDevolverTodos(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível devolver os exemplares."
+      );
+    } finally {
+      setSalvandoDevolverTodos(false);
+    }
+    //   const resposta = await window.ipc.emprestimo.devolverTodos(emprestimo.id);
+
+    //   if (!resposta?.success) {
+    //     setErroDevolverTodos(
+    //       resposta?.error || "Não foi possível devolver os exemplares."
+    //     );
+    //     return;
+    //   }
+
+    //   setModalDevolverTodosAberto(false);
+    //   await recarregarEmprestimo(
+    //     emprestimo.id,
+    //     "Todos os exemplares devolvidos com sucesso!"
+    //   );
+    // } catch (error) {
+    //   console.error("Erro ao devolver todos:", error);
+    //   setErroDevolverTodos(
+    //     error instanceof Error
+    //       ? error.message
+    //       : "Não foi possível devolver os exemplares."
+    //   );
+    // } finally {
+    //   setSalvandoDevolverTodos(false);
+    // }
+  }
+
   async function confirmarDevolucao(quantidade: number) {
     if (!itemParaDevolver || !emprestimo) return;
 
@@ -133,23 +238,15 @@ export default function DetalhesEmprestimo() {
       const devolucaoTotal = resposta.data?.quantidadePendente === 0;
 
       setItemParaDevolver(null);
-      setFeedback(
-        devolucaoTotal
-          ? "Devolução total do item registrada com sucesso!"
-          : "Devolução parcial registrada com sucesso!"
-      );
+      setItemParaDevolver(null);
 
-      // Recarrega o empréstimo sem trocar a tela por "Carregando...",
-      // para atualizar itens, contador de pendentes e status do empréstimo.
-      const atualizado = await window.ipc.emprestimo.buscarPorId(emprestimo.id);
+    await recarregarEmprestimo(
+      emprestimo.id,
+      devolucaoTotal
+        ? "Devolução total do item registrada com sucesso!"
+        : "Devolução parcial registrada com sucesso!"
+    );
 
-      if (atualizado?.success && atualizado.data) {
-        setEmprestimo(atualizado.data);
-      } else {
-        setErro(
-          "Devolução registrada, mas não foi possível atualizar a tela. Recarregue a página."
-        );
-      }
     } catch (error) {
       console.error("Erro ao registrar devolução:", error);
       setErroDevolucao(
@@ -327,11 +424,12 @@ export default function DetalhesEmprestimo() {
               <button
                 type="button"
                 disabled={devolverTodosDesabilitado}
+                onClick={abrirDevolverTodos}
                 className={`h-11 px-6 flex items-center justify-center rounded-xl font-medium text-sm whitespace-nowrap gap-2 shrink-0 ${
-                  devolverTodosDesabilitado
-                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                    : "bg-[#2e8b45] text-white shadow-sm"
-                }`}
+                            devolverTodosDesabilitado
+                              ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                              : "bg-[#2e8b45] text-white shadow-sm hover:bg-[#236c35] cursor-pointer"
+                          }`}
               >
                 <MdUndo size={18} />
                 Devolver todos
@@ -378,6 +476,14 @@ export default function DetalhesEmprestimo() {
           erroExterno={erroDevolucao}
           onCancelar={fecharDevolucao}
           onConfirmar={confirmarDevolucao}
+        />
+        
+        <ModalDevolverTodos
+          aberto={modalDevolverTodosAberto}
+          salvando={salvandoDevolverTodos}
+          erro={erroDevolverTodos}
+          onCancelar={fecharDevolverTodos}
+          onConfirmar={confirmarDevolverTodos}
         />
       </main>
     </div>
