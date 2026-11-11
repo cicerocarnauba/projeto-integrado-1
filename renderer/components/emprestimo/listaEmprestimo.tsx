@@ -55,24 +55,35 @@ export default function ListaEmprestimo({
   return (
     <div className="w-full bg-white border border-[#D3E8D6] rounded-2xl overflow-hidden shadow-sm">
       <div className="w-full overflow-x-auto">
-        <table className="w-full text-left border-collapse">
+        <table className="w-full min-w-[900px] table-fixed text-left border-collapse">
+          <colgroup>
+            {/* Grade idêntica nas 3 abas: nada "pula" ao trocar de aba.
+                Em "Pendentes" a coluna de data ocupa o espaço das duas datas (colSpan=2). */}
+            <col />
+            <col className="hidden md:table-column" style={{ width: "15%" }} />
+            <col className="hidden lg:table-column" style={{ width: "12.5%" }} />
+            <col className="hidden lg:table-column" style={{ width: "12.5%" }} />
+            <col style={{ width: "13%" }} />
+            <col style={{ width: "13%" }} />
+            <col style={{ width: "240px" }} />
+          </colgroup>
           <thead>
             <tr className="bg-[#ebf5ed] border-b border-[#c8decb] text-sm font-semibold text-[#23582c]">
-              <th className="py-3.5 px-4 sm:px-6">Professor responsável</th>
-              <th className="py-3.5 px-3 hidden md:table-cell">Turma</th>
-              <th className="py-3.5 px-3 hidden lg:table-cell">
+              <th className="py-3.5 px-3 text-center">Professor responsável</th>
+              <th className="py-3.5 px-3 hidden md:table-cell text-center">Turma</th>
+              <th colSpan={historico ? 1 : 2} className="py-3.5 px-3 hidden lg:table-cell whitespace-nowrap text-center">
                 {cancelado ? "Data solicitação" : "Data retirada"}
               </th>
               {historico && (
-                <th className="py-3.5 px-3 hidden lg:table-cell">
+                <th className="py-3.5 px-3 hidden lg:table-cell whitespace-nowrap text-center">
                   {cancelado ? "Data cancelamento" : "Data devolução"}
                 </th>
               )}
               <th className="py-3.5 px-3 text-center">Exemplares emprestados</th>
-              <th className="py-3.5 px-3 text-center w-32">
-                {historico ? "Status" : "Status do empréstimo"}
+              <th className="py-3.5 px-3 text-center">
+                Status do empréstimo
               </th>
-              <th className={`py-3.5 px-4 text-center ${historico ? "w-[150px]" : "w-[250px]"}`}>
+              <th className="py-3.5 px-3 text-center">
                 Ações
               </th>
             </tr>
@@ -82,7 +93,7 @@ export default function ListaEmprestimo({
             {emprestimos.length === 0 && (
               <tr>
                 <td
-                  colSpan={historico ? 7 : 6}
+                  colSpan={7}
                   className="py-10 text-center text-sm text-gray-500"
                 >
                   {historico
@@ -94,7 +105,7 @@ export default function ListaEmprestimo({
 
             {emprestimos.map((e) => (
               <tr key={e.id} className="transition-colors hover:bg-[#f6fbf7]">
-                <td className="py-3 px-4 sm:px-6">
+                <td className="py-3 px-3 text-center">
                   <span className="text-sm font-medium text-gray-900 block">
                     {e.professorNome}
                   </span>
@@ -102,10 +113,10 @@ export default function ListaEmprestimo({
                     {e.turmaNome}
                   </span>
                 </td>
-                <td className="py-3 px-3 hidden md:table-cell text-sm text-gray-700">
+                <td className="py-3 px-3 hidden md:table-cell text-sm text-gray-700 text-center">
                   {e.turmaNome}
                 </td>
-                <td className="py-3 px-3 hidden lg:table-cell text-sm text-gray-700 tabular-nums">
+                <td colSpan={historico ? 1 : 2} className="py-3 px-3 hidden lg:table-cell text-sm text-gray-700 tabular-nums whitespace-nowrap text-center">
                   {formatarData(  
                       e.dataRetirada instanceof Date
                       ? e.dataRetirada.toISOString()
@@ -113,7 +124,7 @@ export default function ListaEmprestimo({
                     )}
                 </td>
                 {historico && (
-                  <td className="py-3 px-3 hidden lg:table-cell text-sm text-gray-700 tabular-nums">
+                  <td className="py-3 px-3 hidden lg:table-cell text-sm text-gray-700 tabular-nums whitespace-nowrap text-center">
                     {formatarData(  
                       e.dataDevolucao instanceof Date
                       ? e.dataDevolucao.toISOString()
@@ -121,14 +132,14 @@ export default function ListaEmprestimo({
                     )}
                   </td>
                 )}
-                <td className="py-3 px-3 text-center text-sm font-medium text-gray-900">
+                <td className="py-3 px-3 text-sm font-medium text-gray-900 text-center">
                   {e.quantidadeExemplares}{" "}
                   {e.quantidadeExemplares === 1 ? "exemplar" : "exemplares"}
                 </td>
-                <td className="py-3 px-3 text-center">
+                <td className="py-3 px-3 whitespace-nowrap text-center">
                   <StatusBadge status={e.status} />
                 </td>
-                <td className="py-3 px-4">
+                <td className="py-3 px-2">
                   <div className="flex items-center justify-center gap-2">
                     <button
                       type="button"

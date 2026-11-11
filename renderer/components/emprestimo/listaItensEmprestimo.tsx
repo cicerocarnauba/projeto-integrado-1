@@ -73,13 +73,13 @@ export default function ListaItensEmprestimo({
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-[#ebf5ed] border-b border-[#c8decb] text-sm font-semibold text-[#23582c]">
-              <th className="py-3.5 px-4 sm:px-6">Título</th>
-              <th className="py-3.5 px-3 hidden md:table-cell">Editora</th>
-              <th className="py-3.5 px-3 text-center">
+              <th className="py-3.5 px-4 text-center">Título</th>
+              <th className="py-3.5 px-4 hidden md:table-cell text-center">Editora</th>
+              <th className="py-3.5 px-4 text-center">
                 Exemplares emprestados
               </th>
-              <th className="py-3.5 px-3 text-center">Status do livro</th>
-              <th className="py-3.5 px-3 text-center">Avaria</th>
+              <th className="py-3.5 px-4 text-center">Status do livro</th>
+              <th className="py-3.5 px-4 text-center">Avaria</th>
               <th className="py-3.5 px-4 text-center w-[270px]">Ações</th>
             </tr>
           </thead>
@@ -108,15 +108,15 @@ export default function ListaItensEmprestimo({
                   key={item.id}
                   className="transition-colors hover:bg-[#f6fbf7]"
                 >
-                  <td className="py-3 px-4 sm:px-6 text-sm font-medium text-gray-900 max-w-[200px]">
+                  <td className="py-3 px-4 text-center text-sm font-medium text-gray-900 max-w-[200px]">
                     {item.livroTitulo}
                   </td>
 
-                  <td className="py-3 px-3 hidden md:table-cell text-sm text-gray-700">
+                  <td className="py-3 px-4 hidden md:table-cell text-center text-sm text-gray-700">
                     {item.editora}
                   </td>
 
-                  <td className="py-3 px-3 text-center text-sm font-medium text-gray-900">
+                  <td className="py-3 px-4 text-center text-sm font-medium text-gray-900">
                     {item.quantidadeEmprestada}{" "}
                     {item.quantidadeEmprestada === 1
                       ? "exemplar"
@@ -132,7 +132,7 @@ export default function ListaItensEmprestimo({
                     )}
                   </td>
 
-                  <td className="py-3 px-3 text-center">
+                  <td className="py-3 px-4 text-center">
                     <span
                       className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-semibold text-xs border ${estilo.badge}`}
                     >
@@ -141,7 +141,7 @@ export default function ListaItensEmprestimo({
                     </span>
                   </td>
 
-                  <td className="py-3 px-3 text-center">
+                  <td className="py-3 px-4 text-center">
                     <AvariaBadges item={item} />
                   </td>
 
