@@ -1,0 +1,21 @@
+appId: com.crechemariadelourdes.biblioteca
+productName: LivroCMEI
+directories:
+  output: dist
+  buildResources: resources
+files:
+  - from: .
+    filter:
+      - package.json
+      - app
+linux:
+  maintainer: contato@crechemariadelourdes.com
+  target:
+    - AppImage
+    - deb
+win:
+  target:
+    - nsis
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true

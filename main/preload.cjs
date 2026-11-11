@@ -1,0 +1,43 @@
+// main/preload.cjs
+const { contextBridge, ipcRenderer } = require('electron');
+
+contextBridge.exposeInMainWorld('ipc', {
+  professor: {
+    cadastrar: (input) => ipcRenderer.invoke('professor:cadastrar', input),
+    consultar: (input) => ipcRenderer.invoke('professor:consultar', input),
+    buscarPorId: (id) => ipcRenderer.invoke('professor:buscarPorId', id),
+    excluir: (id) => ipcRenderer.invoke('professor:excluir', id),
+    editar: (input) => ipcRenderer.invoke('professor:editar', input),
+    reativar: (id) => ipcRenderer.invoke('professor:reativar', id),
+    desativar: (id) => ipcRenderer.invoke('professor:desativar', id),
+  },
+  turma: {
+    cadastrar: (input) => ipcRenderer.invoke('turma:cadastrar', input),
+    consultar: (input) => ipcRenderer.invoke('turma:consultar', input),
+    buscarPorId: (id) => ipcRenderer.invoke('turma:buscarPorId', id),
+    ativar: (id) => ipcRenderer.invoke('turma:ativar', id),
+    editar: (input) => ipcRenderer.invoke('turma:editar', input),
+    desativar: (id) => ipcRenderer.invoke('turma:desativar', id),
+    excluir: (id) => ipcRenderer.invoke('turma:excluir', id),
+  },
+  livro: {
+    cadastrar: (input) => ipcRenderer.invoke('livro:cadastrar', input),
+    consultar: (input) => ipcRenderer.invoke('livro:consultar', input),
+    editar: (id, input) => ipcRenderer.invoke('livro:editar', id, input),
+    excluir: (id) => ipcRenderer.invoke('livro:excluir', id),
+    desativar: (id) => ipcRenderer.invoke('livro:desativar', id),
+    ativar: (id, quantidadeTotal) => ipcRenderer.invoke('livro:ativar', id, quantidadeTotal),
+  },
+  emprestimo: {
+    cancelar: (id) => ipcRenderer.invoke('emprestimo:cancelar', id),
+    // input opcional: { professorId?, turmaId?, livroId?, status? }. IDs são números;
+    // consulte renderer/types/global.d.ts para valores de status e exemplos de uso.
+    consultar: (input) => ipcRenderer.invoke('emprestimo:consultar', input),
+    buscarPorId: (id) => ipcRenderer.invoke('emprestimo:buscarPorId', id),
+    realizar: (input) => ipcRenderer.invoke('emprestimo:realizar', input),
+    devolverItem: (emprestimoId, itemId, input) =>
+      ipcRenderer.invoke('emprestimo:devolverItem', emprestimoId, itemId, input),
+  },
+});
+
+console.log('[preload] window.ipc exposto (professor + turma + livro)');

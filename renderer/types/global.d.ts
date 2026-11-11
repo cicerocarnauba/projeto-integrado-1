@@ -1,0 +1,357 @@
+import type {
+  ConsultarEmprestimoInput,
+  ItemEmprestimoConsultaDTO,
+  EmprestimoDetalhesDTO,
+  RegistrarDevolucaoItemInput,
+  ItemDevolucaoResultadoDTO,
+} from '../../main/entities/ConsultaEmprestimo';
+
+declare global {
+  interface Window {
+    ipc: {
+      professor: {
+        cadastrar: (input: {
+          primeiroNome: string;
+          sobrenome: string;
+          email: string;
+        }) => Promise<{
+          success: boolean;
+          data?: any;
+          error?: string;
+        }>;
+
+        consultar: (input?: {
+          nome?: string;
+          email?: string;
+          incluirInativos?: boolean;
+        }) => Promise<{
+          success: boolean;
+          data?: any[];
+          error?: string;
+        }>;
+
+        buscarPorId: (id: number) => Promise<{
+          success: boolean;
+          data?: any;
+          error?: string;
+        }>;
+
+        excluir: (id: number) => Promise<{
+          success: boolean;
+          data?: any;
+          error?: string;
+        }>;
+
+        editar: (input: {
+          id: number;
+          primeiroNome: string;
+          sobrenome: string;
+          email: string;
+        }) => Promise<{
+          success: boolean;
+          data?: any;
+          error?: string;
+        }>;
+
+        reativar: (id: number) => Promise<{
+          success: boolean;
+          data?: any;
+          error?: string;
+        }>;
+
+        desativar: (id: number) => Promise<{
+          success: boolean;
+          data?: any;
+          error?: string;
+        }>;
+      };
+
+      turma: {
+        cadastrar: (input: {
+          nome: string;
+        }) => Promise<{
+          success: boolean;
+          data?: any;
+          error?: string;
+        }>;
+
+        consultar: (input?: {
+          nome?: string;
+          incluirInativos?: boolean;
+        }) => Promise<{
+          success: boolean;
+          data?: any[];
+          error?: string;
+        }>;
+
+        buscarPorId: (id: number) => Promise<{
+          success: boolean;
+          data?: any;
+          error?: string;
+        }>;
+
+        ativar: (id: number) => Promise<{
+          success: boolean;
+          data?: any;
+          error?: string;
+        }>;
+
+        editar: (input: {
+          id: number;
+          nome: string;
+        }) => Promise<{
+          success: boolean;
+          data?: any;
+          error?: string;
+        }>;
+
+        desativar: (id: number) => Promise<{
+          success: boolean;
+          data?: any;
+          error?: string;
+        }>;
+
+        excluir: (id: number) => Promise<{
+          success: boolean;
+          data?: any;
+          error?: string;
+        }>;
+      };
+
+      livro: {
+        cadastrar: (input: {
+          titulo: string;
+          editora: string;
+          quantidadeTotal: number;
+        }) => Promise<{
+          success: boolean;
+          data?: any;
+          error?: string;
+        }>;
+
+        consultar: (input?: {
+          titulo?: string;
+          editora?: string;
+          termo?: string;
+          incluirInativos?: boolean;
+        }) => Promise<{
+          success: boolean;
+          data?: Array<{
+            id: number | null;
+            titulo: string;
+            editora: string;
+            quantidadeTotal: number;
+            quantidadeEmprestada: number;
+            saldoDisponivel: number;
+            status: 'ATIVO' | 'INATIVO';
+            dataCadastro: Date;
+            dataAtualizacao: Date;
+          }>;
+          error?: string;
+        }>;
+
+        editar: (
+          id: number,
+          input: {
+            titulo: string;
+            editora: string;
+            quantidadeTotal: number;
+          }
+        ) => Promise<{
+          success: boolean;
+          data?: {
+            id: number | null;
+            titulo: string;
+            editora: string;
+            quantidadeTotal: number;
+            quantidadeEmprestada: number;
+            saldoDisponivel: number;
+            status: 'ATIVO' | 'INATIVO';
+            dataCadastro: Date;
+            dataAtualizacao: Date;
+          };
+          error?: string;
+        }>;
+
+        excluir: (id: number) => Promise<{
+          success: boolean;
+          data?: {
+            acao: 'EXCLUIDO' | 'DESATIVADO';
+            mensagem: string;
+            id: number;
+            livro?: {
+              id: number | null;
+              titulo: string;
+              editora: string;
+              quantidadeTotal: number;
+              quantidadeEmprestada: number;
+              saldoDisponivel: number;
+              status: 'ATIVO' | 'INATIVO';
+              dataCadastro: Date;
+              dataAtualizacao: Date;
+            };
+          };
+          error?: string;
+        }>;
+
+        desativar: (id: number) => Promise<{
+          success: boolean;
+          data?: {
+            mensagem: string;
+            livro: {
+              id: number | null;
+              titulo: string;
+              editora: string;
+              quantidadeTotal: number;
+              quantidadeEmprestada: number;
+              saldoDisponivel: number;
+              status: 'ATIVO' | 'INATIVO';
+              dataCadastro: Date;
+              dataAtualizacao: Date;
+            };
+          };
+          error?: string;
+        }>;
+
+        ativar: (
+          id: number,
+          quantidadeTotal: number
+        ) => Promise<{
+          success: boolean;
+          data?: {
+            mensagem: string;
+            livro: {
+              id: number | null;
+              titulo: string;
+              editora: string;
+              quantidadeTotal: number;
+              quantidadeEmprestada: number;
+              saldoDisponivel: number;
+              status: 'ATIVO' | 'INATIVO';
+              dataCadastro: Date;
+              dataAtualizacao: Date;
+            };
+          };
+          error?: string;
+        }>;
+      };
+
+      emprestimo: {
+        /**
+         * Equivalente ao PATCH /emprestimos/{id}/cancelar via IPC.
+         * Permite apenas PENDENTE sem devolução, perda ou avaria, repondo todo o saldo.
+         * Confira success antes de usar data; em falha, error contém a mensagem.
+         * @example await window.ipc.emprestimo.cancelar(1);
+         */
+        cancelar: (id: number) => Promise<{
+          success: boolean;
+          data?: {
+            id: number | null;
+            professorId: number;
+            turmaId: number;
+            dataRetirada: Date;
+            status: 'CANCELADO';
+            itens: Array<{
+              id: number | null;
+              emprestimoId: number | null;
+              livroId: number;
+              quantidadeRetirada: number;
+              quantidadeDevolvida: number;
+              quantidadePerdida: number;
+              quantidadeDanificada: number;
+            }>;
+          };
+          error?: string;
+        }>;
+
+        /**
+         * Consulta uma linha por item de empréstimo, incluindo cadastros associados inativos.
+         * @param input Filtros opcionais: professorId, turmaId e livroId são IDs numéricos
+         * inteiros positivos; status aceita 'PENDENTE', 'CONCLUIDO' ou 'CANCELADO'.
+         * Use qualquer filtro sozinho ou combine vários: todos devem corresponder (AND).
+         * Omita os campos sem filtro; não envie null, string vazia ou IDs como texto.
+         * @returns Em sucesso: { success: true, data: [...] }; sem resultados, data é [].
+         * Em falha: { success: false, error: 'Mensagem' }. Confira success antes de usar data.
+         * @example
+         * // Sem parâmetros: todos os itens, independentemente do status.
+         * await window.ipc.emprestimo.consultar();
+         * @example
+         * // Somente o status; nenhum outro filtro é obrigatório.
+         * await window.ipc.emprestimo.consultar({ status: 'PENDENTE' });
+         * @example
+         * // Filtros combinados. Substitua os IDs pelos existentes no banco.
+         * await window.ipc.emprestimo.consultar({
+         *   professorId: 1, turmaId: 2, livroId: 3, status: 'CONCLUIDO'
+         * });
+         */
+        consultar: (input?: ConsultarEmprestimoInput) => Promise<{
+          success: boolean;
+          data?: ItemEmprestimoConsultaDTO[];
+          error?: string;
+        }>;
+
+        /**
+         * Busca os detalhes completos de um empréstimo pelo seu ID.
+         * Retorna os dados gerais (professorNome, turmaNome, dataRetirada, dataDevolucao, quantidadeExemplares, status)
+         * e a lista de itens com os dados dos livros (livroTitulo, titulo, editora, quantidadeExemplar, quantidadeEmprestada, etc).
+         * @param id ID numérico positivo do empréstimo.
+         * @returns Em sucesso: { success: true, data: EmprestimoDetalhesDTO }.
+         * Em falha: { success: false, error: 'Mensagem' }.
+         * @example await window.ipc.emprestimo.buscarPorId(1);
+         */
+        buscarPorId: (id: number) => Promise<{
+          success: boolean;
+          data?: EmprestimoDetalhesDTO;
+          error?: string;
+        }>;
+
+        realizar: (input: {
+          professorId: number;
+          turmaId: number;
+          itens: Array<{ livroId: number; quantidade: number }>;
+        }) => Promise<{
+          success: boolean;
+          data?: {
+            id: number | null;
+            professorId: number;
+            turmaId: number;
+            dataRetirada: Date;
+            status: 'PENDENTE' | 'CONCLUIDO' | 'CANCELADO';
+            itens: Array<{
+              id: number | null;
+              emprestimoId: number | null;
+              livroId: number;
+              quantidadeRetirada: number;
+              quantidadeDevolvida: number;
+              quantidadePerdida: number;
+              quantidadeDanificada: number;
+            }>;
+          };
+          error?: string;
+        }>;
+
+        /**
+         * Registra a devolução total ou parcial de um item de empréstimo.
+         * Equivalente ao endpoint POST /emprestimos/{id}/itens/{itemId}/devolucao.
+         * Atualiza a quantidade devolvida e repõe o saldo disponível do livro.
+         * @param emprestimoId ID numérico positivo do empréstimo.
+         * @param itemId ID numérico positivo do item do empréstimo.
+         * @param input Objeto { quantidadeDevolvida: number } ou número direto da quantidade devolvida.
+         * @returns Em sucesso: { success: true, data: ItemDevolucaoResultadoDTO }.
+         * Em falha: { success: false, error: 'Mensagem' }.
+         * @example await window.ipc.emprestimo.devolverItem(1, 2, { quantidadeDevolvida: 1 });
+         * @example await window.ipc.emprestimo.devolverItem(1, 2, 1);
+         */
+        devolverItem: (
+          emprestimoId: number,
+          itemId: number,
+          input: RegistrarDevolucaoItemInput | number
+        ) => Promise<{
+          success: boolean;
+          data?: ItemDevolucaoResultadoDTO;
+          error?: string;
+        }>;
+      };
+    };
+  }
+}

@@ -1,0 +1,96 @@
+import { ItemEmprestimo } from './ItemEmprestimo.ts';
+
+export type StatusEmprestimo = 'PENDENTE' | 'CONCLUIDO' | 'CANCELADO';
+
+// Emprestimo — representa o registro geral de uma retirada.
+// Vincula um professor, uma turma, a data e uma lista de itens.
+export class Emprestimo {
+  id: number | null;
+  professorId: number;
+  turmaId: number;
+  dataRetirada: Date;
+  status: StatusEmprestimo;
+  itens: ItemEmprestimo[];
+
+  constructor(props: {
+    id?: number | null;
+    professorId: number;
+    turmaId: number;
+    dataRetirada?: Date;
+    status?: StatusEmprestimo;
+    itens?: ItemEmprestimo[];
+  }) {
+    this.id = props.id ?? null;
+    this.professorId = props.professorId;
+    this.turmaId = props.turmaId;
+    this.dataRetirada = props.dataRetirada ?? new Date();
+    this.status = props.status ?? 'PENDENTE';
+    this.itens = props.itens ?? [];
+  }
+
+  /**
+   * HU19 — Criação de novo empréstimo no sistema.
+   * A data do empréstimo é SEMPRE a data atual do sistema (não editável).
+   * O status inicial é SEMPRE "PENDENTE".
+   */
+  public static criarNovo(props: {
+    professorId: number;
+    turmaId: number;
+    itens: ItemEmprestimo[];
+  }): Emprestimo {
+    return new Emprestimo({
+      professorId: props.professorId,
+      turmaId: props.turmaId,
+      dataRetirada: new Date(),
+      status: 'PENDENTE',
+      itens: props.itens,
+    });
+  }
+
+  public getTotalPendente(): number {
+    return this.itens.reduce((acc, item) => acc + item.getQuantidadePendente(), 0);
+  }
+
+  public isTotalmenteConcluido(): boolean {
+    return this.itens.every((item) => item.isTotalmenteBaixado());
+  }
+
+  public recalcularStatus(): void {
+    if (this.status === 'CANCELADO') return;
+    this.status = this.isTotalmenteConcluido() ? 'CONCLUIDO' : 'PENDENTE';
+  }
+
+  public devolverItem(itemId: number, quantidade: number): ItemEmprestimo {
+    if (this.status !== 'PENDENTE') {
+      throw new Error('Apenas empréstimos com status "Pendente" podem receber devoluções.');
+    }
+
+    const item = this.itens.find((item) => item.id === itemId);
+    if (!item) {
+      throw new Error('Item de empréstimo não encontrado.');
+    }
+    if (item.getQuantidadePendente() <= 0) {
+      throw new Error('Este item já foi totalmente devolvido ou baixado.');
+    }
+
+    item.devolver(quantidade);
+    this.recalcularStatus();
+    return item;
+  }
+
+  public cancelar(): void {
+    if (this.status !== 'PENDENTE') {
+      throw new Error('Apenas empréstimos com status "Pendente" podem ser cancelados.');
+    }
+
+    if (this.itens.some((item) =>
+      item.quantidadeDevolvida !== 0 ||
+      item.quantidadePerdida !== 0 ||
+      item.quantidadeDanificada !== 0
+    )) {
+      throw new Error('Não é possível cancelar um empréstimo com devolução, perda ou avaria registrada.');
+    }
+
+    this.status = 'CANCELADO';
+  }
+}

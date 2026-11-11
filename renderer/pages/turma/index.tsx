@@ -1,0 +1,386 @@
+import Link from "next/link";
+
+import { useEffect, useState } from "react";
+
+import { useRouter } from "next/router";
+
+import Sidebar from "../../components/Sidebar";
+import SearchBar, { TipoOrdenacao } from "../../components/Searchbar";
+import AbasStatus, { StatusAba } from "../../components/AbasStatus";
+import ListaTurma from "../../components/turma/listaTurma";
+import Paginacao from "../../components/Paginacao";
+
+import ModalExcluir from "../../components/modal/modalExcluir";
+import ModalAtivar from "../../components/modal/modalAtivar";
+import ModalDesativar from "../../components/modal/modalDesativar";
+
+
+import { MdAdd } from "react-icons/md";
+
+import { Turma } from "../../types/turma";
+import ToastFeedback from "../../components/ToastFeedback";
+
+export default function GerenciarTurmas() {
+  const router = useRouter();
+  // const mostrarSucesso = router.query.sucesso === "1";
+
+  const [turmas, setTurma] = useState<any[]>([]);
+  const [carregada, setCarregada] = useState(true);
+  const [erro, setErro] = useState("");
+  
+  const [termoBusca, setTermoBusca] = useState("");
+  const [abaAtiva, setAbaAtiva] = useState<StatusAba>("ATIVO");
+  const [ordenacao, setOrdenacao] = useState<TipoOrdenacao>("alfabetica");
+  const [recarregar, setRecarregar] = useState(0);
+  
+  const [turmaParaExcluir, setTurmaParaExcluir] = useState<Turma | null>(null);
+  const [turmaExcluindo, setTurmaExcluindo] = useState<number | null>(null);
+  const [turmaParaAtivar, setTurmaParaAtivar] = useState<Turma | null>(null);
+  const [turmaParaDesativar, setTurmaParaDesativar] = useState<Turma | null>(null);
+
+  const [feedback, setFeedback] = useState("");
+
+  useEffect(() => {
+    if (!feedback) return;
+
+    const timer = setTimeout(() => {
+      setFeedback("");
+    }, 2500);
+
+    return () => clearTimeout(timer);
+  }, [feedback]);
+
+  useEffect(() => {
+    const sucesso = router.query.sucesso;
+
+    if (sucesso === "1") {
+      setFeedback("Turma cadastrada com sucesso!");
+    }
+
+    if (sucesso === "editado") {
+      setFeedback("Turma editada com sucesso!");
+    }
+  }, [router.query.sucesso]);
+
+  const [paginaAtual, setPaginaAtual] = useState(1);
+  const ITENS_POR_PAGINA = 10; // 10 itens por página na visualização em lista
+
+  useEffect(() => {
+    setPaginaAtual(1);
+  }, [termoBusca, abaAtiva]);
+
+  useEffect(() => {
+    async function carregarTurmas() {
+      try {
+        setErro("");
+
+        const resposta = await window.ipc?.turma?.consultar({
+          nome: termoBusca,
+          incluirInativos: true,
+        });
+
+        if (!resposta) return;
+
+        if (!resposta.success){
+          setErro(resposta.error || "Erro ao carregar turmas.");
+          return;
+        }
+
+        setTurma(resposta.data || []);
+      } catch(error) {
+        const mensagem = 
+          error instanceof Error
+            ? error.message
+            : "Não foi possível carregar turmas."
+
+        setErro(mensagem);
+      } finally {
+        setCarregada(false);
+      }
+    }
+
+    carregarTurmas();
+  }, [termoBusca, recarregar]);
+
+  const turmasFiltradasPorAba = turmas.filter((t) =>
+    abaAtiva === "ATIVO" ? t.status === "ATIVO" : t.status !== "ATIVO"
+  );
+
+  const turmasExibidas = [...turmasFiltradasPorAba].sort((a, b) => {
+    if (ordenacao === "recentes") {
+      return (b.id ?? 0) - (a.id ?? 0);
+    }
+    return (a.nome || "").localeCompare(b.nome || "", "pt-BR");
+  });
+
+  const totalPaginas = Math.max(
+    1,
+    Math.ceil(turmasExibidas.length / ITENS_POR_PAGINA)
+  );
+
+  useEffect(() => {
+    if (paginaAtual > totalPaginas) {
+      setPaginaAtual(totalPaginas);
+    }
+  }, [totalPaginas, paginaAtual]);
+
+  const inicio = (paginaAtual - 1) * ITENS_POR_PAGINA;
+  const turmasPaginadas = turmasExibidas.slice(
+    inicio,
+    inicio + ITENS_POR_PAGINA
+  );
+
+  const handleExcluir = async (turma: Turma) => {
+    try {
+      const resposta = await window.ipc?.turma?.excluir(turma.id);
+
+      if (!resposta?.success) {
+       setErro(resposta?.error || "Erro ao excluir turma.");
+       return; 
+      }
+
+      setRecarregar((n) => n + 1);
+      setFeedback("Turma excluída com sucesso!");
+
+    } catch (error) {
+      setErro(
+        error instanceof Error
+        ? error.message
+        : "Não foi possível excluir a turma."
+      )
+    }
+  };
+  
+
+  const handleDesativar = async (turma: Turma) => {
+    try {
+      const resposta = await window.ipc?.turma?.desativar(turma.id);
+
+      if (!resposta?.success) {
+       setErro(resposta?.error || "Erro ao desativar turma.");
+       return; 
+      }
+      
+      setRecarregar((n) => n + 1);
+      setFeedback("Turma desativada com sucesso!");
+
+    } catch (error) {
+      setErro(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível desativar a turma."
+      )
+    }
+  };
+  
+  const handleAtivar = async (turma: Turma) => {
+    try {
+      const resposta = await window.ipc?.turma?.ativar(turma.id);
+
+      if (!resposta?.success) {
+       setErro(resposta?.error || "Erro ao ativar turma.");
+       return; 
+      }
+
+      setRecarregar((n) => n + 1);
+      setFeedback("Turma ativada com sucesso!");
+      
+    } catch (error) {
+      setErro(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível ativar a turma."
+      )
+    }
+  };
+
+  return (
+    <div className="flex min-h-screen bg-white">
+      <Sidebar />
+
+      <main className="flex-1 min-w-0 px-8 pt-6 pb-6 animate-fade-in">
+        <h1 className="text-2xl font-bold text-gray-800 mb-4">
+          Gerenciar turmas
+        </h1>
+
+        {/* Abas de status: Ativos e Inativos */}
+        <AbasStatus
+          abaAtiva={abaAtiva}
+          onChangeAba={setAbaAtiva}
+        />
+
+
+        {/* Barra de busca e botão de adicionar */}
+        <div className="flex items-center gap-4 mb-4 w-full">
+          <SearchBar 
+            placeholder="Pesquisar turmas por nome." 
+            valorBusca={termoBusca}
+            onChangeBusca={setTermoBusca}
+            ordenacao={ordenacao}
+            onChangeOrdenacao={setOrdenacao}
+          />
+
+          <Link
+            href="/turma/cadastro_turma"
+            className="h-11 px-6 flex items-center justify-center bg-[#2e8b45] text-white rounded-xl font-medium text-sm hover:bg-[#236c35] transition-all whitespace-nowrap gap-2 shadow-sm cursor-pointer shrink-0 active:scale-95"
+          >
+            <MdAdd size={18} />
+            Adicionar turma
+          </Link>
+        </div>
+
+        {feedback && (
+          <ToastFeedback
+            mensagem={feedback}
+            tipo="sucesso"
+            onClose={() => setFeedback("")}
+          />
+        )}
+
+        {erro && (
+          <ToastFeedback
+            mensagem={erro}
+            tipo="erro"
+            onClose={() => setErro("")}
+          />
+        )}
+        
+        {carregada ? (
+          <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
+            <p className="text-base font-medium">
+              Carregando turmas...
+            </p>
+          </div>
+        ): turmasExibidas.length === 0 ? (
+          <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
+            <p className="text-base font-medium">
+              {termoBusca.trim()
+                ? `Nenhuma turma ${abaAtiva === "ATIVO" ? "ativa" : "inativa"} encontrada para "${termoBusca}".`
+                : `Nenhuma turma ${abaAtiva === "ATIVO" ? "ativa" : "inativa"} cadastrada.`}
+            </p>
+          </div>
+        ) : (
+          <div
+            key={`${termoBusca}-${abaAtiva}-${ordenacao}-${paginaAtual}`}
+            className="animate-fade-in duration-500"
+          >
+            <ListaTurma
+              turmas={turmasPaginadas}
+              turmaExcluindo={turmaExcluindo}
+              onEditar={(turma) => {
+                router.push({
+                  pathname: "/turma/editar_turma",
+                  query: { id: turma.id },
+                });
+              }}
+              onDesativar={(turma) => setTurmaParaDesativar(turma)}
+              onAtivar={(turma) => setTurmaParaAtivar(turma)}
+              onExcluir={(turma) => setTurmaParaExcluir(turma)}
+            />
+
+            <Paginacao
+              paginaAtual={paginaAtual}
+              totalItens={turmasExibidas.length}
+              itensPorPagina={ITENS_POR_PAGINA}
+              nomeEntidade={abaAtiva === "ATIVO" ? "turmas ativas" : "turmas inativas"}
+              nomeEntidadeSingular={abaAtiva === "ATIVO" ? "turma ativa" : "turma inativa"}
+              aoMudarPagina={setPaginaAtual}
+            />
+          </div>
+        )}
+
+        <ModalExcluir
+          aberto={turmaParaExcluir !== null}
+          mensagem={
+            turmaParaExcluir ? (
+              <>
+                Tem certeza que deseja excluir a turma:
+                <span className="block font-bold text-gray-800 text-xs mt-0.75">
+                  Nome:{" "}
+                  <span className="text-sm font-normal text-gray-600">
+                    {turmaParaExcluir.nome}
+                  </span>
+                </span>
+              </>
+            ) : (
+              ""
+            )
+          }
+          onCancelar={() => setTurmaParaExcluir(null)}
+          onConfirmar={async () => {
+            if (!turmaParaExcluir) return;
+
+            const turma = turmaParaExcluir;
+
+            setTurmaExcluindo(turmaParaExcluir.id);
+            setTurmaParaExcluir(null);
+
+            setTimeout(async () => {
+              await handleExcluir(turma);
+              setTurmaExcluindo(null);
+            }, 200);
+          }}
+        />
+
+        <ModalDesativar
+          aberto={turmaParaDesativar !== null}
+          mensagem={
+            turmaParaDesativar ? (
+              <>
+                Tem certeza que deseja desativar a turma:
+                <span className="block font-bold text-gray-800 text-xs mt-0.75">
+                  Nome:{" "}
+                  <span className="text-sm font-normal text-gray-600">
+                    {turmaParaDesativar.nome}
+                  </span>
+                </span>
+              </>
+            ) : (
+              ""
+            )
+          }
+          onCancelar={() => setTurmaParaDesativar(null)}
+          onConfirmar={async () => {
+            if (!turmaParaDesativar) return;
+
+            const turma = turmaParaDesativar;
+
+            setTurmaParaDesativar(null);
+
+            await handleDesativar(turma);
+          }}
+        />
+
+        <ModalAtivar
+          aberto={turmaParaAtivar !== null}
+          mensagem={
+            turmaParaAtivar ? (
+              <>
+                Tem certeza que deseja ativar a turma:
+                <span className="block font-bold text-gray-800 text-xs mt-0.75">
+                  Nome:{" "}
+                  <span className="text-sm font-normal text-gray-600">
+                    {turmaParaAtivar.nome}
+                  </span>
+                </span>
+              </>
+            ) : (
+              ""
+            )
+          }
+          onCancelar={() => setTurmaParaAtivar(null)}
+          onConfirmar={async () => {
+            if (!turmaParaAtivar) return;
+
+            const turma = turmaParaAtivar;
+
+            setTurmaParaAtivar(null);
+
+            await handleAtivar(turma);
+          }}
+        />
+
+      </main>
+    </div>
+  );
+}
