@@ -3,6 +3,7 @@ import { Emprestimo, StatusEmprestimo } from "../../types/emprestimo";
 
 interface ListaEmprestimoProps {
   emprestimos: Emprestimo[];
+  emprestimosComBaixas: ReadonlySet<number>;
   modo: "pendentes" | "historico";
   onVerDetalhes?: (emprestimo: Emprestimo) => void;
   onCancelar?: (emprestimo: Emprestimo) => void;
@@ -43,6 +44,7 @@ export function StatusBadge({ status }: { status: StatusEmprestimo }) {
 
 export default function ListaEmprestimo({
   emprestimos,
+  emprestimosComBaixas,
   modo,
   onVerDetalhes,
   onCancelar,
@@ -135,8 +137,9 @@ export default function ListaEmprestimo({
                     {!historico && (
                       <button
                         type="button"
+                        disabled={e.status !== "PENDENTE" || emprestimosComBaixas.has(e.id)}
                         onClick={() => onCancelar?.(e)}
-                        className="flex items-center gap-1.5 bg-[#dc3b3b] text-white px-3 py-1.5 text-xs rounded-lg font-medium hover:bg-[#c42e2e] transition-colors cursor-pointer shrink-0"
+                        className="flex items-center gap-1.5 bg-[#dc3b3b] text-white px-3 py-1.5 text-xs rounded-lg font-medium enabled:hover:bg-[#c42e2e] transition-colors cursor-pointer shrink-0 disabled:bg-gray-200 disabled:text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <MdClose size={15} />
                         Cancelar

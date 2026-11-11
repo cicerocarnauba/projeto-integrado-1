@@ -36,6 +36,7 @@ describe('Consulta de itens de empréstimo - GET /emprestimos via IPC', () => {
         professor_id INTEGER NOT NULL REFERENCES professor(id),
         turma_id INTEGER NOT NULL REFERENCES turma(id),
         data_retirada TEXT NOT NULL,
+        data_devolucao TEXT,
         status TEXT NOT NULL CHECK (status IN ('PENDENTE', 'CONCLUIDO', 'CANCELADO'))
       );
       CREATE TABLE item_emprestimo (
@@ -50,7 +51,7 @@ describe('Consulta de itens de empréstimo - GET /emprestimos via IPC', () => {
       INSERT INTO professor VALUES (1, 'Ana', 'Silva', 'ATIVO'), (2, 'Maria', 'Souza', 'INATIVO');
       INSERT INTO turma VALUES (1, 'Maternal A', 'ATIVO'), (2, 'Maternal B', 'INATIVO');
       INSERT INTO livro VALUES (1, 'Livro A', 'ATIVO'), (2, 'Livro B', 'INATIVO'), (3, 'Livro C', 'ATIVO');
-      INSERT INTO emprestimo VALUES
+      INSERT INTO emprestimo (id, professor_id, turma_id, data_retirada, status) VALUES
         (1, 1, 1, '2026-01-01T10:00:00.000Z', 'PENDENTE'),
         (2, 2, 2, '2026-02-01T10:00:00.000Z', 'CONCLUIDO'),
         (3, 1, 2, '2026-03-01T10:00:00.000Z', 'CANCELADO'),
@@ -108,13 +109,23 @@ describe('Consulta de itens de empréstimo - GET /emprestimos via IPC', () => {
     assert.deepEqual(controller.consultar({ livroId: 1, professorId: 1 }), [{
       id: 1, emprestimoId: 1, professorId: 1, professorNome: 'Ana Silva',
       turmaId: 1, turmaNome: 'Maternal A', livroId: 1, livroTitulo: 'Livro A',
-      dataRetirada: new Date('2026-01-01T10:00:00.000Z'), status: 'PENDENTE',
+      dataRetirada: new Date('2026-01-01T10:00:00.000Z'), dataDevolucao: null, status: 'PENDENTE',
       quantidadeRetirada: 4, quantidadeDevolvida: 1, quantidadePerdida: 1, quantidadeDanificada: 1,
     }]);
   });
 
   it('ordena pelos empréstimos mais recentes, desempatando por empréstimo e item', () => {
     assert.deepEqual(controller.consultar().map((item) => item.id), [5, 4, 3, 1, 2]);
+  });
+
+  it('inclui a data de devolução na consulta e mantém null quando não há data registrada', () => {
+    db.prepare('UPDATE emprestimo SET data_devolucao = ? WHERE id = 2')
+      .run('2026-11-10T21:45:00.000Z');
+
+    const concluido = controller.consultar({ status: 'CONCLUIDO' });
+    assert.equal(concluido.length, 1);
+    assert.deepEqual(concluido[0].dataDevolucao, new Date('2026-11-10T21:45:00.000Z'));
+    assert.equal(controller.consultar({ status: 'CANCELADO' })[0].dataDevolucao, null);
   });
 
   it('retorna uma lista vazia quando não existem itens', () => {

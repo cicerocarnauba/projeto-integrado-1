@@ -116,7 +116,7 @@ const gruposPorEmprestimo = lista.reduce<Map<number, GrupoEmprestimo>>(
           dataRetirada: new Date(item.dataRetirada).toISOString(),
           quantidadeExemplares: 0,
           status: item.status,
-          dataDevolucao: null,
+          dataDevolucao: item.dataDevolucao,
         },
         itens: [],
       };
@@ -145,6 +145,16 @@ const termoNumerico = termo.replace(/\D/g, "");
 
 const emprestimosAgrupados = Array.from(
   gruposPorEmprestimo.values()
+);
+
+const emprestimosComBaixas = new Set(
+  emprestimosAgrupados
+    .filter(({ itens }) => itens.some((item) =>
+      item.quantidadeDevolvida !== 0 ||
+      item.quantidadePerdida !== 0 ||
+      item.quantidadeDanificada !== 0
+    ))
+    .map(({ emprestimo }) => emprestimo.id)
 );
 
 const filtradosPorAba = emprestimosAgrupados
@@ -189,6 +199,11 @@ const filtradosPorAba = emprestimosAgrupados
 
   const emprestimosExibidos = [...filtradosPorAba].sort((a, b) => {
     if (ordenacao === "recentes") {
+      if (aba === "historico") {
+        const dataA = a.dataDevolucao ? new Date(a.dataDevolucao).getTime() : 0;
+        const dataB = b.dataDevolucao ? new Date(b.dataDevolucao).getTime() : 0;
+        return dataB - dataA || b.id - a.id;
+      }
       return (b.id ?? 0) - (a.id ?? 0);
     }
     return (a.professorNome || "").localeCompare(b.professorNome || "", "pt-BR");
@@ -288,6 +303,7 @@ const filtradosPorAba = emprestimosAgrupados
             <ListaEmprestimo
               modo={aba}
               emprestimos={emprestimosPaginados}
+              emprestimosComBaixas={emprestimosComBaixas}
               onVerDetalhes={(e) => router.push(`/emprestimo/detalhes?id=${e.id}`)}
               onCancelar={(e) => setEmprestimoParaCancelar(e)}
             />
