@@ -187,30 +187,6 @@ export default function DetalhesEmprestimo() {
     } finally {
       setSalvandoDevolverTodos(false);
     }
-    //   const resposta = await window.ipc.emprestimo.devolverTodos(emprestimo.id);
-
-    //   if (!resposta?.success) {
-    //     setErroDevolverTodos(
-    //       resposta?.error || "Não foi possível devolver os exemplares."
-    //     );
-    //     return;
-    //   }
-
-    //   setModalDevolverTodosAberto(false);
-    //   await recarregarEmprestimo(
-    //     emprestimo.id,
-    //     "Todos os exemplares devolvidos com sucesso!"
-    //   );
-    // } catch (error) {
-    //   console.error("Erro ao devolver todos:", error);
-    //   setErroDevolverTodos(
-    //     error instanceof Error
-    //       ? error.message
-    //       : "Não foi possível devolver os exemplares."
-    //   );
-    // } finally {
-    //   setSalvandoDevolverTodos(false);
-    // }
   }
 
   async function confirmarDevolucao(quantidade: number) {
@@ -238,14 +214,13 @@ export default function DetalhesEmprestimo() {
       const devolucaoTotal = resposta.data?.quantidadePendente === 0;
 
       setItemParaDevolver(null);
-      setItemParaDevolver(null);
 
-    await recarregarEmprestimo(
-      emprestimo.id,
-      devolucaoTotal
-        ? "Devolução total do item registrada com sucesso!"
-        : "Devolução parcial registrada com sucesso!"
-    );
+      await recarregarEmprestimo(
+        emprestimo.id,
+        devolucaoTotal
+          ? "Devolução total do item registrada com sucesso!"
+          : "Devolução parcial registrada com sucesso!"
+      );
 
     } catch (error) {
       console.error("Erro ao registrar devolução:", error);
