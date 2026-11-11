@@ -37,6 +37,11 @@ jobs:
           fi
 
       - name: Validar commits com commitlint (Pull Request)
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && github.base_ref != 'main' && github.base_ref != 'master'
         run: |
           npx commitlint --from=${{ github.event.pull_request.base.sha }} --to=${{ github.event.pull_request.head.sha }} --verbose
+
+      - name: Validar título do Pull Request (Release para main/master)
+        if: github.event_name == 'pull_request' && (github.base_ref == 'main' || github.base_ref == 'master')
+        run: |
+          echo "${{ github.event.pull_request.title }}" | npx commitlint --verbose
