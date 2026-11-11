@@ -4,7 +4,7 @@ import { Emprestimo, StatusEmprestimo } from "../../types/emprestimo";
 interface ListaEmprestimoProps {
   emprestimos: Emprestimo[];
   emprestimosComBaixas: ReadonlySet<number>;
-  modo: "pendentes" | "historico";
+  modo: "pendentes" | "concluidos" | "cancelados";
   onVerDetalhes?: (emprestimo: Emprestimo) => void;
   onCancelar?: (emprestimo: Emprestimo) => void;
 }
@@ -49,7 +49,8 @@ export default function ListaEmprestimo({
   onVerDetalhes,
   onCancelar,
 }: ListaEmprestimoProps) {
-  const historico = modo === "historico";
+  const historico = modo !== "pendentes";
+  const cancelado = modo === "cancelados";
 
   return (
     <div className="w-full bg-white border border-[#D3E8D6] rounded-2xl overflow-hidden shadow-sm">
@@ -59,9 +60,13 @@ export default function ListaEmprestimo({
             <tr className="bg-[#ebf5ed] border-b border-[#c8decb] text-sm font-semibold text-[#23582c]">
               <th className="py-3.5 px-4 sm:px-6">Professor responsável</th>
               <th className="py-3.5 px-3 hidden md:table-cell">Turma</th>
-              <th className="py-3.5 px-3 hidden lg:table-cell">Data retirada</th>
+              <th className="py-3.5 px-3 hidden lg:table-cell">
+                {cancelado ? "Data solicitação" : "Data retirada"}
+              </th>
               {historico && (
-                <th className="py-3.5 px-3 hidden lg:table-cell">Data devolução</th>
+                <th className="py-3.5 px-3 hidden lg:table-cell">
+                  {cancelado ? "Data cancelamento" : "Data devolução"}
+                </th>
               )}
               <th className="py-3.5 px-3 text-center">Exemplares emprestados</th>
               <th className="py-3.5 px-3 text-center w-32">

@@ -283,7 +283,7 @@ VALUES (14, 4, 4, '2026-10-28T09:00:00.000Z', NULL, 'PENDENTE');
 
 -- [15] HISTÓRICO: CANCELADO (Estoque já foi recomposto, badge vermelha Cancelado)
 INSERT INTO emprestimo (id, professor_id, turma_id, data_retirada, data_devolucao, status)
-VALUES (15, 10, 10, '2026-09-25T10:00:00.000Z', NULL, 'CANCELADO');
+VALUES (15, 10, 10, '2026-09-25T10:00:00.000Z', '2026-09-25T10:15:00.000Z', 'CANCELADO');
 
 -- [16] HISTÓRICO: CONCLUÍDO COM AVARIA / PERDA (Retirou 2, devolveu 1, 1 perdido. Baixado 100%, concluído)
 INSERT INTO emprestimo (id, professor_id, turma_id, data_retirada, data_devolucao, status)

@@ -100,5 +100,13 @@ export class DatabaseConnection {
     } catch {
       // Ignora se a coluna já existir
     }
+
+    // Empréstimos cancelados antigos não guardavam a data do cancelamento.
+    // Usa a data de retirada como referência para não deixar o histórico sem data.
+    db.exec(`
+      UPDATE emprestimo
+      SET data_devolucao = data_retirada
+      WHERE status = 'CANCELADO' AND data_devolucao IS NULL;
+    `);
   }
 }

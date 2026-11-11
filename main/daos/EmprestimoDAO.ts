@@ -52,7 +52,9 @@ export class EmprestimoDAO {
         reporEstoque(item.livroId, item.quantidadeRetirada);
       }
 
-      this.db.prepare(`UPDATE emprestimo SET status = 'CANCELADO' WHERE id = ?`).run(id);
+      this.db
+        .prepare(`UPDATE emprestimo SET data_devolucao = ?, status = 'CANCELADO' WHERE id = ?`)
+        .run(new Date().toISOString(), id);
       return emprestimo;
     });
 
