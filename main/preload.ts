@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import type { ConsultarEmprestimoInput } from './entities/ConsultaEmprestimo.ts';
+import type { ConsultarEmprestimoInput, RegistrarDevolucaoItemInput } from './entities/ConsultaEmprestimo.ts';
 
 contextBridge.exposeInMainWorld('ipc', {
   professor: {
@@ -53,7 +53,7 @@ contextBridge.exposeInMainWorld('ipc', {
     devolverItem: (
       emprestimoId: number,
       itemId: number,
-      input: { quantidadeDevolvida: number } | number
+      input: RegistrarDevolucaoItemInput | number
     ) =>
       ipcRenderer.invoke('emprestimo:devolverItem', emprestimoId, itemId, input),
   },

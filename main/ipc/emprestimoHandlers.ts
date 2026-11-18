@@ -65,7 +65,7 @@ export function registerEmprestimoHandlers(
     EMPRESTIMO_CHANNELS.DEVOLVER_ITEM,
     async (
       _event,
-      arg1: number | { emprestimoId: number; itemId: number; quantidadeDevolvida: number },
+      arg1: number | (RegistrarDevolucaoItemInput & { emprestimoId: number; itemId: number }),
       arg2?: number,
       arg3?: RegistrarDevolucaoItemInput | number
     ) => {
@@ -77,7 +77,11 @@ export function registerEmprestimoHandlers(
         if (typeof arg1 === 'object' && arg1 !== null) {
           emprestimoId = arg1.emprestimoId;
           itemId = arg1.itemId;
-          input = { quantidadeDevolvida: arg1.quantidadeDevolvida };
+          input = {
+            quantidadeDevolvida: arg1.quantidadeDevolvida,
+            quantidadePerdida: arg1.quantidadePerdida,
+            quantidadeDanificada: arg1.quantidadeDanificada,
+          };
         } else {
           emprestimoId = arg1;
           itemId = arg2 as number;

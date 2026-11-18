@@ -331,16 +331,28 @@ declare global {
         }>;
 
         /**
-         * Registra a devolução total ou parcial de um item de empréstimo.
+         * Registra a devolução total ou parcial, incluindo perdas e avarias (HU22.3).
          * Equivalente ao endpoint POST /emprestimos/{id}/itens/{itemId}/devolucao.
-         * Atualiza a quantidade devolvida e repõe o saldo disponível do livro.
+         * As quantidades são incrementos desta operação; campos omitidos valem zero.
+         * Aceita inteiros não negativos e exige pelo menos uma baixa. A soma não pode
+         * exceder o pendente (retirado menos devolvido, perdido e danificado já registrados).
+         * Todas as baixas saem da quantidade emprestada. Apenas devolvidos repõem o saldo;
+         * perdidos e danificados reduzem também o total do livro, inativando-o se zerar.
+         * Conclui o empréstimo quando todos os itens ficam sem pendências.
+         * A operação é atômica: em falha, nenhuma alteração é persistida.
          * @param emprestimoId ID numérico positivo do empréstimo.
          * @param itemId ID numérico positivo do item do empréstimo.
-         * @param input Objeto { quantidadeDevolvida: number } ou número direto da quantidade devolvida.
+         * @param input Objeto { quantidadeDevolvida?, quantidadePerdida?, quantidadeDanificada? }
+         * ou número direto da quantidade devolvida (compatível com as chamadas existentes).
          * @returns Em sucesso: { success: true, data: ItemDevolucaoResultadoDTO }.
          * Em falha: { success: false, error: 'Mensagem' }.
          * @example await window.ipc.emprestimo.devolverItem(1, 2, { quantidadeDevolvida: 1 });
          * @example await window.ipc.emprestimo.devolverItem(1, 2, 1);
+         * @example await window.ipc.emprestimo.devolverItem(1, 2, {
+         *   quantidadeDevolvida: 1, quantidadePerdida: 1, quantidadeDanificada: 1
+         * });
+         * @example await window.ipc.emprestimo.devolverItem(1, 2, { quantidadePerdida: 1 });
+         * @example await window.ipc.emprestimo.devolverItem(1, 2, { quantidadeDanificada: 1 });
          */
         devolverItem: (
           emprestimoId: number,

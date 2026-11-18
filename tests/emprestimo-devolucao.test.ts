@@ -53,6 +53,22 @@ describe('Regras da entidade - Devolução no ItemEmprestimo', () => {
     assert.equal(item.isTotalmenteBaixado(), true);
   });
 
+  it('registra as três quantidades juntas e rejeita excesso sem alterar a entidade', () => {
+    const item = new ItemEmprestimo({ livroId: 1, quantidadeRetirada: 5 });
+    item.devolver(1, 1, 1);
+    assert.equal(item.quantidadeDevolvida, 1);
+    assert.equal(item.quantidadePerdida, 1);
+    assert.equal(item.quantidadeDanificada, 1);
+    assert.equal(item.getQuantidadePendente(), 2);
+
+    const antes = { ...item };
+    assert.throws(() => item.devolver(1, 1, 1), /soma.*maior que a quantidade pendente/);
+    assert.deepEqual({ ...item }, antes);
+
+    item.devolver(0, 1, 1);
+    assert.equal(item.isTotalmenteBaixado(), true);
+  });
+
   it('rejeita quantidade maior que a pendente', () => {
     const item = new ItemEmprestimo({
       livroId: 1,
@@ -171,6 +187,144 @@ describe('Devolução de item de empréstimo - Banco de Dados e Controller', () 
 
   afterEach(() => {
     db.close();
+  });
+
+  it('HU22.3: acumula devoluções, perdas e avarias e repõe apenas as cópias devolvidas (RN03)', () => {
+    const resultado = controller.devolverItem(1, 1, {
+      quantidadeDevolvida: 1, quantidadePerdida: 1, quantidadeDanificada: 1,
+    });
+    assert.equal(resultado.quantidadeDevolvida, 1);
+    assert.equal(resultado.quantidadePerdida, 1);
+    assert.equal(resultado.quantidadeDanificada, 1);
+    assert.equal(resultado.quantidadePendente, 1);
+    assert.equal(resultado.status, 'PENDENTE');
+    let livro = livroDAO.buscarPorId(1)!;
+    assert.equal(livro.quantidadeTotal, 8);
+    assert.equal(livro.quantidadeEmprestada, 1);
+    assert.equal(livro.getSaldoDisponivel(), 7);
+    assert.equal(livro.status, 'ATIVO');
+
+    controller.devolverItem(1, 1, { quantidadePerdida: 1 });
+    const item = emprestimoDAO.buscarItemPorId(1)!;
+    assert.equal(item.quantidadeDevolvida, 1);
+    assert.equal(item.quantidadePerdida, 2);
+    assert.equal(item.quantidadeDanificada, 1);
+    assert.equal(item.getQuantidadePendente(), 0);
+    livro = livroDAO.buscarPorId(1)!;
+    assert.equal(livro.quantidadeTotal, 7);
+    assert.equal(livro.quantidadeEmprestada, 0);
+    assert.equal(livro.getSaldoDisponivel(), 7);
+    assert.equal(controller.buscarPorId(1).status, 'PENDENTE');
+
+    controller.devolverItem(1, 2, { quantidadeDanificada: 2 });
+    const detalhes = controller.buscarPorId(1);
+    assert.equal(detalhes.status, 'CONCLUIDO');
+    assert.ok(detalhes.dataDevolucao instanceof Date);
+    assert.equal(detalhes.itens[0].quantidadePerdida, 2);
+    assert.equal(detalhes.itens[0].quantidadeDanificada, 1);
+    assert.equal(detalhes.itens[0].quantidadePendente, 0);
+    assert.equal(detalhes.itens[1].quantidadeDanificada, 2);
+    assert.equal(emprestimoDAO.buscarPorId(1)!.getTotalPendente(), 0);
+    assert.equal(livroDAO.buscarPorId(2)!.quantidadeTotal, 3);
+    assert.equal(livroDAO.buscarPorId(2)!.getSaldoDisponivel(), 3);
+    const historico = controller.consultar({ status: 'CONCLUIDO', livroId: 1 });
+    assert.equal(historico[0].quantidadePerdida, 2);
+    assert.equal(historico[0].quantidadeDanificada, 1);
+  });
+
+  for (const campo of ['quantidadePerdida', 'quantidadeDanificada'] as const) {
+    it(`HU22.3: inativa o livro ao zerar o acervo com ${campo} e conclui o empréstimo`, () => {
+      controller.devolverItem(1, 1, 4);
+      db.prepare('UPDATE livro SET quantidade_total = 2 WHERE id = 2').run();
+
+      const resultado = controller.devolverItem(1, 2, { [campo]: 2 });
+      assert.equal(resultado[campo], 2);
+      assert.equal(resultado.quantidadeDevolvida, 0);
+      assert.equal(resultado.quantidadePendente, 0);
+      assert.equal(resultado.status, 'CONCLUIDO');
+      const livro = livroDAO.buscarPorId(2)!;
+      assert.equal(livro.quantidadeTotal, 0);
+      assert.equal(livro.quantidadeEmprestada, 0);
+      assert.equal(livro.getSaldoDisponivel(), 0);
+      assert.equal(livro.status, 'INATIVO');
+      assert.equal(controller.buscarPorId(1).status, 'CONCLUIDO');
+      assert.equal(controller.consultar({ livroId: 2 })[0][campo], 2);
+      assert.equal(livroDAO.consultar({}).some((livro) => livro.id === 2), false);
+    });
+
+    it(`HU22.3: bloqueia cancelamento após registrar ${campo}`, () => {
+      controller.devolverItem(1, 1, { [campo]: 1 });
+      const antes = db.serialize();
+      assert.throws(() => controller.cancelar(1), /devolução, perda ou avaria registrada/);
+      assert.deepEqual(db.serialize(), antes);
+    });
+
+    for (const valor of [-1, 1.5, NaN, Infinity, Number.MAX_SAFE_INTEGER + 1, '1', null]) {
+      it(`HU22.3: rejeita ${campo} inválida (${valor}) sem alterar o banco`, () => {
+        const antes = db.serialize();
+        assert.throws(
+          () => controller.devolverItem(1, 1, { quantidadeDevolvida: 1, [campo]: valor } as any),
+          /A quantidade (perdida|danificada) deve ser um número inteiro maior ou igual a zero/
+        );
+        assert.deepEqual(db.serialize(), antes);
+      });
+    }
+  }
+
+  it('HU22.3: rejeita a soma acima do pendente restante e não altera o histórico ou estoque', () => {
+    controller.devolverItem(1, 1, { quantidadePerdida: 1 });
+    const antes = db.serialize();
+    assert.throws(
+      () => controller.devolverItem(1, 1, {
+        quantidadeDevolvida: 2, quantidadePerdida: 1, quantidadeDanificada: 1,
+      }),
+      /A soma.*\(4\).*maior que a quantidade pendente \(3\)/
+    );
+    assert.deepEqual(db.serialize(), antes);
+  });
+
+  it('HU22.3: mantém as cópias de outro empréstimo como emprestadas após perdas e avarias', () => {
+    const outro = controller.realizar({
+      professorId: 1, turmaId: 1, itens: [{ livroId: 1, quantidade: 2 }],
+    });
+    controller.devolverItem(1, 1, { quantidadePerdida: 2, quantidadeDanificada: 2 });
+    const livro = livroDAO.buscarPorId(1)!;
+    assert.equal(livro.quantidadeTotal, 6);
+    assert.equal(livro.quantidadeEmprestada, 2);
+    assert.equal(livro.getSaldoDisponivel(), 4);
+    assert.equal(livro.status, 'ATIVO');
+    assert.equal(emprestimoDAO.buscarPorId(outro.id!)!.getTotalPendente(), 2);
+  });
+
+  it('HU22.3: desfaz todas as baixas se a redução da quantidade total falhar', () => {
+    db.exec(`
+      CREATE TRIGGER simular_erro_total BEFORE UPDATE OF quantidade_total ON livro
+      BEGIN SELECT RAISE(ABORT, 'Falha simulada na redução do acervo'); END;
+    `);
+    const antes = db.serialize();
+    assert.throws(
+      () => controller.devolverItem(1, 1, {
+        quantidadeDevolvida: 1, quantidadePerdida: 1, quantidadeDanificada: 1,
+      }),
+      /Falha simulada na redução do acervo/
+    );
+    assert.deepEqual(db.serialize(), antes);
+  });
+
+  it('HU22.3: desfaz perdas, avarias e inativação se a conclusão do empréstimo falhar', () => {
+    controller.devolverItem(1, 1, 4);
+    db.prepare('UPDATE livro SET quantidade_total = 2 WHERE id = 2').run();
+    db.exec(`
+      CREATE TRIGGER simular_erro_conclusao BEFORE UPDATE OF status ON emprestimo
+      WHEN NEW.status = 'CONCLUIDO'
+      BEGIN SELECT RAISE(ABORT, 'Falha simulada na conclusão'); END;
+    `);
+    const antes = db.serialize();
+    assert.throws(
+      () => controller.devolverItem(1, 2, { quantidadePerdida: 1, quantidadeDanificada: 1 }),
+      /Falha simulada na conclusão/
+    );
+    assert.deepEqual(db.serialize(), antes);
   });
 
   it('encerra o item e repõe seu saldo, mantendo o empréstimo pendente enquanto houver outro item', () => {
@@ -539,6 +693,40 @@ describe('Devolução de item de empréstimo - Endpoint IPC e Preload', () => {
     return exports;
   }
 
+  it('HU22.3: o IPC aceita perdas e avarias nos dois formatos e rejeita soma excedente', async () => {
+    const handlers = new Map<string, Function>();
+    const modulo = carregarModulo('../main/ipc/emprestimoHandlers.ts', {
+      ipcMain: { handle: (canal: string, handler: Function) => handlers.set(canal, handler) },
+    });
+    modulo.registerEmprestimoHandlers(controller);
+    const devolver = handlers.get(modulo.EMPRESTIMO_CHANNELS.DEVOLVER_ITEM)!;
+
+    const excesso = await devolver({}, 1, 1, {
+      quantidadeDevolvida: 2, quantidadePerdida: 1, quantidadeDanificada: 1,
+    });
+    assert.equal(excesso.success, false);
+    assert.match(excesso.error, /soma.*maior que a quantidade pendente/);
+
+    const parcial = await devolver({}, 1, 1, {
+      quantidadeDevolvida: 1, quantidadePerdida: 1,
+    });
+    assert.equal(parcial.success, true);
+    assert.equal(parcial.data.quantidadePerdida, 1);
+    assert.equal(parcial.data.quantidadePendente, 1);
+
+    const final = await devolver({}, { emprestimoId: 1, itemId: 1, quantidadeDanificada: 1 });
+    assert.equal(final.success, true);
+    assert.equal(final.data.quantidadeDevolvida, 1);
+    assert.equal(final.data.quantidadePerdida, 1);
+    assert.equal(final.data.quantidadeDanificada, 1);
+    assert.equal(final.data.quantidadePendente, 0);
+    assert.equal(final.data.status, 'CONCLUIDO');
+    assert.equal(controller.buscarPorId(1).status, 'CONCLUIDO');
+    const livro = new LivroDAO(db).buscarPorId(1)!;
+    assert.equal(livro.quantidadeTotal, 8);
+    assert.equal(livro.quantidadeEmprestada, 0);
+  });
+
   it('o canal IPC emprestimo:devolverItem processa devolução com sucesso e trata erros', async () => {
     const handlers = new Map<string, Function>();
     const modulo = carregarModulo('../main/ipc/emprestimoHandlers.ts', {
@@ -619,6 +807,14 @@ describe('Devolução de item de empréstimo - Endpoint IPC e Preload', () => {
       assert.deepEqual(resultado, respostaEsperada);
       assert.deepEqual(chamadas, [
         ['emprestimo:devolverItem', 1, 1, { quantidadeDevolvida: 2 }],
+      ]);
+
+      await api.emprestimo.devolverItem(1, 1, {
+        quantidadeDevolvida: 1, quantidadePerdida: 1, quantidadeDanificada: 1,
+      });
+      assert.deepEqual(chamadas[1], [
+        'emprestimo:devolverItem', 1, 1,
+        { quantidadeDevolvida: 1, quantidadePerdida: 1, quantidadeDanificada: 1 },
       ]);
     });
   }
