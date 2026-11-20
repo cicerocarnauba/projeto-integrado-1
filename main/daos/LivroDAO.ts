@@ -288,7 +288,7 @@ export class LivroDAO {
       .run(quantidade, new Date().toISOString(), livroId);
   }
 
-  /** Repõe o saldo disponível ao cancelar, sem alterar o total de exemplares. */
+  /** Retira as cópias baixadas da quantidade emprestada, sem alterar o total. */
   public decrementarEmprestada(livroId: number, quantidade: number): void {
     if (!Number.isSafeInteger(quantidade) || quantidade <= 0) {
       throw new Error('Quantidade inválida para reposição do saldo do livro.');
@@ -303,6 +303,26 @@ export class LivroDAO {
 
     if (info.changes !== 1) {
       throw new Error(`Não foi possível repor o saldo do livro (ID ${livroId}). Verifique a quantidade emprestada.`);
+    }
+  }
+
+  /** HU22.3 — Reduz o acervo por perda/avaria e inativa o livro se o total zerar. */
+  public reduzirQuantidadeTotal(livroId: number, quantidade: number): void {
+    if (!Number.isSafeInteger(quantidade) || quantidade <= 0) {
+      throw new Error('Quantidade inválida para baixa por perda ou avaria.');
+    }
+
+    const info = this.db.prepare(`
+      UPDATE livro
+      SET quantidade_total = quantidade_total - ?,
+          status = CASE WHEN quantidade_total - ? = 0 THEN 'INATIVO' ELSE status END,
+          data_atualizacao = ?
+      WHERE id = ? AND quantidade_total >= ?
+        AND quantidade_total - ? >= quantidade_emprestada
+    `).run(quantidade, quantidade, new Date().toISOString(), livroId, quantidade, quantidade);
+
+    if (info.changes !== 1) {
+      throw new Error(`Não foi possível baixar perdas ou avarias do livro (ID ${livroId}). Verifique a quantidade total.`);
     }
   }
 

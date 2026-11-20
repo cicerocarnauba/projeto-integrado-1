@@ -322,14 +322,16 @@ export class EmprestimoDAO {
   }
 
   /**
-   * HU22.1 — Valida a baixa, atualiza o item e repõe o estoque na mesma transação.
+   * HU22.1 / HU22.3 — Valida a baixa e atualiza o item e o acervo na mesma transação.
    * Conclui o empréstimo quando todos os itens ficam sem pendências.
    */
   public registrarDevolucaoItem(
     emprestimoId: number,
     itemId: number,
     quantidadeDevolvida: number,
-    atualizarSaldoLivro: (livroId: number, quantidadeDevolvida: number) => void
+    atualizarSaldoLivro: (livroId: number, quantidadeBaixada: number) => void,
+    quantidadePerdida: number = 0,
+    quantidadeDanificada: number = 0
   ): ItemEmprestimo {
     const transacao = this.db.transaction(() => {
       const emprestimo = this.buscarPorId(emprestimoId);
@@ -337,17 +339,19 @@ export class EmprestimoDAO {
         throw new Error('Empréstimo não encontrado.');
       }
 
-      const item = emprestimo.devolverItem(itemId, quantidadeDevolvida);
+      const item = emprestimo.devolverItem(
+        itemId, quantidadeDevolvida, quantidadePerdida, quantidadeDanificada
+      );
 
       this.db
         .prepare(
           `UPDATE item_emprestimo
-           SET quantidade_devolvida = ?
+           SET quantidade_devolvida = ?, quantidade_perdida = ?, quantidade_danificada = ?
            WHERE id = ?`
         )
-        .run(item.quantidadeDevolvida, item.id);
+        .run(item.quantidadeDevolvida, item.quantidadePerdida, item.quantidadeDanificada, item.id);
 
-      atualizarSaldoLivro(item.livroId, quantidadeDevolvida);
+      atualizarSaldoLivro(item.livroId, quantidadeDevolvida + quantidadePerdida + quantidadeDanificada);
 
       this.db
         .prepare(`UPDATE emprestimo SET data_devolucao = ?, status = ? WHERE id = ?`)

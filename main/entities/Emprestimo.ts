@@ -60,7 +60,12 @@ export class Emprestimo {
     this.status = this.isTotalmenteConcluido() ? 'CONCLUIDO' : 'PENDENTE';
   }
 
-  public devolverItem(itemId: number, quantidade: number): ItemEmprestimo {
+  public devolverItem(
+    itemId: number,
+    quantidade: number,
+    quantidadePerdida: number = 0,
+    quantidadeDanificada: number = 0
+  ): ItemEmprestimo {
     if (this.status !== 'PENDENTE') {
       throw new Error('Apenas empréstimos com status "Pendente" podem receber devoluções.');
     }
@@ -73,7 +78,7 @@ export class Emprestimo {
       throw new Error('Este item já foi totalmente devolvido ou baixado.');
     }
 
-    item.devolver(quantidade);
+    item.devolver(quantidade, quantidadePerdida, quantidadeDanificada);
     this.recalcularStatus();
     return item;
   }

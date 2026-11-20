@@ -82,7 +82,10 @@ export interface EmprestimoDetalhesDTO {
  * Entrada para a operação de registrar devolução de um item de empréstimo.
  */
 export interface RegistrarDevolucaoItemInput {
-  quantidadeDevolvida: number;
+  /** Quantidades desta operação, somadas ao histórico. Campos omitidos valem zero. */
+  quantidadeDevolvida?: number;
+  quantidadePerdida?: number;
+  quantidadeDanificada?: number;
 }
 
 /**

@@ -56,7 +56,7 @@ export class EmprestimoController {
   }
 
   /**
-   * Registra a devolução total ou parcial de um item de empréstimo.
+   * Registra a devolução total ou parcial, com perdas e avarias opcionais (HU22.3).
    * Valida a entrada e devolve os dados atualizados do item.
    */
   public devolverItem(
@@ -72,18 +72,26 @@ export class EmprestimoController {
       throw new Error('ID do item de empréstimo inválido para devolução.');
     }
 
-    const quantidade =
-      typeof input === 'object' && input !== null ? input.quantidadeDevolvida : input;
-
-    if (!Number.isSafeInteger(quantidade) || (quantidade as number) <= 0) {
-      throw new Error('A quantidade devolvida deve ser um número inteiro maior que zero.');
-    }
+    const dados = typeof input === 'object' && input !== null
+      ? input
+      : { quantidadeDevolvida: input };
+    const quantidade = dados.quantidadeDevolvida === undefined ? 0 : dados.quantidadeDevolvida;
+    const quantidadePerdida = dados.quantidadePerdida === undefined ? 0 : dados.quantidadePerdida;
+    const quantidadeDanificada = dados.quantidadeDanificada === undefined ? 0 : dados.quantidadeDanificada;
 
     const itemAtualizado = this.emprestimoDAO.registrarDevolucaoItem(
       emprestimoId,
       itemId,
-      quantidade as number,
-      (livroId, qtd) => this.livroDAO.decrementarEmprestada(livroId, qtd)
+      quantidade,
+      (livroId, qtd) => {
+        this.livroDAO.decrementarEmprestada(livroId, qtd);
+        const quantidadeInutilizada = quantidadePerdida + quantidadeDanificada;
+        if (quantidadeInutilizada > 0) {
+          this.livroDAO.reduzirQuantidadeTotal(livroId, quantidadeInutilizada);
+        }
+      },
+      quantidadePerdida,
+      quantidadeDanificada
     );
 
     return {
