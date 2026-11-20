@@ -44,7 +44,7 @@ export default function ListaItensEmprestimo({
   onDevolver,
 }: ListaItensEmprestimoProps) {
   const btnBase =
-    "inline-flex items-center justify-center gap-1.5 px-3 h-8 text-[13.5px] rounded-lg font-semibold shrink-0 transition-colors whitespace-nowrap";
+    "inline-flex items-center justify-center gap-1.5 px-2.5 h-8 text-[13.5px] rounded-lg font-semibold shrink-0 transition-colors whitespace-nowrap";
 
   const btnInativo = `${btnBase} bg-gray-200 text-gray-400 cursor-not-allowed`;
 
