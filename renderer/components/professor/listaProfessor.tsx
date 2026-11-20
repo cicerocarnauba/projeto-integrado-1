@@ -74,7 +74,7 @@ export default function ListaProfessor({
                   <td className="py-2.5 px-4 hidden lg:table-cell text-left">
                     <span
                       title={professor.email}
-                      className={`text-sm font-medium block leading-snug truncate max-w-full ${
+                      className={`text-base font-normal block leading-snug truncate max-w-full ${
                         ativo ? "text-gray-700" : "text-gray-500"
                       }`}
                     >

@@ -79,7 +79,7 @@ export default function ListaLivro({
                   <td className="py-2.5 px-4 hidden xl:table-cell text-left">
                     <span
                       title={livro.editora}
-                      className={`text-sm font-medium block leading-snug truncate max-w-full ${
+                      className={`text-base font-normal block leading-snug truncate max-w-full ${
                         ativo ? "text-gray-700" : "text-gray-500"
                       }`}
                     >
@@ -87,16 +87,16 @@ export default function ListaLivro({
                     </span>
                   </td>
                   <td className="py-2.5 px-3 text-center">
-                    <div className="inline-flex items-baseline justify-center gap-1.5 w-[132px]">
+                    <div className="inline-flex items-baseline justify-center gap-1.5 w-[136px]">
                       <span
-                        className={`w-7 text-right font-semibold text-base tabular-nums ${
-                          ativo ? "text-gray-900" : "text-gray-500"
+                        className={`w-7 text-right font-normal text-base tabular-nums ${
+                          ativo ? "text-gray-700" : "text-gray-500"
                         }`}
                       >
                         {livro.quantidadeTotal}
                       </span>
                       <span
-                        className={`w-[92px] text-left font-medium text-sm ${
+                        className={`w-[96px] text-left font-normal text-base ${
                           ativo ? "text-gray-700" : "text-gray-500"
                         }`}
                       >

@@ -107,7 +107,7 @@ export default function ListaItensEmprestimo({
                     </span>
                   </td>
 
-                  <td className="py-2.5 px-4 hidden xl:table-cell text-left text-sm font-medium text-gray-700">
+                  <td className="py-2.5 px-4 hidden xl:table-cell text-left text-base font-normal text-gray-700">
                     <span
                       title={item.editora}
                       className="block leading-snug truncate max-w-full"
@@ -117,11 +117,11 @@ export default function ListaItensEmprestimo({
                   </td>
 
                   <td className="py-2.5 px-3 text-center">
-                    <div className="inline-flex items-baseline justify-center gap-1.5 w-[132px]">
-                      <span className="w-7 text-right font-semibold text-base text-gray-900 tabular-nums">
+                    <div className="inline-flex items-baseline justify-center gap-1.5 w-[136px]">
+                      <span className="w-7 text-right font-normal text-base text-gray-700 tabular-nums">
                         {item.quantidadeEmprestada}
                       </span>
-                      <span className="w-[92px] text-left font-medium text-sm text-gray-700">
+                      <span className="w-[96px] text-left font-normal text-base text-gray-700">
                         {item.quantidadeEmprestada === 1
                           ? "exemplar"
                           : "exemplares"}

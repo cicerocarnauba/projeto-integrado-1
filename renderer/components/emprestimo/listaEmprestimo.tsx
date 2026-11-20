@@ -85,7 +85,7 @@ export default function ListaEmprestimo({
                     {e.turmaNome} · {formatarData(e.dataRetirada instanceof Date ? e.dataRetirada.toISOString() : e.dataRetirada)}
                   </span>
                 </td>
-                <td className="py-2.5 px-4 hidden xl:table-cell text-sm font-medium text-gray-700 text-left">
+                <td className="py-2.5 px-4 hidden xl:table-cell text-base font-normal text-gray-700 text-left">
                   <span
                     title={e.turmaNome}
                     className="block leading-snug truncate max-w-full"
@@ -95,7 +95,7 @@ export default function ListaEmprestimo({
                 </td>
                 <td
                   colSpan={historico ? 1 : 2}
-                  className="py-2.5 px-3 hidden xl:table-cell text-sm font-medium text-gray-700 tabular-nums whitespace-nowrap text-center"
+                  className="py-2.5 px-3 hidden xl:table-cell text-base font-normal text-gray-700 tabular-nums whitespace-nowrap text-center"
                 >
                   {formatarData(
                     e.dataRetirada instanceof Date
@@ -104,7 +104,7 @@ export default function ListaEmprestimo({
                   )}
                 </td>
                 {historico && (
-                  <td className="py-2.5 px-3 hidden xl:table-cell text-sm font-medium text-gray-700 tabular-nums whitespace-nowrap text-center">
+                  <td className="py-2.5 px-3 hidden xl:table-cell text-base font-normal text-gray-700 tabular-nums whitespace-nowrap text-center">
                     {formatarData(
                       e.dataDevolucao instanceof Date
                         ? e.dataDevolucao.toISOString()
@@ -113,11 +113,11 @@ export default function ListaEmprestimo({
                   </td>
                 )}
                 <td className="py-2.5 px-3 text-center whitespace-nowrap">
-                  <div className="inline-flex items-baseline justify-center gap-1.5 w-[132px]">
-                    <span className="w-7 text-right font-semibold text-base text-gray-900 tabular-nums">
+                  <div className="inline-flex items-baseline justify-center gap-1.5 w-[136px]">
+                    <span className="w-7 text-right font-normal text-base text-gray-700 tabular-nums">
                       {e.quantidadeExemplares}
                     </span>
-                    <span className="w-[92px] text-left font-medium text-sm text-gray-700">
+                    <span className="w-[96px] text-left font-normal text-base text-gray-700">
                       {e.quantidadeExemplares === 1 ? "exemplar" : "exemplares"}
                     </span>
                   </div>
