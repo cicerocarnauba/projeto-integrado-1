@@ -4,7 +4,7 @@
  * sempre preservando largura mínima confortável para a coluna principal à esquerda.
  */
 export const TABLE_COL_WIDTHS = {
-  acoes: "268px",
+  acoes: "244px",
   status: "192px",
   exemplares: "212px",
   avaria: "140px",
