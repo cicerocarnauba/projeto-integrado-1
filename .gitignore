@@ -84,3 +84,6 @@ reqp1.md
 hup1.md
 renderer/next-env.d.ts
 *.tsbuildinfo
+limpar_banco.js
+popular_banco.js
+seed_dados.sql
