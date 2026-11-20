@@ -31,14 +31,14 @@ export default function ModalDevolverTodos({
         <h2 className="text-xl font-bold text-gray-900">
           Devolver todos os exemplares?
         </h2>
-        <p className="mt-2 text-[15px] text-gray-600 leading-relaxed">
+        <p className="mt-2 text-base text-gray-600 leading-relaxed">
           Tem certeza que deseja devolver todos os exemplares pendentes deste empréstimo?
         </p>
 
         {erro && (
           <div
             role="alert"
-            className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-[14.5px] text-red-700"
+            className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
           >
             {erro}
           </div>
@@ -49,7 +49,7 @@ export default function ModalDevolverTodos({
             type="button"
             disabled={salvando}
             onClick={onCancelar}
-            className="h-10 inline-flex items-center justify-center gap-1.5 px-5 rounded-xl text-[14.5px] font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-colors disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+            className="h-10 inline-flex items-center justify-center gap-1.5 px-5 rounded-xl text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-colors disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
           >
             <MdClear size={17} />
             Cancelar
@@ -59,7 +59,7 @@ export default function ModalDevolverTodos({
             type="button"
             disabled={salvando}
             onClick={onConfirmar}
-            className="h-10 inline-flex items-center justify-center gap-1.5 px-5 rounded-xl text-[14.5px] font-semibold text-white bg-[#2e8b45] hover:bg-[#236c35] transition-colors disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+            className="h-10 inline-flex items-center justify-center gap-1.5 px-5 rounded-xl text-sm font-semibold text-white bg-[#2e8b45] hover:bg-[#236c35] transition-colors disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
           >
             <MdUndo size={17} />
             {salvando ? "Devolvendo..." : "Devolver"}

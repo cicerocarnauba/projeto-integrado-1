@@ -23,7 +23,7 @@ export interface ItemSelecionado {
 }
 
 const inputBase =
-  "w-full h-12 bg-white border border-[#cde5d3] rounded-xl px-4 text-[15.5px] text-gray-900 outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20 disabled:opacity-60";
+  "w-full h-12 bg-white border border-[#cde5d3] rounded-xl px-4 text-base text-gray-900 outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20 disabled:opacity-60";
 
 export default function FormRealizarEmprestimo() {
   const router = useRouter();
@@ -266,7 +266,7 @@ export default function FormRealizarEmprestimo() {
       {erro && (
         <div
           role="alert"
-          className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3.5 text-[15px] text-red-700"
+          className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3.5 text-base text-red-700"
         >
           {erro}
         </div>
@@ -275,7 +275,7 @@ export default function FormRealizarEmprestimo() {
       {/* Professor, turma e data */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 pb-6 border-b border-[#cde5d3]">
         <div className="md:col-span-5">
-          <label className="text-[15px] font-semibold text-[#1e582d] mb-2 block">
+          <label className="text-base font-semibold text-[#1e582d] mb-2 block">
             Professor <span className="text-red-500">*</span>
           </label>
           <SelectPesquisavel
@@ -298,7 +298,7 @@ export default function FormRealizarEmprestimo() {
         </div>
 
         <div className="md:col-span-4">
-          <label className="text-[15px] font-semibold text-[#1e582d] mb-2 block">
+          <label className="text-base font-semibold text-[#1e582d] mb-2 block">
             Turma <span className="text-red-500">*</span>
           </label>
           <SelectPesquisavel
@@ -321,7 +321,7 @@ export default function FormRealizarEmprestimo() {
         </div>
 
         <div className="md:col-span-3">
-          <label className="text-[15px] font-semibold text-[#1e582d] mb-2 block">
+          <label className="text-base font-semibold text-[#1e582d] mb-2 block">
             Data do empréstimo
           </label>
           <input
@@ -336,13 +336,13 @@ export default function FormRealizarEmprestimo() {
 
       {/* Adicionar livros */}
       <div className="pt-6">
-        <h2 className="text-[16.5px] font-bold text-[#1e582d] mb-4">
+        <h2 className="text-lg font-bold text-[#1e582d] mb-4">
           Adicionar livros ao empréstimo
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
           <div className="md:col-span-6">
-            <label className="text-[15px] font-semibold text-[#1e582d] mb-2 block">
+            <label className="text-base font-semibold text-[#1e582d] mb-2 block">
               Livro
             </label>
             <SelectPesquisavel
@@ -370,7 +370,7 @@ export default function FormRealizarEmprestimo() {
           </div>
 
           <div className="md:col-span-2">
-            <label className="text-[15px] font-semibold text-[#1e582d] mb-2 block">
+            <label className="text-base font-semibold text-[#1e582d] mb-2 block">
               Quantidade
             </label>
             <div className="w-full h-12 bg-white border border-[#cde5d3] rounded-xl p-1 flex items-center justify-between focus-within:border-[#2e8b45] focus-within:ring-2 focus-within:ring-[#2e8b45]/20">
@@ -407,7 +407,7 @@ export default function FormRealizarEmprestimo() {
               type="button"
               onClick={adicionarLivro}
               disabled={!podeAdicionar}
-              className="w-full h-12 inline-flex items-center justify-center gap-2 whitespace-nowrap bg-[#2e8b45] hover:bg-[#236c35] text-white rounded-xl text-[15px] font-semibold transition-all active:scale-95 cursor-pointer disabled:bg-[#9cc9a8] disabled:hover:bg-[#9cc9a8] disabled:active:scale-100 disabled:cursor-not-allowed"
+              className="w-full h-12 inline-flex items-center justify-center gap-2 whitespace-nowrap bg-[#2e8b45] hover:bg-[#236c35] text-white rounded-xl text-base font-semibold transition-all active:scale-95 cursor-pointer disabled:bg-[#9cc9a8] disabled:hover:bg-[#9cc9a8] disabled:active:scale-100 disabled:cursor-not-allowed"
             >
               <MdAdd size={20} />
               Adicionar ao empréstimo
@@ -417,7 +417,7 @@ export default function FormRealizarEmprestimo() {
 
         {/* Saldo do livro escolhido e aviso de quantidade acima do saldo */}
         {livroSelecionado && (
-          <p className="mt-2.5 text-[15px] text-[#245B2F]">
+          <p className="mt-2.5 text-base text-[#245B2F]">
             Saldo disponível:{" "}
             <span className="font-bold tabular-nums">{livroSelecionado.saldoDisponivel}</span>
             {jaAdicionado > 0 && (
@@ -432,7 +432,7 @@ export default function FormRealizarEmprestimo() {
         {avisoQuantidade && (
           <div
             role="alert"
-            className="mt-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3.5 text-[15px] text-red-700"
+            className="mt-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3.5 text-base text-red-700"
           >
             {avisoQuantidade}
           </div>
@@ -441,13 +441,13 @@ export default function FormRealizarEmprestimo() {
 
       {/* Livros selecionados */}
       <div className="mt-6">
-        <p className="text-[14.5px] font-bold text-[#1e582d] mb-2">
+        <p className="text-sm font-bold text-[#1e582d] mb-2">
           Livros selecionados ({itens.length})
         </p>
 
         <div className="w-full bg-white border border-[#cde5d3] rounded-xl overflow-hidden">
           {itens.length === 0 ? (
-            <p className="px-4 py-7 text-center text-[15px] text-gray-500">
+            <p className="px-4 py-7 text-center text-base text-gray-500">
               Nenhum livro adicionado ao empréstimo ainda.
             </p>
           ) : (
@@ -458,16 +458,16 @@ export default function FormRealizarEmprestimo() {
                   className="flex items-center justify-between gap-4 px-5 py-3.5 hover:bg-[#f7fbf8] transition-colors"
                 >
                   <div className="min-w-0">
-                    <p className="text-[15.5px] font-semibold text-gray-900 truncate">
+                    <p className="text-base font-semibold text-gray-900 truncate">
                       {item.titulo}
                     </p>
-                    <p className="text-[13.5px] text-gray-600 truncate">
+                    <p className="text-sm text-gray-600 truncate">
                       Editora: {item.editora}
                     </p>
                   </div>
 
                   <div className="flex items-center gap-4 shrink-0">
-                    <span className="px-3 py-1 rounded-lg bg-[#eef7f0] border border-[#cde5d4] text-[14px] font-bold text-[#1e582d] tabular-nums">
+                    <span className="px-3 py-1 rounded-lg bg-[#eef7f0] border border-[#cde5d4] text-sm font-bold text-[#1e582d] tabular-nums">
                       {item.quantidade} {item.quantidade === 1 ? "exemplar" : "exemplares"}
                     </span>
 
@@ -491,7 +491,7 @@ export default function FormRealizarEmprestimo() {
       {erroEnvio && (
         <div
           role="alert"
-          className="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3.5 text-[15px] text-red-700"
+          className="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3.5 text-base text-red-700"
         >
           {erroEnvio}
         </div>
@@ -503,7 +503,7 @@ export default function FormRealizarEmprestimo() {
           type="button"
           onClick={tentarCancelar}
           disabled={salvando}
-          className="h-11 inline-flex items-center justify-center gap-2 px-6 rounded-xl text-[15px] font-semibold text-white bg-[#cf4a4a] hover:bg-[#b83a3a] transition-colors shadow-xs active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          className="h-11 inline-flex items-center justify-center gap-2 px-6 rounded-xl text-base font-semibold text-white bg-[#cf4a4a] hover:bg-[#b83a3a] transition-colors shadow-xs active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <MdClear size={19} />
           Cancelar
@@ -512,7 +512,7 @@ export default function FormRealizarEmprestimo() {
         <button
           type="submit"
           disabled={!podeConfirmar || salvando}
-          className="h-11 inline-flex items-center justify-center gap-2 bg-[#2e8b45] hover:bg-[#236c35] text-white px-7 rounded-xl text-[15px] font-semibold transition-all shadow-sm active:scale-95 cursor-pointer disabled:bg-[#9cc9a8] disabled:hover:bg-[#9cc9a8] disabled:active:scale-100 disabled:cursor-not-allowed"
+          className="h-11 inline-flex items-center justify-center gap-2 bg-[#2e8b45] hover:bg-[#236c35] text-white px-7 rounded-xl text-base font-semibold transition-all shadow-sm active:scale-95 cursor-pointer disabled:bg-[#9cc9a8] disabled:hover:bg-[#9cc9a8] disabled:active:scale-100 disabled:cursor-not-allowed"
         >
           <MdCheck size={19} />
           {salvando ? "Confirmando..." : "Confirmar empréstimo"}

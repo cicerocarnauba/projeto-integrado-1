@@ -79,12 +79,12 @@ export default function Paginacao({
     >
       {/* Indicador claro e amigável: Página X de Y • N entidades */}
       <div className="flex items-center gap-3">
-        <span className="text-[15px] font-semibold text-gray-800 tabular-nums">
+        <span className="text-base font-semibold text-gray-800 tabular-nums">
           Página <span className="text-[#2e8b45] font-bold">{paginaAtual}</span> de{" "}
           <span>{totalPaginas}</span>
         </span>
         <span className="text-gray-300">•</span>
-        <span className="bg-[#e8f5ec] text-[#1e582d] text-[13.5px] font-semibold px-3.5 py-1 rounded-full border border-[#c6e3cd] tabular-nums">
+        <span className="bg-[#e8f5ec] text-[#1e582d] text-sm font-semibold px-3.5 py-1 rounded-full border border-[#c6e3cd] tabular-nums">
           {totalResumo} {formatarEntidade(totalResumo, nomeEntidade, nomeEntidadeSingular)}
         </span>
       </div>
@@ -96,7 +96,7 @@ export default function Paginacao({
           onClick={() => aoMudarPagina(paginaAtual - 1)}
           disabled={paginaAtual <= 1}
           aria-label="Página anterior"
-          className={`h-10 px-4 flex items-center gap-1.5 rounded-xl font-semibold text-[14.5px] transition-all shadow-2xs ${
+          className={`h-10 px-4 flex items-center gap-1.5 rounded-xl font-semibold text-sm transition-all shadow-2xs ${
             paginaAtual <= 1
               ? "bg-gray-100 border border-gray-200 text-gray-400 opacity-65 cursor-not-allowed"
               : "bg-white border border-[#cde5d4] text-[#1e582d] hover:bg-[#eef7f0] hover:border-[#2e8b45] cursor-pointer active:scale-95"
@@ -112,7 +112,7 @@ export default function Paginacao({
               return (
                 <span
                   key={`ellipsis-${index}`}
-                  className="w-8 text-center text-[15px] font-bold text-gray-400 select-none"
+                  className="w-8 text-center text-base font-bold text-gray-400 select-none"
                 >
                   {item}
                 </span>
@@ -126,7 +126,7 @@ export default function Paginacao({
                 type="button"
                 onClick={() => aoMudarPagina(item)}
                 aria-current={ativa ? "page" : undefined}
-                className={`h-10 min-w-10 px-3 flex items-center justify-center rounded-xl text-[15px] font-bold tabular-nums transition-all shadow-2xs ${
+                className={`h-10 min-w-10 px-3 flex items-center justify-center rounded-xl text-base font-bold tabular-nums transition-all shadow-2xs ${
                   ativa
                     ? "bg-[#2e8b45] text-white border border-[#2e8b45]"
                     : "bg-white border border-[#cde5d4] text-[#1e582d] hover:bg-[#eef7f0] hover:border-[#2e8b45] cursor-pointer active:scale-95"
@@ -143,7 +143,7 @@ export default function Paginacao({
           onClick={() => aoMudarPagina(paginaAtual + 1)}
           disabled={paginaAtual >= totalPaginas}
           aria-label="Próxima página"
-          className={`h-10 px-4 flex items-center gap-1.5 rounded-xl font-semibold text-[14.5px] transition-all shadow-2xs ${
+          className={`h-10 px-4 flex items-center gap-1.5 rounded-xl font-semibold text-sm transition-all shadow-2xs ${
             paginaAtual >= totalPaginas
               ? "bg-gray-100 border border-gray-200 text-gray-400 opacity-65 cursor-not-allowed"
               : "bg-white border border-[#cde5d4] text-[#1e582d] hover:bg-[#eef7f0] hover:border-[#2e8b45] cursor-pointer active:scale-95"

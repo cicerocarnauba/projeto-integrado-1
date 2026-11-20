@@ -46,7 +46,7 @@ export default function SearchBar({
             placeholder={placeholder}
             value={valorBusca}
             onChange={(e) => onChangeBusca?.(e.target.value)}
-            className="bg-transparent placeholder:text-gray-400 text-gray-900 outline-none w-full text-[15.5px]"
+            className="bg-transparent placeholder:text-gray-400 text-gray-900 outline-none w-full text-base"
           />
           {valorBusca && valorBusca.length > 0 && (
             <button
@@ -67,7 +67,7 @@ export default function SearchBar({
             <button
               type="button"
               onClick={() => setDropdownAberto(!dropdownAberto)}
-              className="h-11 px-5 flex items-center gap-2 rounded-xl font-semibold text-[15px] transition-all shadow-xs hover:shadow-sm cursor-pointer shrink-0 border border-[#cde5d4] bg-white hover:bg-[#2e8b45] hover:border-[#2e8b45] text-[#1e582d] hover:text-white group active:scale-95"
+              className="h-11 px-5 flex items-center gap-2 rounded-xl font-semibold text-base transition-all shadow-xs hover:shadow-sm cursor-pointer shrink-0 border border-[#cde5d4] bg-white hover:bg-[#2e8b45] hover:border-[#2e8b45] text-[#1e582d] hover:text-white group active:scale-95"
             >
               <MdSort
                 size={20}
@@ -92,7 +92,7 @@ export default function SearchBar({
                       onChangeOrdenacao("alfabetica");
                       setDropdownAberto(false);
                     }}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-[15px] font-medium transition-colors cursor-pointer text-left ${
+                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-base font-medium transition-colors cursor-pointer text-left ${
                       ordenacao === "alfabetica"
                         ? "bg-[#eef7f0] text-[#1e582d] font-semibold"
                         : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
@@ -110,7 +110,7 @@ export default function SearchBar({
                       onChangeOrdenacao("recentes");
                       setDropdownAberto(false);
                     }}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-[15px] font-medium transition-colors cursor-pointer text-left ${
+                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-base font-medium transition-colors cursor-pointer text-left ${
                       ordenacao === "recentes"
                         ? "bg-[#eef7f0] text-[#1e582d] font-semibold"
                         : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"

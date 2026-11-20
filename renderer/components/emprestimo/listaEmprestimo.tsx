@@ -38,7 +38,7 @@ export default function ListaEmprestimo({
             <col style={{ width: TABLE_COL_WIDTHS.acoes }} />
           </colgroup>
           <thead>
-            <tr className="bg-[#e8f4eb] border-b border-[#c5dfca] text-[15px] font-bold text-[#1e582d] leading-snug">
+            <tr className="bg-[#e8f4eb] border-b border-[#c5dfca] text-sm font-bold text-[#1e582d] leading-snug">
               <th className="py-3 px-6 text-left whitespace-nowrap">Professor responsável</th>
               <th className="py-3 px-4 hidden xl:table-cell text-left whitespace-nowrap">Turma</th>
               <th colSpan={historico ? 1 : 2} className="py-3 px-3 hidden xl:table-cell text-center whitespace-nowrap">
@@ -74,18 +74,18 @@ export default function ListaEmprestimo({
                 <td className="py-2.5 px-6 text-left">
                   <span
                     title={e.professorNome}
-                    className="text-[15.5px] font-semibold text-gray-900 block leading-snug truncate max-w-full"
+                    className="text-base font-semibold text-gray-900 block leading-snug truncate max-w-full"
                   >
                     {e.professorNome}
                   </span>
                   <span
                     title={e.turmaNome}
-                    className="block xl:hidden text-[13px] text-gray-600 mt-0.5 truncate max-w-full"
+                    className="block xl:hidden text-xs text-gray-600 mt-0.5 truncate max-w-full"
                   >
                     {e.turmaNome} · {formatarData(e.dataRetirada instanceof Date ? e.dataRetirada.toISOString() : e.dataRetirada)}
                   </span>
                 </td>
-                <td className="py-2.5 px-4 hidden xl:table-cell text-[15px] font-medium text-gray-700 text-left">
+                <td className="py-2.5 px-4 hidden xl:table-cell text-sm font-medium text-gray-700 text-left">
                   <span
                     title={e.turmaNome}
                     className="block leading-snug truncate max-w-full"
@@ -95,7 +95,7 @@ export default function ListaEmprestimo({
                 </td>
                 <td
                   colSpan={historico ? 1 : 2}
-                  className="py-2.5 px-3 hidden xl:table-cell text-[15px] font-medium text-gray-700 tabular-nums whitespace-nowrap text-center"
+                  className="py-2.5 px-3 hidden xl:table-cell text-sm font-medium text-gray-700 tabular-nums whitespace-nowrap text-center"
                 >
                   {formatarData(
                     e.dataRetirada instanceof Date
@@ -104,7 +104,7 @@ export default function ListaEmprestimo({
                   )}
                 </td>
                 {historico && (
-                  <td className="py-2.5 px-3 hidden xl:table-cell text-[15px] font-medium text-gray-700 tabular-nums whitespace-nowrap text-center">
+                  <td className="py-2.5 px-3 hidden xl:table-cell text-sm font-medium text-gray-700 tabular-nums whitespace-nowrap text-center">
                     {formatarData(
                       e.dataDevolucao instanceof Date
                         ? e.dataDevolucao.toISOString()
@@ -114,10 +114,10 @@ export default function ListaEmprestimo({
                 )}
                 <td className="py-2.5 px-3 text-center whitespace-nowrap">
                   <div className="inline-flex items-baseline justify-center gap-1.5 w-[132px]">
-                    <span className="w-7 text-right font-semibold text-[15.5px] text-gray-900 tabular-nums">
+                    <span className="w-7 text-right font-semibold text-base text-gray-900 tabular-nums">
                       {e.quantidadeExemplares}
                     </span>
-                    <span className="w-[92px] text-left font-medium text-[15px] text-gray-700">
+                    <span className="w-[92px] text-left font-medium text-sm text-gray-700">
                       {e.quantidadeExemplares === 1 ? "exemplar" : "exemplares"}
                     </span>
                   </div>
@@ -130,7 +130,7 @@ export default function ListaEmprestimo({
                     <button
                       type="button"
                       onClick={() => onVerDetalhes?.(e)}
-                      className="inline-flex items-center justify-center gap-1.5 w-[104px] h-8 bg-[#389348] text-white text-[13.5px] rounded-lg font-semibold hover:bg-[#2e7d3d] transition-colors cursor-pointer shrink-0"
+                      className="inline-flex items-center justify-center gap-1.5 w-[104px] h-8 bg-[#389348] text-white text-sm rounded-lg font-semibold hover:bg-[#2e7d3d] transition-colors cursor-pointer shrink-0"
                     >
                       <MdChecklist size={16} />
                       Detalhes
@@ -148,7 +148,7 @@ export default function ListaEmprestimo({
                               : undefined
                         }
                         onClick={() => onCancelar?.(e)}
-                        className={`inline-flex items-center justify-center gap-1.5 w-[104px] h-8 text-[13.5px] rounded-lg font-semibold shrink-0 transition-colors ${
+                        className={`inline-flex items-center justify-center gap-1.5 w-[104px] h-8 text-sm rounded-lg font-semibold shrink-0 transition-colors ${
                           emprestimosComBaixas.has(e.id) || e.status !== "PENDENTE"
                             ? "bg-gray-200 text-gray-400 cursor-not-allowed"
                             : "bg-[#cf4a4a] text-white hover:bg-[#b83a3a] cursor-pointer"

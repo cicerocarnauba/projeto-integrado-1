@@ -101,11 +101,11 @@ export default function ModalDevolverExemplares({
           Devolver os exemplares?
         </h2>
 
-        <p className="mt-2 text-[15px] text-gray-600 leading-relaxed">
+        <p className="mt-2 text-base text-gray-600 leading-relaxed">
           Informe a quantidade de exemplares devolvidos deste livro:
         </p>
 
-        <div className="mt-3 rounded-xl bg-[#eef7f0] border border-[#d5ead9] p-3.5 space-y-1 text-[14.5px]">
+        <div className="mt-3 rounded-xl bg-[#eef7f0] border border-[#d5ead9] p-3.5 space-y-1 text-sm">
           <p>
             <span className="font-semibold text-[#1e582d]">Título: </span>
             <span className="text-gray-800">{item.livroTitulo}</span>
@@ -122,7 +122,7 @@ export default function ModalDevolverExemplares({
           </p>
 
           {/* Retirada / devolvida / pendente */}
-          <div className="flex flex-wrap gap-x-4 gap-y-1 pt-2 mt-2 border-t border-[#cde5d3] text-[14px] tabular-nums">
+          <div className="flex flex-wrap gap-x-4 gap-y-1 pt-2 mt-2 border-t border-[#cde5d3] text-sm tabular-nums">
             <span>
               <strong className="font-semibold text-[#1e582d]">Retirados: </strong>
               <span className="text-gray-800">{item.quantidadeEmprestada}</span>
@@ -138,7 +138,7 @@ export default function ModalDevolverExemplares({
           </div>
         </div>
 
-        <label className="block mt-5 mb-2 text-[15px] font-semibold text-[#1e582d]">
+        <label className="block mt-5 mb-2 text-base font-semibold text-[#1e582d]">
           Quantidade de exemplares que serão devolvidos
         </label>
 
@@ -177,7 +177,7 @@ export default function ModalDevolverExemplares({
         {tocou && !valido && (
           <div
             role="alert"
-            className="mt-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-[14.5px] text-red-700"
+            className="mt-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
           >
             {erro}
           </div>
@@ -186,7 +186,7 @@ export default function ModalDevolverExemplares({
         {erroExterno && (
           <div
             role="alert"
-            className="mt-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-[14.5px] text-red-700"
+            className="mt-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
           >
             {erroExterno}
           </div>
@@ -197,7 +197,7 @@ export default function ModalDevolverExemplares({
             type="button"
             onClick={onCancelar}
             disabled={salvando}
-            className="h-10 inline-flex items-center justify-center gap-1.5 px-5 rounded-xl text-[14.5px] font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            className="h-10 inline-flex items-center justify-center gap-1.5 px-5 rounded-xl text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <MdClear size={17} />
             Cancelar
@@ -207,7 +207,7 @@ export default function ModalDevolverExemplares({
             type="button"
             onClick={confirmar}
             disabled={!valido || salvando}
-            className="h-10 inline-flex items-center justify-center gap-1.5 px-5 rounded-xl text-[14.5px] font-semibold text-white bg-[#2e8b45] hover:bg-[#236c35] transition-colors cursor-pointer disabled:bg-[#9cc9a8] disabled:hover:bg-[#9cc9a8] disabled:cursor-not-allowed"
+            className="h-10 inline-flex items-center justify-center gap-1.5 px-5 rounded-xl text-sm font-semibold text-white bg-[#2e8b45] hover:bg-[#236c35] transition-colors cursor-pointer disabled:bg-[#9cc9a8] disabled:hover:bg-[#9cc9a8] disabled:cursor-not-allowed"
           >
             <MdReplay size={17} />
             {salvando ? "Devolvendo..." : "Devolver"}

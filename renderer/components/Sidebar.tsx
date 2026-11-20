@@ -88,7 +88,7 @@ export default function Sidebar({ activePath, className = "" }: SidebarProps) {
       suppressHydrationWarning
       className={`sticky top-0 h-screen bg-[#2e8b45] text-white flex flex-col justify-between select-none shrink-0 overflow-hidden shadow-md ${
         montado ? "transition-[width] duration-300 ease-in-out" : "transition-none"
-      } z-40 px-4 py-6 ${recolhida ? "w-20" : "w-[292px]"} ${className}`}
+      } z-40 px-4 py-6 ${recolhida ? "w-20" : "w-[304px]"} ${className}`}
     >
       <div className="flex flex-col w-full">
         {/* Cabeçalho da Sidebar com Toggle */}
@@ -98,7 +98,7 @@ export default function Sidebar({ activePath, className = "" }: SidebarProps) {
               recolhida ? "w-0 opacity-0" : "w-auto opacity-100 delay-100"
             }`}
           >
-            <h2 className="text-[22px] font-bold text-white tracking-tight whitespace-nowrap pl-2.5">
+            <h2 className="text-xl font-bold text-white tracking-tight whitespace-nowrap pl-2.5">
               Menu
             </h2>
           </div>
@@ -122,7 +122,7 @@ export default function Sidebar({ activePath, className = "" }: SidebarProps) {
         </div>
 
         {/* Links de navegação */}
-        <nav className="flex flex-col gap-2 text-[15.5px] font-medium w-full">
+        <nav className="flex flex-col gap-2 text-base font-medium w-full">
           {menuItems.map((item) => {
             const Icon = item.icon;
             return (
@@ -152,7 +152,7 @@ export default function Sidebar({ activePath, className = "" }: SidebarProps) {
                       : "opacity-100 duration-200 delay-100"
                   }`}
                 >
-                  <span className="whitespace-nowrap text-[15px] pl-0.5">
+                  <span className="whitespace-nowrap text-base pl-0.5">
                     {item.label}
                   </span>
 

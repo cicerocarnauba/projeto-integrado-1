@@ -25,7 +25,7 @@ export default function PageShell({
       <main className="flex-1 min-w-0 px-4 sm:px-6 lg:px-10 py-4 sm:py-5 animate-fade-in">
         <div className={maxWidthClass}>
           <div className="flex flex-wrap items-center justify-between gap-3 mb-3.5">
-            <h1 className="text-2xl sm:text-[26px] lg:text-[28px] font-bold tracking-tight text-gray-900">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">
               {titulo}
             </h1>
             {acaoTopo}

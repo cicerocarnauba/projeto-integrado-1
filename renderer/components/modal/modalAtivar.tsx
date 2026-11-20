@@ -34,7 +34,7 @@ export default function ModalAtivar({
       >
         <h2 className="text-xl font-bold text-gray-900">{titulo}</h2>
 
-        <div className="mt-2 text-[15px] text-gray-600 leading-relaxed">
+        <div className="mt-2 text-base text-gray-600 leading-relaxed">
           {mensagem}
         </div>
 
@@ -42,7 +42,7 @@ export default function ModalAtivar({
           <button
             type="button"
             onClick={onCancelar}
-            className="h-10 inline-flex items-center justify-center gap-1.5 px-5 rounded-xl text-[14.5px] font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-colors cursor-pointer"
+            className="h-10 inline-flex items-center justify-center gap-1.5 px-5 rounded-xl text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-colors cursor-pointer"
           >
             <MdClear size={17} />
             Cancelar
@@ -51,7 +51,7 @@ export default function ModalAtivar({
           <button
             type="button"
             onClick={onConfirmar}
-            className="h-10 inline-flex items-center justify-center gap-1.5 px-5 rounded-xl text-[14.5px] font-semibold text-white bg-[#2e8b45] hover:bg-[#236c35] transition-colors cursor-pointer"
+            className="h-10 inline-flex items-center justify-center gap-1.5 px-5 rounded-xl text-sm font-semibold text-white bg-[#2e8b45] hover:bg-[#236c35] transition-colors cursor-pointer"
           >
             <MdCheck size={17} />
             Ativar

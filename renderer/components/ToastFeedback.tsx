@@ -30,7 +30,7 @@ export default function ToastFeedback({
       className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 animate-fade-in pointer-events-none"
     >
       <div
-        className={`pointer-events-auto flex items-center gap-3 px-5 py-3.5 rounded-2xl shadow-xl text-[15px] font-semibold border transition-all ${
+        className={`pointer-events-auto flex items-center gap-3 px-5 py-3.5 rounded-2xl shadow-xl text-base font-semibold border transition-all ${
           isSucesso
             ? "bg-[#2e8b45] text-white border-[#236c35] shadow-emerald-950/20"
             : "bg-[#cf4a4a] text-white border-[#b83a3a] shadow-rose-950/20"

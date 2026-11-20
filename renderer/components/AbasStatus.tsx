@@ -20,7 +20,7 @@ export default function AbasStatus({
   totalInativos,
 }: AbasStatusProps) {
   const abaClass = (ativa: boolean) =>
-    `pb-2.5 px-1 text-[15.5px] font-semibold border-b-[3px] transition-colors cursor-pointer inline-flex items-center gap-2 whitespace-nowrap ${
+    `pb-2.5 px-1 text-base font-semibold border-b-[3px] transition-colors cursor-pointer inline-flex items-center gap-2 whitespace-nowrap ${
       ativa
         ? "text-[#1e582d] border-[#2e8b45]"
         : "text-gray-500 border-transparent hover:text-gray-800 hover:border-[#cde5d4]"

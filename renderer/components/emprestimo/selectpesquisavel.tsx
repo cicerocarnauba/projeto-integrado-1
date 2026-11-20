@@ -153,7 +153,7 @@ export default function SelectPesquisavel({
         }}
         onKeyDown={aoPressionarTecla}
         // pr-10 reserva o espaço da seta: o texto nunca passa por baixo dela
-        className="w-full h-12 bg-white border border-[#cde5d3] rounded-xl pl-4 pr-10 text-[15.5px] text-gray-900 placeholder:text-gray-400 truncate outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20 disabled:opacity-60 disabled:cursor-not-allowed"
+        className="w-full h-12 bg-white border border-[#cde5d3] rounded-xl pl-4 pr-10 text-base text-gray-900 placeholder:text-gray-400 truncate outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20 disabled:opacity-60 disabled:cursor-not-allowed"
       />
 
       {/* Seta sempre à mesma distância da borda direita, em todos os campos */}
@@ -172,7 +172,7 @@ export default function SelectPesquisavel({
           className="absolute z-30 mt-1.5 w-full max-h-64 overflow-auto bg-white border border-[#cde5d3] rounded-xl shadow-xl py-1.5"
         >
           {filtradas.length === 0 ? (
-            <li className="px-4 py-3 text-[15px] text-gray-500">{mensagemVazia}</li>
+            <li className="px-4 py-3 text-base text-gray-500">{mensagemVazia}</li>
           ) : (
             filtradas.map((opcao, indice) => (
               <li
@@ -187,7 +187,7 @@ export default function SelectPesquisavel({
                   escolher(opcao);
                 }}
                 onMouseEnter={() => !opcao.desabilitada && setIndiceAtivo(indice)}
-                className={`flex items-center justify-between gap-3 px-4 py-2.5 text-[15px] ${
+                className={`flex items-center justify-between gap-3 px-4 py-2.5 text-base ${
                   opcao.desabilitada
                     ? "text-gray-400 cursor-not-allowed"
                     : "cursor-pointer text-gray-800"
@@ -199,7 +199,7 @@ export default function SelectPesquisavel({
               >
                 <span className="truncate">{opcao.label}</span>
                 {opcao.extra && (
-                  <span className="shrink-0 text-[13px] font-semibold text-[#2e8b45] tabular-nums">
+                  <span className="shrink-0 text-xs font-semibold text-[#2e8b45] tabular-nums">
                     {opcao.extra}
                   </span>
                 )}

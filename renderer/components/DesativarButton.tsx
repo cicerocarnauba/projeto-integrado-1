@@ -21,7 +21,7 @@ export default function DesativarButton({
       onClick={disabled ? undefined : onClick}
       disabled={disabled}
       title={title || defaultTitle}
-      className={`inline-flex items-center justify-center gap-1.5 w-[98px] h-8 text-[13.5px] rounded-lg font-semibold transition-colors shrink-0 ${
+      className={`inline-flex items-center justify-center gap-1.5 w-[98px] h-8 text-sm rounded-lg font-semibold transition-colors shrink-0 ${
         disabled
           ? "bg-gray-200 text-gray-400 cursor-not-allowed"
           : "bg-[#cf4a4a] text-white hover:bg-[#b83a3a] cursor-pointer"

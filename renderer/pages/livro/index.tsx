@@ -237,7 +237,7 @@ export default function GerenciarLivros() {
 
         <Link
           href="/livro/cadastro_livro"
-          className="h-11 px-5 sm:px-6 inline-flex items-center justify-center bg-[#2e8b45] text-white rounded-xl font-semibold text-[15px] hover:bg-[#236c35] transition-all whitespace-nowrap gap-2 shadow-sm cursor-pointer shrink-0 active:scale-95"
+          className="h-11 px-5 sm:px-6 inline-flex items-center justify-center bg-[#2e8b45] text-white rounded-xl font-semibold text-base hover:bg-[#236c35] transition-all whitespace-nowrap gap-2 shadow-sm cursor-pointer shrink-0 active:scale-95"
         >
           <MdAdd size={20} />
           Adicionar livro
@@ -287,7 +287,7 @@ export default function GerenciarLivros() {
             livroParaExcluir ? (
               <div>
                 <p>Tem certeza que deseja excluir este livro?</p>
-                <div className="mt-3 rounded-xl bg-[#eef7f0] border border-[#d5ead9] p-3.5 space-y-1 text-[14.5px]">
+                <div className="mt-3 rounded-xl bg-[#eef7f0] border border-[#d5ead9] p-3.5 space-y-1 text-sm">
                   <p>
                     <span className="font-semibold text-[#1e582d]">Título: </span>
                     <span className="text-gray-800">{livroParaExcluir.titulo}</span>
@@ -326,7 +326,7 @@ export default function GerenciarLivros() {
             livroParaDesativar ? (
               <div>
                 <p>Tem certeza que deseja desativar este livro?</p>
-                <div className="mt-3 rounded-xl bg-[#eef7f0] border border-[#d5ead9] p-3.5 space-y-1 text-[14.5px]">
+                <div className="mt-3 rounded-xl bg-[#eef7f0] border border-[#d5ead9] p-3.5 space-y-1 text-sm">
                   <p>
                     <span className="font-semibold text-[#1e582d]">Título: </span>
                     <span className="text-gray-800">{livroParaDesativar.titulo}</span>

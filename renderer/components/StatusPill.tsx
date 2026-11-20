@@ -42,7 +42,7 @@ export default function StatusPill({ status }: { status: TipoStatusPill }) {
   const s = STATUS_CONFIG[status] ?? STATUS_CONFIG.INATIVO;
   return (
     <span
-      className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg font-semibold text-[13px] border whitespace-nowrap shrink-0 ${s.badge}`}
+      className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg font-semibold text-xs border whitespace-nowrap shrink-0 ${s.badge}`}
     >
       <span className={`w-2 h-2 rounded-full shrink-0 ${s.dot}`} />
       {s.label}

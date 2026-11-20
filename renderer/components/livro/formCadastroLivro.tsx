@@ -67,7 +67,7 @@ export default function FormCadastroLivro() {
       className="w-full bg-[#eef7f0] border border-[#cfe5d4] rounded-2xl p-8 shadow-xs"
     >
       {erro && (
-        <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3.5 text-[15px] text-red-700">
+        <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3.5 text-base text-red-700">
           {erro}
         </div>
       )}
@@ -75,7 +75,7 @@ export default function FormCadastroLivro() {
       {/* Campos do formulário */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-6">
         <div className="md:col-span-12">
-          <label className="text-[15px] font-semibold text-[#1e582d] mb-2 block">
+          <label className="text-base font-semibold text-[#1e582d] mb-2 block">
             Título do livro
           </label>
           <input
@@ -84,12 +84,12 @@ export default function FormCadastroLivro() {
             placeholder="Ex: Dom Casmurro"
             value={titulo}
             onChange={(e) => setTitulo(e.target.value)}
-            className="w-full h-12 bg-white border border-[#cde5d3] rounded-xl px-4 text-[15.5px] text-gray-900 placeholder:text-gray-400 outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20"
+            className="w-full h-12 bg-white border border-[#cde5d3] rounded-xl px-4 text-base text-gray-900 placeholder:text-gray-400 outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20"
           />
         </div>
 
         <div className="md:col-span-8">
-          <label className="text-[15px] font-semibold text-[#1e582d] mb-2 block">
+          <label className="text-base font-semibold text-[#1e582d] mb-2 block">
             Editora
           </label>
           <input
@@ -98,12 +98,12 @@ export default function FormCadastroLivro() {
             placeholder="Ex: Ática"
             value={editora}
             onChange={(e) => setEditora(e.target.value)}
-            className="w-full h-12 bg-white border border-[#cde5d3] rounded-xl px-4 text-[15.5px] text-gray-900 placeholder:text-gray-400 outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20"
+            className="w-full h-12 bg-white border border-[#cde5d3] rounded-xl px-4 text-base text-gray-900 placeholder:text-gray-400 outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20"
           />
         </div>
 
         <div className="md:col-span-4">
-          <label className="text-[15px] font-semibold text-[#1e582d] mb-2 block whitespace-nowrap">
+          <label className="text-base font-semibold text-[#1e582d] mb-2 block whitespace-nowrap">
             Exemplares
           </label>
           <div className="w-full h-12 bg-white border border-[#cde5d3] rounded-xl p-1 flex items-center justify-between shadow-2xs focus-within:border-[#2e8b45] focus-within:ring-2 focus-within:ring-[#2e8b45]/20">
@@ -145,7 +145,7 @@ export default function FormCadastroLivro() {
 
       {/* Efeito em tempo real da quantidade escolhida */}
       <div className="mb-8 space-y-3">
-        <p className="text-[15px] text-[#245B2F]">
+        <p className="text-base text-[#245B2F]">
           Exemplares disponíveis para empréstimo:{" "}
           <span className="font-bold tabular-nums">{quantidadeTotal}</span>
         </p>
@@ -157,7 +157,7 @@ export default function FormCadastroLivro() {
           type="button"
           onClick={cancelar}
           disabled={salvando}
-          className="h-11 inline-flex items-center justify-center gap-2 px-6 rounded-xl text-[15px] font-semibold text-white bg-[#cf4a4a] hover:bg-[#b83a3a] transition-colors shadow-xs active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          className="h-11 inline-flex items-center justify-center gap-2 px-6 rounded-xl text-base font-semibold text-white bg-[#cf4a4a] hover:bg-[#b83a3a] transition-colors shadow-xs active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <MdClear size={19} />
           Cancelar
@@ -166,7 +166,7 @@ export default function FormCadastroLivro() {
         <button
           type="submit"
           disabled={salvando}
-          className="h-11 inline-flex items-center justify-center gap-2 bg-[#2e8b45] hover:bg-[#236c35] text-white px-7 rounded-xl text-[15px] font-semibold transition-all shadow-sm active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          className="h-11 inline-flex items-center justify-center gap-2 bg-[#2e8b45] hover:bg-[#236c35] text-white px-7 rounded-xl text-base font-semibold transition-all shadow-sm active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <MdCheck size={19} />
           {salvando ? "Salvando..." : "Confirmar"}

@@ -21,14 +21,14 @@ function AvariaBadges({ item }: { item: ItemEmprestimo }) {
 
   if (!p && !d) {
     return (
-      <span className="inline-flex items-center px-3 py-1 rounded-lg text-[13px] font-semibold bg-gray-100 text-gray-600 border border-gray-300 whitespace-nowrap">
+      <span className="inline-flex items-center px-3 py-1 rounded-lg text-xs font-semibold bg-gray-100 text-gray-600 border border-gray-300 whitespace-nowrap">
         Sem avaria
       </span>
     );
   }
 
   const badge =
-    "inline-flex items-center px-3 py-1 rounded-lg text-[13px] font-semibold bg-[#fee2e2] text-[#b91c1c] border border-[#fecaca] whitespace-nowrap";
+    "inline-flex items-center px-3 py-1 rounded-lg text-xs font-semibold bg-[#fee2e2] text-[#b91c1c] border border-[#fecaca] whitespace-nowrap";
 
   return (
     <div className="flex flex-col items-center gap-1">
@@ -44,7 +44,7 @@ export default function ListaItensEmprestimo({
   onDevolver,
 }: ListaItensEmprestimoProps) {
   const btnBase =
-    "inline-flex items-center justify-center gap-1.5 w-[104px] h-8 text-[13.5px] rounded-lg font-semibold shrink-0 transition-colors whitespace-nowrap";
+    "inline-flex items-center justify-center gap-1.5 w-[104px] h-8 text-sm rounded-lg font-semibold shrink-0 transition-colors whitespace-nowrap";
 
   const btnInativo = `${btnBase} bg-gray-200 text-gray-400 cursor-not-allowed`;
 
@@ -61,7 +61,7 @@ export default function ListaItensEmprestimo({
             <col style={{ width: TABLE_COL_WIDTHS.acoes }} />
           </colgroup>
           <thead>
-            <tr className="bg-[#e8f4eb] border-b border-[#c5dfca] text-[15px] font-bold text-[#1e582d] leading-snug">
+            <tr className="bg-[#e8f4eb] border-b border-[#c5dfca] text-sm font-bold text-[#1e582d] leading-snug">
               <th className="py-3 px-6 text-left whitespace-nowrap">Título</th>
               <th className="py-3 px-4 hidden xl:table-cell text-left whitespace-nowrap">Editora</th>
               <th className="py-3 px-3 text-center whitespace-nowrap">Exemplares emprestados</th>
@@ -95,19 +95,19 @@ export default function ListaItensEmprestimo({
                   <td className="py-2.5 px-6 text-left">
                     <span
                       title={item.livroTitulo}
-                      className="text-[15.5px] font-semibold text-gray-900 block leading-snug truncate max-w-full"
+                      className="text-base font-semibold text-gray-900 block leading-snug truncate max-w-full"
                     >
                       {item.livroTitulo}
                     </span>
                     <span
                       title={item.editora}
-                      className="block xl:hidden text-[13px] text-gray-600 mt-0.5 truncate max-w-full"
+                      className="block xl:hidden text-xs text-gray-600 mt-0.5 truncate max-w-full"
                     >
                       {item.editora}
                     </span>
                   </td>
 
-                  <td className="py-2.5 px-4 hidden xl:table-cell text-left text-[15px] font-medium text-gray-700">
+                  <td className="py-2.5 px-4 hidden xl:table-cell text-left text-sm font-medium text-gray-700">
                     <span
                       title={item.editora}
                       className="block leading-snug truncate max-w-full"
@@ -118,10 +118,10 @@ export default function ListaItensEmprestimo({
 
                   <td className="py-2.5 px-3 text-center">
                     <div className="inline-flex items-baseline justify-center gap-1.5 w-[132px]">
-                      <span className="w-7 text-right font-semibold text-[15.5px] text-gray-900 tabular-nums">
+                      <span className="w-7 text-right font-semibold text-base text-gray-900 tabular-nums">
                         {item.quantidadeEmprestada}
                       </span>
-                      <span className="w-[92px] text-left font-medium text-[15px] text-gray-700">
+                      <span className="w-[92px] text-left font-medium text-sm text-gray-700">
                         {item.quantidadeEmprestada === 1
                           ? "exemplar"
                           : "exemplares"}
@@ -129,7 +129,7 @@ export default function ListaItensEmprestimo({
                     </div>
 
                     {devolvida > 0 && (
-                      <span className="block text-[13px] font-medium text-[#2e8b45] mt-0.5 whitespace-nowrap tabular-nums">
+                      <span className="block text-xs font-medium text-[#2e8b45] mt-0.5 whitespace-nowrap tabular-nums">
                         {devolvida} {devolvida === 1 ? "devolvido" : "devolvidos"}
                         {" · "}
                         {pendente} {pendente === 1 ? "pendente" : "pendentes"}

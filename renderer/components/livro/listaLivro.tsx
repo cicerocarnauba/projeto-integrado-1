@@ -35,7 +35,7 @@ export default function ListaLivro({
             <col style={{ width: TABLE_COL_WIDTHS.acoes }} />
           </colgroup>
           <thead>
-            <tr className="bg-[#e8f4eb] border-b border-[#c5dfca] text-[15px] font-bold text-[#1e582d] leading-snug">
+            <tr className="bg-[#e8f4eb] border-b border-[#c5dfca] text-sm font-bold text-[#1e582d] leading-snug">
               <th className="py-3 px-6 text-left whitespace-nowrap">Título do livro</th>
               <th className="py-3 px-4 hidden xl:table-cell text-left whitespace-nowrap">Editora</th>
               <th className="py-3 px-3 text-center whitespace-nowrap">Total de exemplares</th>
@@ -63,7 +63,7 @@ export default function ListaLivro({
                   <td className="py-2.5 px-6 text-left">
                     <span
                       title={livro.titulo}
-                      className={`text-[15.5px] font-semibold block leading-snug truncate max-w-full ${
+                      className={`text-base font-semibold block leading-snug truncate max-w-full ${
                         ativo ? "text-gray-900" : "text-gray-500"
                       }`}
                     >
@@ -71,7 +71,7 @@ export default function ListaLivro({
                     </span>
                     <span
                       title={livro.editora}
-                      className="block xl:hidden text-[13px] text-gray-600 truncate max-w-full mt-0.5"
+                      className="block xl:hidden text-xs text-gray-600 truncate max-w-full mt-0.5"
                     >
                       {livro.editora}
                     </span>
@@ -79,7 +79,7 @@ export default function ListaLivro({
                   <td className="py-2.5 px-4 hidden xl:table-cell text-left">
                     <span
                       title={livro.editora}
-                      className={`text-[15px] font-medium block leading-snug truncate max-w-full ${
+                      className={`text-sm font-medium block leading-snug truncate max-w-full ${
                         ativo ? "text-gray-700" : "text-gray-500"
                       }`}
                     >
@@ -89,14 +89,14 @@ export default function ListaLivro({
                   <td className="py-2.5 px-3 text-center">
                     <div className="inline-flex items-baseline justify-center gap-1.5 w-[132px]">
                       <span
-                        className={`w-7 text-right font-semibold text-[15.5px] tabular-nums ${
+                        className={`w-7 text-right font-semibold text-base tabular-nums ${
                           ativo ? "text-gray-900" : "text-gray-500"
                         }`}
                       >
                         {livro.quantidadeTotal}
                       </span>
                       <span
-                        className={`w-[92px] text-left font-medium text-[15px] ${
+                        className={`w-[92px] text-left font-medium text-sm ${
                           ativo ? "text-gray-700" : "text-gray-500"
                         }`}
                       >
@@ -114,7 +114,7 @@ export default function ListaLivro({
                           <button
                             type="button"
                             onClick={() => onEditar?.(livro)}
-                            className="inline-flex items-center justify-center gap-1.5 w-[98px] h-8 bg-[#389348] text-white text-[13.5px] rounded-lg font-semibold hover:bg-[#2e7d3d] transition-colors cursor-pointer shrink-0"
+                            className="inline-flex items-center justify-center gap-1.5 w-[98px] h-8 bg-[#389348] text-white text-sm rounded-lg font-semibold hover:bg-[#2e7d3d] transition-colors cursor-pointer shrink-0"
                           >
                             <MdEdit size={16} />
                             Editar
@@ -140,7 +140,7 @@ export default function ListaLivro({
                             type="button"
                             disabled
                             title="Livro desativado não pode ser editado"
-                            className="inline-flex items-center justify-center gap-1.5 w-[98px] h-8 bg-gray-200 text-gray-400 text-[13.5px] rounded-lg font-semibold cursor-not-allowed shrink-0"
+                            className="inline-flex items-center justify-center gap-1.5 w-[98px] h-8 bg-gray-200 text-gray-400 text-sm rounded-lg font-semibold cursor-not-allowed shrink-0"
                           >
                             <MdEdit size={16} />
                             Editar

@@ -48,7 +48,7 @@ export default function CardModulo({ modulo, onSelect, disabled }: CardModuloPro
         />
       </div>
 
-      <h3 className="text-base sm:text-[20px] font-bold text-[#1e582d] group-hover:text-[#174623] transition-colors leading-snug">
+      <h3 className="text-base sm:text-xl font-bold text-[#1e582d] group-hover:text-[#174623] transition-colors leading-snug">
         {modulo.titulo}
       </h3>
     </Link>

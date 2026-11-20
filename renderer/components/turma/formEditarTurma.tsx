@@ -96,7 +96,7 @@ export default function FormEditarTurma({ turma }: FormEditarTurmaProps) {
       {erro && (
         <div
           role="alert"
-          className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3.5 text-[15px] text-red-700"
+          className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3.5 text-base text-red-700"
         >
           {erro}
         </div>
@@ -104,7 +104,7 @@ export default function FormEditarTurma({ turma }: FormEditarTurmaProps) {
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-8">
         <div className="md:col-span-12">
-          <label className="text-[15px] font-semibold text-[#1e582d] mb-2 block">
+          <label className="text-base font-semibold text-[#1e582d] mb-2 block">
             Nome da turma
           </label>
           <input
@@ -115,7 +115,7 @@ export default function FormEditarTurma({ turma }: FormEditarTurmaProps) {
               limparErro();
               setNome(e.target.value);
             }}
-            className="w-full h-12 bg-white border border-[#cde5d3] rounded-xl px-4 text-[15.5px] text-gray-900 placeholder:text-gray-400 outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20 disabled:opacity-60"
+            className="w-full h-12 bg-white border border-[#cde5d3] rounded-xl px-4 text-base text-gray-900 placeholder:text-gray-400 outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20 disabled:opacity-60"
           />
         </div>
       </div>
@@ -125,7 +125,7 @@ export default function FormEditarTurma({ turma }: FormEditarTurmaProps) {
           type="button"
           onClick={cancelar}
           disabled={salvando}
-          className="h-11 inline-flex items-center justify-center gap-2 px-6 rounded-xl text-[15px] font-semibold text-white bg-[#cf4a4a] hover:bg-[#b83a3a] transition-colors shadow-xs active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          className="h-11 inline-flex items-center justify-center gap-2 px-6 rounded-xl text-base font-semibold text-white bg-[#cf4a4a] hover:bg-[#b83a3a] transition-colors shadow-xs active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <MdClear size={19} />
           Cancelar edição
@@ -134,7 +134,7 @@ export default function FormEditarTurma({ turma }: FormEditarTurmaProps) {
         <button
           type="submit"
           disabled={salvando}
-          className="h-11 inline-flex items-center justify-center gap-2 bg-[#2e8b45] hover:bg-[#236c35] text-white px-7 rounded-xl text-[15px] font-semibold transition-all shadow-sm active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          className="h-11 inline-flex items-center justify-center gap-2 bg-[#2e8b45] hover:bg-[#236c35] text-white px-7 rounded-xl text-base font-semibold transition-all shadow-sm active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <MdCheck size={19} />
           {salvando ? "Salvando..." : "Confirmar edição"}

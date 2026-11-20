@@ -111,11 +111,11 @@ export default function ModalAtivarLivro({
       >
         <h2 className="text-xl font-bold text-gray-900">Ativar livro?</h2>
 
-        <p className="mt-2 text-[15px] text-gray-600 leading-relaxed">
+        <p className="mt-2 text-base text-gray-600 leading-relaxed">
           Informe a nova quantidade total de exemplares:
         </p>
 
-        <div className="mt-3 rounded-xl bg-[#eef7f0] border border-[#d5ead9] p-3.5 space-y-1 text-[14.5px]">
+        <div className="mt-3 rounded-xl bg-[#eef7f0] border border-[#d5ead9] p-3.5 space-y-1 text-sm">
           <p>
             <span className="font-semibold text-[#1e582d]">Título: </span>
             <span className="text-gray-800">{livro.titulo}</span>
@@ -129,13 +129,13 @@ export default function ModalAtivarLivro({
         {mensagemErro && (
           <div
             role="alert"
-            className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-[14.5px] text-red-700"
+            className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
           >
             {mensagemErro}
           </div>
         )}
 
-        <label className="text-[15px] font-semibold text-[#1e582d] mt-5 mb-2 block">
+        <label className="text-base font-semibold text-[#1e582d] mt-5 mb-2 block">
           Nova quantidade total de exemplares
         </label>
 
@@ -176,7 +176,7 @@ export default function ModalAtivarLivro({
         </div>
 
         {emprestados > 0 && (
-          <p className="text-[13.5px] font-medium text-[#2e8b45] mt-2">
+          <p className="text-sm font-medium text-[#2e8b45] mt-2">
             Mínimo de {minimo}: {emprestados}{" "}
             {emprestados === 1
               ? "exemplar emprestado"
@@ -189,7 +189,7 @@ export default function ModalAtivarLivro({
             type="button"
             onClick={onCancelar}
             disabled={carregando}
-            className="h-10 inline-flex items-center justify-center gap-1.5 px-5 rounded-xl text-[14.5px] font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-colors cursor-pointer disabled:opacity-50"
+            className="h-10 inline-flex items-center justify-center gap-1.5 px-5 rounded-xl text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-colors cursor-pointer disabled:opacity-50"
           >
             <MdClear size={17} />
             Cancelar
@@ -199,7 +199,7 @@ export default function ModalAtivarLivro({
             type="button"
             onClick={confirmar}
             disabled={carregando}
-            className="h-10 inline-flex items-center justify-center gap-1.5 px-5 rounded-xl text-[14.5px] font-semibold text-white bg-[#2e8b45] hover:bg-[#236c35] transition-colors cursor-pointer disabled:opacity-50"
+            className="h-10 inline-flex items-center justify-center gap-1.5 px-5 rounded-xl text-sm font-semibold text-white bg-[#2e8b45] hover:bg-[#236c35] transition-colors cursor-pointer disabled:opacity-50"
           >
             <MdCheck size={17} />
             {carregando ? "Ativando..." : "Ativar"}

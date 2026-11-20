@@ -33,7 +33,7 @@ export default function ListaTurma({
             <col style={{ width: TABLE_COL_WIDTHS.acoes }} />
           </colgroup>
           <thead>
-            <tr className="bg-[#e8f4eb] border-b border-[#c5dfca] text-[15px] font-bold text-[#1e582d] leading-snug">
+            <tr className="bg-[#e8f4eb] border-b border-[#c5dfca] text-sm font-bold text-[#1e582d] leading-snug">
               <th className="py-3 px-6 text-left whitespace-nowrap">Nome da turma</th>
               <th className="py-3 px-3 text-center whitespace-nowrap">Status da turma</th>
               <th className="py-3 px-3 text-center whitespace-nowrap">Ações</th>
@@ -56,7 +56,7 @@ export default function ListaTurma({
                   <td className="py-2.5 px-6 text-left">
                     <span
                       title={turma.nome}
-                      className={`text-[15.5px] font-semibold block leading-snug truncate max-w-full ${
+                      className={`text-base font-semibold block leading-snug truncate max-w-full ${
                         ativo ? "text-gray-900" : "text-gray-500"
                       }`}
                     >
@@ -73,7 +73,7 @@ export default function ListaTurma({
                           <button
                             type="button"
                             onClick={() => onEditar?.(turma)}
-                            className="inline-flex items-center justify-center gap-1.5 w-[98px] h-8 bg-[#389348] text-white text-[13.5px] rounded-lg font-semibold hover:bg-[#2e7d3d] transition-colors cursor-pointer shrink-0"
+                            className="inline-flex items-center justify-center gap-1.5 w-[98px] h-8 bg-[#389348] text-white text-sm rounded-lg font-semibold hover:bg-[#2e7d3d] transition-colors cursor-pointer shrink-0"
                           >
                             <MdEdit size={16} />
                             Editar
@@ -101,7 +101,7 @@ export default function ListaTurma({
                             type="button"
                             disabled
                             title="Turma desativada não pode ser editada"
-                            className="inline-flex items-center justify-center gap-1.5 w-[98px] h-8 bg-gray-200 text-gray-400 text-[13.5px] rounded-lg font-semibold cursor-not-allowed shrink-0"
+                            className="inline-flex items-center justify-center gap-1.5 w-[98px] h-8 bg-gray-200 text-gray-400 text-sm rounded-lg font-semibold cursor-not-allowed shrink-0"
                           >
                             <MdEdit size={16} />
                             Editar

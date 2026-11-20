@@ -57,7 +57,7 @@ export default function ModalConfirmarEmprestimo({
           {titulo}
         </h2>
 
-        <div className="mt-2 text-[15px] text-gray-600 leading-relaxed">
+        <div className="mt-2 text-base text-gray-600 leading-relaxed">
           {mensagem}
         </div>
 
@@ -65,7 +65,7 @@ export default function ModalConfirmarEmprestimo({
           <button
             type="button"
             onClick={onCancelar}
-            className="h-10 inline-flex items-center justify-center gap-1.5 px-5 rounded-xl text-[14.5px] font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-colors active:scale-95 cursor-pointer"
+            className="h-10 inline-flex items-center justify-center gap-1.5 px-5 rounded-xl text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-colors active:scale-95 cursor-pointer"
           >
             <MdClear size={17} />
             {textoCancelar}
@@ -75,7 +75,7 @@ export default function ModalConfirmarEmprestimo({
             type="button"
             onClick={onConfirmar}
             autoFocus
-            className={`h-10 inline-flex items-center justify-center gap-1.5 px-5 rounded-xl text-[14.5px] font-semibold text-white transition-colors active:scale-95 cursor-pointer ${
+            className={`h-10 inline-flex items-center justify-center gap-1.5 px-5 rounded-xl text-sm font-semibold text-white transition-colors active:scale-95 cursor-pointer ${
               isPerigo
                 ? "bg-[#cf4a4a] hover:bg-[#b83a3a]"
                 : "bg-[#2e8b45] hover:bg-[#236c35]"

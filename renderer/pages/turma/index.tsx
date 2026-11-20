@@ -228,7 +228,7 @@ export default function GerenciarTurmas() {
 
         <Link
           href="/turma/cadastro_turma"
-          className="h-11 px-5 sm:px-6 inline-flex items-center justify-center bg-[#2e8b45] text-white rounded-xl font-semibold text-[15px] hover:bg-[#236c35] transition-all whitespace-nowrap gap-2 shadow-sm cursor-pointer shrink-0 active:scale-95"
+          className="h-11 px-5 sm:px-6 inline-flex items-center justify-center bg-[#2e8b45] text-white rounded-xl font-semibold text-base hover:bg-[#236c35] transition-all whitespace-nowrap gap-2 shadow-sm cursor-pointer shrink-0 active:scale-95"
         >
           <MdAdd size={20} />
           Adicionar turma
@@ -298,7 +298,7 @@ export default function GerenciarTurmas() {
             turmaParaExcluir ? (
               <div>
                 <p>Tem certeza que deseja excluir esta turma?</p>
-                <div className="mt-3 rounded-xl bg-[#eef7f0] border border-[#d5ead9] p-3.5 text-[14.5px]">
+                <div className="mt-3 rounded-xl bg-[#eef7f0] border border-[#d5ead9] p-3.5 text-sm">
                   <span className="font-semibold text-[#1e582d]">Nome: </span>
                   <span className="text-gray-800">{turmaParaExcluir.nome}</span>
                 </div>
@@ -330,7 +330,7 @@ export default function GerenciarTurmas() {
             turmaParaDesativar ? (
               <div>
                 <p>Tem certeza que deseja desativar esta turma?</p>
-                <div className="mt-3 rounded-xl bg-[#eef7f0] border border-[#d5ead9] p-3.5 text-[14.5px]">
+                <div className="mt-3 rounded-xl bg-[#eef7f0] border border-[#d5ead9] p-3.5 text-sm">
                   <span className="font-semibold text-[#1e582d]">Nome: </span>
                   <span className="text-gray-800">{turmaParaDesativar.nome}</span>
                 </div>
@@ -358,7 +358,7 @@ export default function GerenciarTurmas() {
             turmaParaAtivar ? (
               <div>
                 <p>Tem certeza que deseja ativar esta turma?</p>
-                <div className="mt-3 rounded-xl bg-[#eef7f0] border border-[#d5ead9] p-3.5 text-[14.5px]">
+                <div className="mt-3 rounded-xl bg-[#eef7f0] border border-[#d5ead9] p-3.5 text-sm">
                   <span className="font-semibold text-[#1e582d]">Nome: </span>
                   <span className="text-gray-800">{turmaParaAtivar.nome}</span>
                 </div>
