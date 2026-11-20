@@ -1,3 +1,4 @@
+
 name: Validar Conventional Commits
 
 on:
@@ -9,39 +10,111 @@ on:
       - master
       - develop
 
+permissions:
+  contents: read
+
 jobs:
   lint-commits:
     name: Validar Mensagens de Commit
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout do Código
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Configurar Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
-          node-version: '22'
+          node-version: '24'
+          package-manager-cache: false
 
       - name: Instalar dependências de validação
-        run: npm install --no-save @commitlint/cli @commitlint/config-conventional
+        run: npm install --no-save --no-audit --no-fund @commitlint/cli @commitlint/config-conventional
 
-      - name: Validar commits com commitlint (Push)
+      # Validação dos commits adicionados no Push
+      - name: Validar commits do Push
         if: github.event_name == 'push'
+        env:
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.event.after }}
         run: |
-          if [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
-            npx commitlint --last --verbose
-          else
-            npx commitlint --from=${{ github.event.before }} --to=${{ github.sha }} --verbose
+          ZERO_SHA="0000000000000000000000000000000000000000"
+
+          if [ "$AFTER" = "$ZERO_SHA" ]; then
+            echo "Branch removida. Nenhum commit para validar."
+            exit 0
           fi
 
-      - name: Validar commits com commitlint (Pull Request)
-        if: github.event_name == 'pull_request' && github.base_ref != 'main' && github.base_ref != 'master'
-        run: |
-          npx commitlint --from=${{ github.event.pull_request.base.sha }} --to=${{ github.event.pull_request.head.sha }} --verbose
+          if [ "$BEFORE" = "$ZERO_SHA" ]; then
+            echo "Primeiro envio da branch. Validando histórico enviado."
+            COMMITS=$(git rev-list --reverse "$AFTER")
+          else
+            if git merge-base --is-ancestor "$BEFORE" "$AFTER"; then
+              BASE="$BEFORE"
+            else
+              echo "Histórico reescrito detectado. Calculando ponto de divergência."
+              BASE=$(git merge-base "$BEFORE" "$AFTER")
 
-      - name: Validar título do Pull Request (Release para main/master)
-        if: github.event_name == 'pull_request' && (github.base_ref == 'main' || github.base_ref == 'master')
+              if [ -z "$BASE" ]; then
+                echo "Não foi possível encontrar um ancestral comum."
+                exit 1
+              fi
+            fi
+
+            COMMITS=$(git rev-list --reverse "$AFTER" "^$BASE")
+          fi
+
+          if [ -z "$COMMITS" ]; then
+            echo "Nenhum commit novo para validar."
+            exit 0
+          fi
+
+          for COMMIT in $COMMITS; do
+            echo "----------------------------------------"
+            echo "Validando commit: $COMMIT"
+            git show -s --format=%B "$COMMIT" | npx commitlint --verbose
+          done
+
+          echo "Todos os commits do Push foram validados!"
+
+      # Validação dos commits de Pull Requests comuns
+      - name: Validar commits do Pull Request
+        if: github.event_name == 'pull_request' && github.base_ref != 'main' && github.base_ref != 'master'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          echo "${{ github.event.pull_request.title }}" | npx commitlint --verbose
+          BASE=$(git merge-base "$BASE_SHA" "$HEAD_SHA")
+
+          if [ -z "$BASE" ]; then
+            echo "Não foi possível encontrar o ponto de divergência."
+            exit 1
+          fi
+
+          COMMITS=$(git rev-list --reverse "$HEAD_SHA" "^$BASE")
+
+          if [ -z "$COMMITS" ]; then
+            echo "Nenhum commit para validar."
+            exit 0
+          fi
+
+          for COMMIT in $COMMITS; do
+            echo "----------------------------------------"
+            echo "Validando commit: $COMMIT"
+            git show -s --format=%B "$COMMIT" | npx commitlint --verbose
+          done
+
+          echo "Todos os commits do Pull Request foram validados!"
+
+      # Validação do título de PRs destinadas à main ou master
+      - name: Validar título do Pull Request (Release)
+        if: github.event_name == 'pull_request' && (github.base_ref == 'main' || github.base_ref == 'master')
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          echo "$PR_TITLE" | npx commitlint --verbose
+
+          echo "Título do Pull Request validado!"
