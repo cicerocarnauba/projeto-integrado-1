@@ -1,8 +1,10 @@
 import { MdEdit } from "react-icons/md";
 import { Livro } from "../../types/livro";
+import { TABLE_COL_WIDTHS } from "../../utils/tableLayout";
 import ExcluirButton from "../ExcluirButton";
 import DesativarButton from "../DesativarButton";
 import AtivarButton from "../AtivarButton";
+import StatusPill from "../StatusPill";
 
 interface ListaLivroProps {
   livros: Livro[];
@@ -22,26 +24,26 @@ export default function ListaLivro({
   onDesativar,
 }: ListaLivroProps) {
   return (
-    <div className="w-full bg-white border border-[#D3E8D6] rounded-2xl overflow-hidden shadow-sm">
+    <div className="w-full bg-white border border-[#cfe5d4] rounded-2xl overflow-hidden shadow-xs">
       <div className="w-full overflow-x-auto">
-        <table className="w-full min-w-[900px] text-left border-collapse table-fixed">
+        <table className="w-full min-w-[860px] xl:min-w-[1120px] text-left border-collapse table-fixed">
           <colgroup>
-            <col style={{ width: "32%" }} />
-            <col className="hidden md:table-column" />
-            <col style={{ width: "200px" }} />
-            <col style={{ width: "160px" }} />
-            <col style={{ width: "240px" }} />
+            <col />
+            <col className="hidden xl:table-column" style={{ width: "20%" }} />
+            <col style={{ width: TABLE_COL_WIDTHS.exemplares }} />
+            <col style={{ width: TABLE_COL_WIDTHS.status }} />
+            <col style={{ width: TABLE_COL_WIDTHS.acoes }} />
           </colgroup>
           <thead>
-            <tr className="bg-[#ebf5ed] border-b border-[#c8decb] text-sm font-semibold text-[#23582c]">
-              <th className="py-3.5 px-6 text-left">Título do livro</th>
-              <th className="py-3.5 px-4 hidden md:table-cell text-left">Editora</th>
-              <th className="py-3.5 px-3 text-center">Total de exemplares</th>
-              <th className="py-3.5 px-3 text-center">Status do livro</th>
-              <th className="py-3.5 px-4 text-center">Ações</th>
+            <tr className="bg-[#e8f4eb] border-b border-[#c5dfca] text-[15px] font-bold text-[#1e582d] leading-snug">
+              <th className="py-3 px-6 text-left whitespace-nowrap">Título do livro</th>
+              <th className="py-3 px-4 hidden xl:table-cell text-left whitespace-nowrap">Editora</th>
+              <th className="py-3 px-3 text-center whitespace-nowrap">Total de exemplares</th>
+              <th className="py-3 px-3 text-center whitespace-nowrap">Status do livro</th>
+              <th className="py-3 px-3 text-center whitespace-nowrap">Ações</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#E6F0E8]">
+          <tbody className="divide-y divide-[#e6f0e8]">
             {livros.map((livro) => {
               const ativo = livro.status === "ATIVO" || livro.ativo === true;
               const temHistorico =
@@ -54,14 +56,14 @@ export default function ListaLivro({
               return (
                 <tr
                   key={livro.id}
-                  className={`transition-all duration-200 hover:bg-[#f6fbf7] ${
+                  className={`transition-all duration-200 hover:bg-[#f4faf6] ${
                     estaExcluindo ? "opacity-0 scale-95" : "opacity-100 scale-100"
-                  } ${ativo ? "bg-white" : "bg-[#fcfdfc]"}`}
+                  } ${ativo ? "bg-white" : "bg-[#fbfdfb]"}`}
                 >
-                  <td className="py-3 px-6 text-left">
+                  <td className="py-2.5 px-6 text-left">
                     <span
                       title={livro.titulo}
-                      className={`text-sm font-medium block leading-tight truncate max-w-full ${
+                      className={`text-[15.5px] font-semibold block leading-snug truncate max-w-full ${
                         ativo ? "text-gray-900" : "text-gray-500"
                       }`}
                     >
@@ -69,58 +71,52 @@ export default function ListaLivro({
                     </span>
                     <span
                       title={livro.editora}
-                      className="block md:hidden text-xs text-gray-500 truncate max-w-[200px] mt-0.5"
+                      className="block xl:hidden text-[13px] text-gray-600 truncate max-w-full mt-0.5"
                     >
-                      {livro.editora} • {livro.quantidadeTotal}{" "}
-                      {livro.quantidadeTotal === 1 ? "exemplar" : "exemplares"}
+                      {livro.editora}
                     </span>
                   </td>
-                  <td className="py-3 px-4 hidden md:table-cell text-left">
+                  <td className="py-2.5 px-4 hidden xl:table-cell text-left">
                     <span
                       title={livro.editora}
-                      className={`text-sm font-medium block truncate max-w-full ${
-                        ativo ? "text-gray-900" : "text-gray-500"
+                      className={`text-[15px] font-medium block leading-snug truncate max-w-full ${
+                        ativo ? "text-gray-700" : "text-gray-500"
                       }`}
                     >
                       {livro.editora}
                     </span>
                   </td>
-                  <td className="py-3 px-3 text-center">
-                    <div className="inline-flex items-baseline justify-center gap-1.5 w-[115px]">
-                      <span className="w-5 text-right font-medium text-sm text-gray-900 tabular-nums">
+                  <td className="py-2.5 px-3 text-center">
+                    <div className="inline-flex items-baseline justify-center gap-1.5 w-[132px]">
+                      <span
+                        className={`w-7 text-right font-semibold text-[15.5px] tabular-nums ${
+                          ativo ? "text-gray-900" : "text-gray-500"
+                        }`}
+                      >
                         {livro.quantidadeTotal}
                       </span>
-                      <span className="w-20 text-left font-medium text-sm text-gray-900">
+                      <span
+                        className={`w-[92px] text-left font-medium text-[15px] ${
+                          ativo ? "text-gray-700" : "text-gray-500"
+                        }`}
+                      >
                         {livro.quantidadeTotal === 1 ? "exemplar" : "exemplares"}
                       </span>
                     </div>
                   </td>
-                  <td className="py-3 px-3 text-center">
-                    <span
-                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-semibold text-xs shrink-0 transition-colors ${
-                        ativo
-                          ? "bg-[#d8f3dc] text-[#1e582d] border border-[#c1e7c9]"
-                          : "bg-gray-200/80 text-gray-600 border border-gray-300"
-                      }`}
-                    >
-                      <span
-                        className={`w-2 h-2 rounded-full shrink-0 ${
-                          ativo ? "bg-[#2e8b45]" : "bg-gray-400"
-                        }`}
-                      />
-                      {ativo ? "Ativo" : "Inativo"}
-                    </span>
+                  <td className="py-2.5 px-3 text-center">
+                    <StatusPill status={ativo ? "ATIVO" : "INATIVO"} />
                   </td>
-                  <td className="py-3 px-2 text-center">
+                  <td className="py-2.5 px-3 text-center">
                     <div className="flex items-center justify-center gap-2 shrink-0">
                       {ativo ? (
                         <>
                           <button
                             type="button"
                             onClick={() => onEditar?.(livro)}
-                            className="flex items-center justify-center gap-1.5 bg-[#389348] text-white px-2.5 sm:px-3 py-1.5 text-xs rounded-lg font-medium hover:bg-[#2e7d3d] transition-colors cursor-pointer shrink-0"
+                            className="inline-flex items-center justify-center gap-1.5 w-[98px] h-8 bg-[#389348] text-white text-[13.5px] rounded-lg font-semibold hover:bg-[#2e7d3d] transition-colors cursor-pointer shrink-0"
                           >
-                            <MdEdit size={15} />
+                            <MdEdit size={16} />
                             Editar
                           </button>
 
@@ -144,9 +140,9 @@ export default function ListaLivro({
                             type="button"
                             disabled
                             title="Livro desativado não pode ser editado"
-                            className="flex items-center justify-center gap-1.5 bg-gray-200 text-gray-400 px-2.5 sm:px-3 py-1.5 text-xs rounded-lg font-medium cursor-not-allowed shrink-0"
+                            className="inline-flex items-center justify-center gap-1.5 w-[98px] h-8 bg-gray-200 text-gray-400 text-[13.5px] rounded-lg font-semibold cursor-not-allowed shrink-0"
                           >
-                            <MdEdit size={15} />
+                            <MdEdit size={16} />
                             Editar
                           </button>
 

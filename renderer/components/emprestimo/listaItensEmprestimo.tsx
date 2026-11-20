@@ -5,6 +5,8 @@ import {
   StatusItemEmprestimo,
 } from "../../types/emprestimo";
 import { calcularPendente } from "../../utils/emprestimoItem";
+import { TABLE_COL_WIDTHS } from "../../utils/tableLayout";
+import StatusPill from "../StatusPill";
 
 interface ListaItensEmprestimoProps {
   itens: ItemEmprestimo[];
@@ -14,40 +16,19 @@ interface ListaItensEmprestimoProps {
   onDevolver?: (item: ItemEmprestimo) => void;
 }
 
-const STATUS_ITEM_STYLE: Record<
-  StatusItemEmprestimo,
-  { label: string; badge: string; dot: string }
-> = {
-  PENDENTE: {
-    label: "Pendente",
-    badge: "bg-[#fff4d6] text-[#b45309] border-[#fde3a1]",
-    dot: "bg-[#f59e0b]",
-  },
-  CONCLUIDO: {
-    label: "Concluído",
-    badge: "bg-[#d8f3dc] text-[#1e582d] border-[#c1e7c9]",
-    dot: "bg-[#2e8b45]",
-  },
-  CANCELADO: {
-    label: "Cancelado",
-    badge: "bg-[#fee2e2] text-[#b91c1c] border-[#fecaca]",
-    dot: "bg-[#dc2626]",
-  },
-};
-
 function AvariaBadges({ item }: { item: ItemEmprestimo }) {
   const { quantidadePerdida: p, quantidadeDanificada: d } = item;
 
   if (!p && !d) {
     return (
-      <span className="px-3 py-1 rounded-lg text-xs font-medium bg-gray-100 text-gray-600 border border-gray-300">
+      <span className="inline-flex items-center px-3 py-1 rounded-lg text-[13px] font-semibold bg-gray-100 text-gray-600 border border-gray-300 whitespace-nowrap">
         Sem avaria
       </span>
     );
   }
 
   const badge =
-    "px-3 py-1 rounded-lg text-xs font-medium bg-[#fee2e2] text-[#b91c1c] border border-[#fecaca]";
+    "inline-flex items-center px-3 py-1 rounded-lg text-[13px] font-semibold bg-[#fee2e2] text-[#b91c1c] border border-[#fecaca] whitespace-nowrap";
 
   return (
     <div className="flex flex-col items-center gap-1">
@@ -63,68 +44,92 @@ export default function ListaItensEmprestimo({
   onDevolver,
 }: ListaItensEmprestimoProps) {
   const btnBase =
-    "flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg font-medium shrink-0 transition-colors";
+    "inline-flex items-center justify-center gap-1.5 px-3 h-8 text-[13.5px] rounded-lg font-semibold shrink-0 transition-colors whitespace-nowrap";
 
   const btnInativo = `${btnBase} bg-gray-200 text-gray-400 cursor-not-allowed`;
 
   return (
-    <div className="w-full bg-white border border-[#D3E8D6] rounded-2xl overflow-hidden shadow-sm">
+    <div className="w-full bg-white border border-[#cfe5d4] rounded-2xl overflow-hidden shadow-xs">
       <div className="w-full overflow-x-auto">
-        <table className="w-full text-left border-collapse">
+        <table className="w-full min-w-[980px] xl:min-w-[1220px] table-fixed text-left border-collapse">
+          <colgroup>
+            <col />
+            <col className="hidden xl:table-column" style={{ width: "16%" }} />
+            <col style={{ width: TABLE_COL_WIDTHS.exemplares }} />
+            <col style={{ width: TABLE_COL_WIDTHS.status }} />
+            <col style={{ width: TABLE_COL_WIDTHS.avaria }} />
+            <col style={{ width: TABLE_COL_WIDTHS.acoes }} />
+          </colgroup>
           <thead>
-            <tr className="bg-[#ebf5ed] border-b border-[#c8decb] text-sm font-semibold text-[#23582c]">
-              <th className="py-3.5 px-4 text-center">Título</th>
-              <th className="py-3.5 px-4 hidden md:table-cell text-center">Editora</th>
-              <th className="py-3.5 px-4 text-center">
-                Exemplares emprestados
-              </th>
-              <th className="py-3.5 px-4 text-center">Status do livro</th>
-              <th className="py-3.5 px-4 text-center">Avaria</th>
-              <th className="py-3.5 px-4 text-center w-[270px]">Ações</th>
+            <tr className="bg-[#e8f4eb] border-b border-[#c5dfca] text-[15px] font-bold text-[#1e582d] leading-snug">
+              <th className="py-3 px-6 text-left whitespace-nowrap">Título</th>
+              <th className="py-3 px-4 hidden xl:table-cell text-left whitespace-nowrap">Editora</th>
+              <th className="py-3 px-3 text-center whitespace-nowrap">Exemplares emprestados</th>
+              <th className="py-3 px-3 text-center whitespace-nowrap">Status do livro</th>
+              <th className="py-3 px-3 text-center whitespace-nowrap">Avaria</th>
+              <th className="py-3 px-3 text-center whitespace-nowrap">Ações</th>
             </tr>
           </thead>
 
-          <tbody className="divide-y divide-[#E6F0E8]">
+          <tbody className="divide-y divide-[#e6f0e8]">
             {itens.map((item) => {
               const statusEfetivo: StatusItemEmprestimo =
                 statusEmprestimo === "CANCELADO" ? "CANCELADO" : item.status;
 
-              const estilo =
-                STATUS_ITEM_STYLE[statusEfetivo] ?? STATUS_ITEM_STYLE.PENDENTE;
-
               const pendente = calcularPendente(item);
               const devolvida = item.quantidadeDevolvida ?? 0;
 
-              // Só itens pendentes podem ser devolvidos / ter avaria registrada
-              const emprestimoFinalizado = statusEmprestimo !== undefined && statusEmprestimo !== "PENDENTE";
+              const emprestimoFinalizado =
+                statusEmprestimo !== undefined && statusEmprestimo !== "PENDENTE";
 
-              const acoesDesabilitadas = emprestimoFinalizado || statusEfetivo !== "PENDENTE";
+              const acoesDesabilitadas =
+                emprestimoFinalizado || statusEfetivo !== "PENDENTE";
 
-              // Devolver também fica bloqueado se não sobrou nada pendente
               const devolverDesabilitado = acoesDesabilitadas || pendente === 0;
 
               return (
                 <tr
                   key={item.id}
-                  className="transition-colors hover:bg-[#f6fbf7]"
+                  className="transition-colors hover:bg-[#f4faf6]"
                 >
-                  <td className="py-3 px-4 text-center text-sm font-medium text-gray-900 max-w-[200px]">
-                    {item.livroTitulo}
+                  <td className="py-2.5 px-6 text-left">
+                    <span
+                      title={item.livroTitulo}
+                      className="text-[15.5px] font-semibold text-gray-900 block leading-snug truncate max-w-full"
+                    >
+                      {item.livroTitulo}
+                    </span>
+                    <span
+                      title={item.editora}
+                      className="block xl:hidden text-[13px] text-gray-600 mt-0.5 truncate max-w-full"
+                    >
+                      {item.editora}
+                    </span>
                   </td>
 
-                  <td className="py-3 px-4 hidden md:table-cell text-center text-sm text-gray-700">
-                    {item.editora}
+                  <td className="py-2.5 px-4 hidden xl:table-cell text-left text-[15px] font-medium text-gray-700">
+                    <span
+                      title={item.editora}
+                      className="block leading-snug truncate max-w-full"
+                    >
+                      {item.editora}
+                    </span>
                   </td>
 
-                  <td className="py-3 px-4 text-center text-sm font-medium text-gray-900">
-                    {item.quantidadeEmprestada}{" "}
-                    {item.quantidadeEmprestada === 1
-                      ? "exemplar"
-                      : "exemplares"}
+                  <td className="py-2.5 px-3 text-center">
+                    <div className="inline-flex items-baseline justify-center gap-1.5 w-[132px]">
+                      <span className="w-7 text-right font-semibold text-[15.5px] text-gray-900 tabular-nums">
+                        {item.quantidadeEmprestada}
+                      </span>
+                      <span className="w-[92px] text-left font-medium text-[15px] text-gray-700">
+                        {item.quantidadeEmprestada === 1
+                          ? "exemplar"
+                          : "exemplares"}
+                      </span>
+                    </div>
 
-                    {/* Aparece quando já houve devolução (parcial ou total) */}
                     {devolvida > 0 && (
-                      <span className="block text-xs font-normal text-[#5AA365] mt-0.5">
+                      <span className="block text-[13px] font-medium text-[#2e8b45] mt-0.5 whitespace-nowrap tabular-nums">
                         {devolvida} {devolvida === 1 ? "devolvido" : "devolvidos"}
                         {" · "}
                         {pendente} {pendente === 1 ? "pendente" : "pendentes"}
@@ -132,21 +137,16 @@ export default function ListaItensEmprestimo({
                     )}
                   </td>
 
-                  <td className="py-3 px-4 text-center">
-                    <span
-                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-semibold text-xs border ${estilo.badge}`}
-                    >
-                      <span className={`w-2 h-2 rounded-full ${estilo.dot}`} />
-                      {estilo.label}
-                    </span>
+                  <td className="py-2.5 px-3 text-center">
+                    <StatusPill status={statusEfetivo} />
                   </td>
 
-                  <td className="py-3 px-4 text-center">
+                  <td className="py-2.5 px-3 text-center">
                     <AvariaBadges item={item} />
                   </td>
 
-                  <td className="py-3 px-4">
-                    <div className="flex items-center justify-center gap-2">
+                  <td className="py-2.5 px-2 text-center">
+                    <div className="flex items-center justify-center gap-2 shrink-0">
                       <button
                         type="button"
                         disabled={devolverDesabilitado}
@@ -157,7 +157,7 @@ export default function ListaItensEmprestimo({
                             : `${btnBase} bg-[#389348] text-white hover:bg-[#2e7d3d] cursor-pointer`
                         }
                       >
-                        <MdReplay size={15} />
+                        <MdReplay size={16} />
                         Devolver
                       </button>
 
@@ -167,10 +167,10 @@ export default function ListaItensEmprestimo({
                         className={
                           acoesDesabilitadas
                             ? btnInativo
-                            : `${btnBase} bg-[#dc3b3b] text-white cursor-pointer`
+                            : `${btnBase} bg-[#cf4a4a] text-white hover:bg-[#b83a3a] cursor-pointer`
                         }
                       >
-                        <MdOutlineReport size={15} />
+                        <MdOutlineReport size={16} />
                         Registrar avaria
                       </button>
                     </div>

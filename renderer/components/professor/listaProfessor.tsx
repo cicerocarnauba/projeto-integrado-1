@@ -1,11 +1,14 @@
 import { MdEdit } from "react-icons/md";
 import { Professor } from "../../types/professor";
+import { TABLE_COL_WIDTHS } from "../../utils/tableLayout";
 import ExcluirButton from "../ExcluirButton";
 import DesativarButton from "../DesativarButton";
 import AtivarButton from "../AtivarButton";
+import StatusPill from "../StatusPill";
 
 interface ListaProfessorProps {
   professores: Professor[];
+  professorExcluindo?: number | null;
   onEditar?: (professor: Professor) => void;
   onExcluir?: (professor: Professor) => void;
   onDesativar?: (professor: Professor) => void;
@@ -14,46 +17,48 @@ interface ListaProfessorProps {
 
 export default function ListaProfessor({
   professores,
+  professorExcluindo,
   onEditar,
   onExcluir,
   onDesativar,
   onAtivar,
 }: ListaProfessorProps) {
   return (
-    <div className="w-full bg-white border border-[#D3E8D6] rounded-2xl overflow-hidden shadow-sm">
+    <div className="w-full bg-white border border-[#cfe5d4] rounded-2xl overflow-hidden shadow-xs">
       <div className="w-full overflow-x-auto">
-        <table className="w-full min-w-[800px] text-left border-collapse table-fixed">
+        <table className="w-full min-w-[660px] lg:min-w-[940px] text-left border-collapse table-fixed">
           <colgroup>
-            <col style={{ width: "35%" }} />
-            <col className="hidden md:table-column" />
-            <col style={{ width: "180px" }} />
-            <col style={{ width: "240px" }} />
+            <col />
+            <col className="hidden lg:table-column" style={{ width: "28%" }} />
+            <col style={{ width: TABLE_COL_WIDTHS.status }} />
+            <col style={{ width: TABLE_COL_WIDTHS.acoes }} />
           </colgroup>
           <thead>
-            <tr className="bg-[#ebf5ed] border-b border-[#c8decb] text-sm font-semibold text-[#23582c]">
-              <th className="py-3.5 px-6 text-left">Nome do professor</th>
-              <th className="py-3.5 px-4 hidden md:table-cell text-left">E-mail</th>
-              <th className="py-3.5 px-3 text-center">Status do professor</th>
-              <th className="py-3.5 px-4 text-center">Ações</th>
+            <tr className="bg-[#e8f4eb] border-b border-[#c5dfca] text-[15px] font-bold text-[#1e582d] leading-snug">
+              <th className="py-3 px-6 text-left whitespace-nowrap">Nome do professor</th>
+              <th className="py-3 px-4 hidden lg:table-cell text-left whitespace-nowrap">E-mail</th>
+              <th className="py-3 px-3 text-center whitespace-nowrap">Status do professor</th>
+              <th className="py-3 px-3 text-center whitespace-nowrap">Ações</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#E6F0E8]">
+          <tbody className="divide-y divide-[#e6f0e8]">
             {professores.map((professor) => {
               const ativo = professor.status === "ATIVO" || professor.ativo === true;
               const temHistorico = professor.possuiHistorico ?? false;
               const naoPodeDesativar = professor.possuiEmprestimoPendente === true;
+              const estaExcluindo = professorExcluindo === professor.id;
 
               return (
                 <tr
                   key={professor.id}
-                  className={`transition-all duration-200 hover:bg-[#f6fbf7] ${
-                    ativo ? "bg-white" : "bg-[#fcfdfc]"
-                  }`}
+                  className={`transition-all duration-200 hover:bg-[#f4faf6] ${
+                    estaExcluindo ? "opacity-0 scale-95" : "opacity-100 scale-100"
+                  } ${ativo ? "bg-white" : "bg-[#fbfdfb]"}`}
                 >
-                  <td className="py-3 px-6 text-left">
+                  <td className="py-2.5 px-6 text-left">
                     <span
                       title={`${professor.primeiroNome} ${professor.sobrenome}`}
-                      className={`text-sm font-medium block leading-tight truncate max-w-full ${
+                      className={`text-[15.5px] font-semibold block leading-snug truncate max-w-full ${
                         ativo ? "text-gray-900" : "text-gray-500"
                       }`}
                     >
@@ -61,47 +66,34 @@ export default function ListaProfessor({
                     </span>
                     <span
                       title={professor.email}
-                      className="block md:hidden text-xs text-gray-500 truncate max-w-[170px] mt-0.5"
+                      className="block lg:hidden text-[13px] text-gray-600 truncate max-w-full mt-0.5"
                     >
                       {professor.email}
                     </span>
                   </td>
-                  <td className="py-3 px-4 hidden md:table-cell text-left">
+                  <td className="py-2.5 px-4 hidden lg:table-cell text-left">
                     <span
                       title={professor.email}
-                      className={`text-sm font-medium block truncate max-w-full ${
-                        ativo ? "text-gray-900" : "text-gray-500"
+                      className={`text-[15px] font-medium block leading-snug truncate max-w-full ${
+                        ativo ? "text-gray-700" : "text-gray-500"
                       }`}
                     >
                       {professor.email}
                     </span>
                   </td>
-                  <td className="py-3 px-3 text-center">
-                    <span
-                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-semibold text-xs shrink-0 transition-colors ${
-                        ativo
-                          ? "bg-[#d8f3dc] text-[#1e582d] border border-[#c1e7c9]"
-                          : "bg-gray-200/80 text-gray-600 border border-gray-300"
-                      }`}
-                    >
-                      <span
-                        className={`w-2 h-2 rounded-full shrink-0 ${
-                          ativo ? "bg-[#2e8b45]" : "bg-gray-400"
-                        }`}
-                      />
-                      {ativo ? "Ativo" : "Inativo"}
-                    </span>
+                  <td className="py-2.5 px-3 text-center">
+                    <StatusPill status={ativo ? "ATIVO" : "INATIVO"} />
                   </td>
-                  <td className="py-3 px-2 text-center">
+                  <td className="py-2.5 px-3 text-center">
                     <div className="flex items-center justify-center gap-2 shrink-0">
                       {ativo ? (
                         <>
                           <button
                             type="button"
                             onClick={() => onEditar?.(professor)}
-                            className="flex items-center justify-center gap-1.5 bg-[#389348] text-white px-2.5 sm:px-3 py-1.5 text-xs rounded-lg font-medium hover:bg-[#2e7d3d] transition-colors cursor-pointer shrink-0"
+                            className="inline-flex items-center justify-center gap-1.5 w-[98px] h-8 bg-[#389348] text-white text-[13.5px] rounded-lg font-semibold hover:bg-[#2e7d3d] transition-colors cursor-pointer shrink-0"
                           >
-                            <MdEdit size={15} />
+                            <MdEdit size={16} />
                             Editar
                           </button>
 
@@ -127,9 +119,9 @@ export default function ListaProfessor({
                             type="button"
                             disabled
                             title="Professor desativado não pode ser editado"
-                            className="flex items-center justify-center gap-1.5 bg-gray-200 text-gray-400 px-2.5 sm:px-3 py-1.5 text-xs rounded-lg font-medium cursor-not-allowed shrink-0"
+                            className="inline-flex items-center justify-center gap-1.5 w-[98px] h-8 bg-gray-200 text-gray-400 text-[13.5px] rounded-lg font-semibold cursor-not-allowed shrink-0"
                           >
-                            <MdEdit size={15} />
+                            <MdEdit size={16} />
                             Editar
                           </button>
 

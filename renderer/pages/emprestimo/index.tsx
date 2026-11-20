@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import { MdAdd } from "react-icons/md";
-import Sidebar from "../../components/Sidebar";
+import PageShell from "../../components/PageShell";
+import EstadoLista from "../../components/EstadoLista";
 import SearchBar, { TipoOrdenacao } from "../../components/Searchbar";
 import Paginacao from "../../components/Paginacao";
+import { useItensPorPagina } from "../../hooks/useItensPorPagina";
 import ToastFeedback from "../../components/ToastFeedback";
 import ListaEmprestimo from "../../components/emprestimo/listaEmprestimo";
 import ModalConfirmarAcao from "../../components/modal/ModalConfirmacaoEmprestimo";
@@ -12,7 +14,6 @@ import type { ItemEmprestimoConsultaDTO } from "../../../main/entities/ConsultaE
 
 type Aba = "pendentes" | "concluidos" | "cancelados";
 
-const ITENS_POR_PAGINA = 10;
 interface GrupoEmprestimo {
   emprestimo: Emprestimo;
   itens: ItemEmprestimoConsultaDTO[];
@@ -220,9 +221,27 @@ const filtradosPorAba = emprestimosAgrupados
     [emprestimosAgrupados]
   );
 
+  const totalConcluidos = useMemo(
+    () =>
+      emprestimosAgrupados.filter(
+        ({ emprestimo }) => emprestimo.status === "CONCLUIDO"
+      ).length,
+    [emprestimosAgrupados]
+  );
+
+  const totalCancelados = useMemo(
+    () =>
+      emprestimosAgrupados.filter(
+        ({ emprestimo }) => emprestimo.status === "CANCELADO"
+      ).length,
+    [emprestimosAgrupados]
+  );
+
+  const itensPorPagina = useItensPorPagina();
+
   const totalPaginas = Math.max(
     1,
-    Math.ceil(emprestimosExibidos.length / ITENS_POR_PAGINA)
+    Math.ceil(emprestimosExibidos.length / itensPorPagina)
   );
 
   useEffect(() => {
@@ -231,17 +250,17 @@ const filtradosPorAba = emprestimosAgrupados
     }
   }, [totalPaginas, paginaAtual]);
 
-  const inicio = (paginaAtual - 1) * ITENS_POR_PAGINA;
+  const inicio = (paginaAtual - 1) * itensPorPagina;
   const emprestimosPaginados = emprestimosExibidos.slice(
     inicio,
-    inicio + ITENS_POR_PAGINA
+    inicio + itensPorPagina
   );
 
   const abaClass = (ativa: boolean) =>
-    `pb-3 px-1 text-sm font-semibold border-b-2 transition-colors cursor-pointer flex items-center gap-2 ${
+    `pb-2.5 px-1 text-[15.5px] font-semibold border-b-[3px] transition-colors cursor-pointer inline-flex items-center gap-2 whitespace-nowrap ${
       ativa
-        ? "text-[#389348] border-[#389348]"
-        : "text-gray-500 border-transparent hover:text-gray-700"
+        ? "text-[#1e582d] border-[#2e8b45]"
+        : "text-gray-500 border-transparent hover:text-gray-800 hover:border-[#cde5d4]"
     }`;
 
   const nomeAba =
@@ -252,86 +271,93 @@ const filtradosPorAba = emprestimosAgrupados
         : "cancelado";
 
   return (
-    <div className="flex min-h-screen bg-white">
-      <Sidebar />
+    <PageShell titulo="Gerenciar empréstimos">
+      <ToastFeedback mensagem={feedback} tipo="sucesso" onClose={fecharFeedback} />
+      <ToastFeedback mensagem={erro} tipo="erro" onClose={fecharErro} />
 
-      <main className="flex-1 min-w-0 px-8 pt-6 pb-6 animate-fade-in">
-        <h1 className="text-2xl font-bold text-gray-800 mb-4">
-          Gerenciar empréstimos
-        </h1>
-
-        <ToastFeedback mensagem={feedback} tipo="sucesso" onClose={fecharFeedback} />
-        <ToastFeedback mensagem={erro} tipo="erro" onClose={fecharErro} />
-
-        <div className="flex gap-8 border-b border-[#E6F0E8] mb-4">
-          <button
-            type="button"
-            className={abaClass(aba === "pendentes")}
-            onClick={() => setAba("pendentes")}
+      <div className="flex flex-wrap gap-6 sm:gap-8 border-b border-[#D3E8D6] mb-3.5">
+        <button
+          type="button"
+          className={abaClass(aba === "pendentes")}
+          onClick={() => setAba("pendentes")}
+        >
+          <span>Empréstimos Pendentes</span>
+          <span
+            className={`inline-flex items-center justify-center text-xs font-bold px-2.5 py-0.5 rounded-full tabular-nums ${
+              aba === "pendentes"
+                ? "bg-[#d8f3dc] text-[#1e582d]"
+                : "bg-gray-200/80 text-gray-600"
+            }`}
           >
-            <span>Empréstimos Pendentes</span>
-            {totalPendentes > 0 && (
-              <span
-                className={`inline-flex items-center justify-center text-xs font-bold px-2 py-0.5 rounded-full ${
-                  aba === "pendentes"
-                    ? "bg-[#389348] text-white"
-                    : "bg-gray-100 text-gray-600"
-                }`}
-              >
-                {totalPendentes}
-              </span>
-            )}
-          </button>
-          <button
-            type="button"
-            className={abaClass(aba === "concluidos")}
-            onClick={() => setAba("concluidos")}
+            {totalPendentes}
+          </span>
+        </button>
+        <button
+          type="button"
+          className={abaClass(aba === "concluidos")}
+          onClick={() => setAba("concluidos")}
+        >
+          <span>Empréstimos Concluídos</span>
+          <span
+            className={`inline-flex items-center justify-center text-xs font-bold px-2.5 py-0.5 rounded-full tabular-nums ${
+              aba === "concluidos"
+                ? "bg-[#d8f3dc] text-[#1e582d]"
+                : "bg-gray-200/80 text-gray-600"
+            }`}
           >
-            Empréstimos Concluídos
-          </button>
-          <button
-            type="button"
-            className={abaClass(aba === "cancelados")}
-            onClick={() => setAba("cancelados")}
+            {totalConcluidos}
+          </span>
+        </button>
+        <button
+          type="button"
+          className={abaClass(aba === "cancelados")}
+          onClick={() => setAba("cancelados")}
+        >
+          <span>Empréstimos Cancelados</span>
+          <span
+            className={`inline-flex items-center justify-center text-xs font-bold px-2.5 py-0.5 rounded-full tabular-nums ${
+              aba === "cancelados"
+                ? "bg-[#d8f3dc] text-[#1e582d]"
+                : "bg-gray-200/80 text-gray-600"
+            }`}
           >
-            Empréstimos Cancelados
-          </button>
-        </div>
+            {totalCancelados}
+          </span>
+        </button>
+      </div>
 
-        <div className="flex items-center gap-4 mb-4 w-full">
-          <SearchBar
-            placeholder="Pesquisar por professor, turma ou data..."
-            valorBusca={termoBusca}
-            onChangeBusca={setTermoBusca}
-            ordenacao={ordenacao}
-            onChangeOrdenacao={setOrdenacao}
-          />
+      <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4 mb-3.5 w-full">
+        <SearchBar
+          placeholder="Pesquisar por professor, turma ou data..."
+          valorBusca={termoBusca}
+          onChangeBusca={setTermoBusca}
+          ordenacao={ordenacao}
+          onChangeOrdenacao={setOrdenacao}
+        />
 
-          <button
-            type="button"
-            onClick={() => router.push("/emprestimo/novo")}
-            className="h-11 px-6 flex items-center justify-center bg-[#2e8b45] text-white rounded-xl font-medium text-sm hover:bg-[#236c35] transition-all whitespace-nowrap gap-2 shadow-sm cursor-pointer shrink-0 active:scale-95"
-          >
-            <MdAdd size={18} />
-            Realizar empréstimo
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => router.push("/emprestimo/novo")}
+          className="h-11 px-5 sm:px-6 inline-flex items-center justify-center bg-[#2e8b45] text-white rounded-xl font-semibold text-[15px] hover:bg-[#236c35] transition-all whitespace-nowrap gap-2 shadow-sm cursor-pointer shrink-0 active:scale-95"
+        >
+          <MdAdd size={20} />
+          Realizar empréstimo
+        </button>
+      </div>
 
-        {carregando ? (
-          <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
-            <p className="text-base font-medium">Carregando empréstimos...</p>
-          </div>
-        ) : emprestimosExibidos.length === 0 ? (
-          <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
-            <p className="text-base font-medium">
-              {termoBusca.trim()
-                ? `Nenhum empréstimo ${nomeAba} encontrado para "${termoBusca}".`
-                : `Nenhum empréstimo ${nomeAba}.`}
-            </p>
-          </div>
-        ) : (
+      {carregando ? (
+        <EstadoLista mensagem="Carregando empréstimos..." />
+      ) : emprestimosExibidos.length === 0 ? (
+        <EstadoLista
+          mensagem={
+            termoBusca.trim()
+              ? `Nenhum empréstimo ${nomeAba} encontrado para "${termoBusca}".`
+              : `Nenhum empréstimo ${nomeAba}.`
+          }
+        />
+      ) : (
           <div
-            key={`${termoBusca}-${aba}-${ordenacao}-${paginaAtual}`}
+            key={`${aba}-${ordenacao}-${paginaAtual}`}
             className="animate-fade-in duration-300"
           >
             <ListaEmprestimo
@@ -345,7 +371,7 @@ const filtradosPorAba = emprestimosAgrupados
             <Paginacao
               paginaAtual={paginaAtual}
               totalItens={emprestimosExibidos.length}
-              itensPorPagina={ITENS_POR_PAGINA}
+              itensPorPagina={itensPorPagina}
               nomeEntidade={
                 aba === "pendentes"
                   ? "empréstimos pendentes"
@@ -361,42 +387,39 @@ const filtradosPorAba = emprestimosAgrupados
 
         <ModalConfirmarAcao
           aberto={emprestimoParaCancelar !== null}
-          titulo="Cancelar empréstimo"
+          titulo="Cancelar empréstimo?"
           variante="perigo"
           textoConfirmar="Cancelar empréstimo"
           mensagem={
             emprestimoParaCancelar ? (
-              <>
-                Tem certeza que deseja cancelar este empréstimo?
-                <span className="block font-bold text-gray-800 text-xs mt-1">
-                  Professor:{" "}
-                  <span className="text-sm font-normal text-gray-600">
-                    {emprestimoParaCancelar.professorNome}
-                  </span>
-                </span>
-                <span className="block font-bold text-gray-800 text-xs">
-                  Turma:{" "}
-                  <span className="text-sm font-normal text-gray-600">
-                    {emprestimoParaCancelar.turmaNome}
-                  </span>
-                </span>
-                <span className="block font-bold text-gray-800 text-xs">
-                  Data Reirada:{" "}
-                  <span className="text-sm font-normal text-gray-600">
-                    {new Date(emprestimoParaCancelar.dataRetirada).toLocaleDateString("pt-BR")}
-                  </span>
-                </span>
-                <span className="block font-bold text-gray-800 text-xs">
-                  Exemplares Emprestados:{" "}
-                  <span className="text-sm font-normal text-gray-600">
-                    {emprestimoParaCancelar.quantidadeExemplares}{" "}
-                    {emprestimoParaCancelar.quantidadeExemplares === 1
-                      ? "exemplar"
-                      : "exemplares"
-                    }
-                  </span>
-                </span>
-              </>
+              <div>
+                <p>Tem certeza que deseja cancelar este empréstimo?</p>
+                <div className="mt-3 rounded-xl bg-[#eef7f0] border border-[#d5ead9] p-3.5 space-y-1 text-[14.5px]">
+                  <p>
+                    <span className="font-semibold text-[#1e582d]">Professor: </span>
+                    <span className="text-gray-800">{emprestimoParaCancelar.professorNome}</span>
+                  </p>
+                  <p>
+                    <span className="font-semibold text-[#1e582d]">Turma: </span>
+                    <span className="text-gray-800">{emprestimoParaCancelar.turmaNome}</span>
+                  </p>
+                  <p>
+                    <span className="font-semibold text-[#1e582d]">Data de retirada: </span>
+                    <span className="text-gray-800 tabular-nums">
+                      {new Date(emprestimoParaCancelar.dataRetirada).toLocaleDateString("pt-BR")}
+                    </span>
+                  </p>
+                  <p>
+                    <span className="font-semibold text-[#1e582d]">Exemplares: </span>
+                    <span className="text-gray-800 tabular-nums">
+                      {emprestimoParaCancelar.quantidadeExemplares}{" "}
+                      {emprestimoParaCancelar.quantidadeExemplares === 1
+                        ? "exemplar"
+                        : "exemplares"}
+                    </span>
+                  </p>
+                </div>
+              </div>
             ) : (
               ""
             )
@@ -404,7 +427,6 @@ const filtradosPorAba = emprestimosAgrupados
           onCancelar={() => setEmprestimoParaCancelar(null)}
           onConfirmar={confirmarCancelamento}
         />
-      </main>
-    </div>
+    </PageShell>
   );
 }

@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import Sidebar from "../../components/Sidebar";
+import PageShell from "../../components/PageShell";
+import EstadoLista from "../../components/EstadoLista";
 import SearchBar, { TipoOrdenacao } from "../../components/Searchbar";
 import AbasStatus, { StatusAba } from "../../components/AbasStatus";
 import { Livro } from "../../types/livro";
 import ListaLivro from "../../components/livro/listaLivro";
 import Paginacao from "../../components/Paginacao";
+import { useItensPorPagina } from "../../hooks/useItensPorPagina";
 import { useRouter } from "next/router";
 import { MdAdd } from "react-icons/md";
 
@@ -42,7 +44,7 @@ export default function GerenciarLivros() {
   const [ordenacao, setOrdenacao] = useState<TipoOrdenacao>("alfabetica");
 
   const [paginaAtual, setPaginaAtual] = useState(1);
-  const ITENS_POR_PAGINA = 10; // 10 itens por página na visualização em lista
+  const itensPorPagina = useItensPorPagina();
 
   const [excluindo, setExcluindo] = useState(false);
   const [recarregar, setRecarregar] = useState(0);
@@ -64,20 +66,21 @@ export default function GerenciarLivros() {
   }, [feedback]);
 
    useEffect(() => {
+    if (!router.isReady) return;
     const sucesso = router.query.sucesso;
 
     if (sucesso === "1") {
       setFeedback("Livro cadastrado com sucesso!");
-    }
-
-    if (sucesso === "editado") {
+      router.replace("/livro", undefined, { shallow: true });
+    } else if (sucesso === "editado") {
       setFeedback("Livro editado com sucesso!");
-    }
-
-    if (sucesso === "editado_inativo") {
+      router.replace("/livro", undefined, { shallow: true });
+    } else if (sucesso === "editado_inativo") {
       setAbaAtiva("INATIVO");
+      setFeedback("Livro editado com sucesso. Com 0 exemplares, ele foi desativado.");
+      router.replace("/livro", undefined, { shallow: true });
     }
-  }, [router.query.sucesso]);
+  }, [router.isReady, router.query.sucesso]);
 
 
   const handleExcluir = async (livro: Livro) => {
@@ -195,7 +198,7 @@ export default function GerenciarLivros() {
 
   const totalPaginas = Math.max(
     1,
-    Math.ceil(livrosExibidos.length / ITENS_POR_PAGINA),
+    Math.ceil(livrosExibidos.length / itensPorPagina),
   );
 
   useEffect(() => {
@@ -204,108 +207,73 @@ export default function GerenciarLivros() {
     }
   }, [totalPaginas, paginaAtual]);
 
-  const inicio = (paginaAtual - 1) * ITENS_POR_PAGINA;
+  const totalAtivos = listaLivros.filter(
+    (livro) => livro.status === "ATIVO" || livro.ativo === true
+  ).length;
+  const totalInativos = listaLivros.length - totalAtivos;
+
+  const inicio = (paginaAtual - 1) * itensPorPagina;
   const livrosPaginados = livrosExibidos.slice(
     inicio,
-    inicio + ITENS_POR_PAGINA,
+    inicio + itensPorPagina,
   );
-
-  // Mesma regra do card: Desativar quando o livro tem histórico de empréstimos
-  const livroTemHistorico = livroParaExcluir
-    ? (livroParaExcluir.possuiHistorico ??
-      (livroParaExcluir.quantidadeEmprestada ?? 0) > 0)
-    : false;
-
-  async function confirmarExclusao() {
-    if (!livroParaExcluir) return;
-
-    setExcluindo(true);
-    setFeedback("Livro excluído com successo!");
-
-    try {
-      const resposta = await window.ipc.livro.excluir(livroParaExcluir.id);
-      setRecarregar((n) => n + 1);
-    } catch (error) {
-      setErro(
-        error instanceof Error
-          ? error.message
-          : "Não foi possível excluir o livro."
-      )
-    } finally {
-      setExcluindo(false);
-      setLivroParaExcluir(null);
-    }
-  }
-
-  function confirmarAtivacao(quantidadeTotal: number) {
-    // Subtarefa 3: aqui entra a chamada ao backend
-    // quando o canal existir.
-    console.log("Ativar livro:", livroParaAtivar?.id, quantidadeTotal);
-    setLivroParaAtivar(null);
-  }
   return (
-    <div className="flex min-h-screen bg-white">
-      <Sidebar />
+    <PageShell titulo="Gerenciar livros">
+      <ToastFeedback
+        mensagem={feedback}
+        tipo="sucesso"
+        onClose={() => setFeedback("")}
+      />
 
-      <main className="flex-1 min-w-0 px-8 pt-6 pb-6 animate-fade-in">
-        <h1 className="text-2xl font-bold text-gray-800 mb-4">
-          Gerenciar livros
-        </h1>
+      <ToastFeedback
+        mensagem={erro}
+        tipo="erro"
+        onClose={() => setErro("")}
+      />
 
-        <ToastFeedback
-          mensagem={feedback}
-          tipo="sucesso"
-          onClose={() => setFeedback("")}
+      {/* Abas de status: Livros Ativos e Livros Inativos */}
+      <AbasStatus
+        abaAtiva={abaAtiva}
+        onChangeAba={setAbaAtiva}
+        labelAtivos="Livros Ativos"
+        labelInativos="Livros Inativos"
+        totalAtivos={totalAtivos}
+        totalInativos={totalInativos}
+      />
+
+      {/* Barra de busca e botão de adicionar */}
+      <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4 mb-3.5 w-full">
+        <SearchBar
+          placeholder="Pesquisar livro por título ou editora..."
+          valorBusca={termoBusca}
+          onChangeBusca={setTermoBusca}
+          ordenacao={ordenacao}
+          onChangeOrdenacao={setOrdenacao}
         />
 
-        <ToastFeedback
-          mensagem={erro}
-          tipo="erro"
-          onClose={() => setErro("")}
+        <Link
+          href="/livro/cadastro_livro"
+          className="h-11 px-5 sm:px-6 inline-flex items-center justify-center bg-[#2e8b45] text-white rounded-xl font-semibold text-[15px] hover:bg-[#236c35] transition-all whitespace-nowrap gap-2 shadow-sm cursor-pointer shrink-0 active:scale-95"
+        >
+          <MdAdd size={20} />
+          Adicionar livro
+        </Link>
+      </div>
+
+      {/* Lista de livros ou mensagens de estado */}
+      {carregando ? (
+        <EstadoLista mensagem="Carregando livros..." />
+      ) : livrosExibidos.length === 0 ? (
+        <EstadoLista
+          mensagem={
+            termoBusca.trim()
+              ? `Nenhum livro ${abaAtiva === "ATIVO" ? "ativo" : "inativo"} encontrado para "${termoBusca}".`
+              : `Nenhum livro ${abaAtiva === "ATIVO" ? "ativo" : "inativo"} cadastrado.`
+          }
         />
-
-        {/* Abas de status: Ativos e Inativos */}
-        <AbasStatus
-          abaAtiva={abaAtiva}
-          onChangeAba={setAbaAtiva}
-        />
-
-
-        {/* Barra de busca e botão de adicionar */}
-        <div className="flex items-center gap-4 mb-4 w-full">
-          <SearchBar
-            placeholder="Pesquisar livro por título ou editora..."
-            valorBusca={termoBusca}
-            onChangeBusca={setTermoBusca}
-            ordenacao={ordenacao}
-            onChangeOrdenacao={setOrdenacao}
-          />
-
-          <Link
-            href="/livro/cadastro_livro"
-            className="h-11 px-6 flex items-center justify-center bg-[#2e8b45] text-white rounded-xl font-medium text-sm hover:bg-[#236c35] transition-all whitespace-nowrap gap-2 shadow-sm cursor-pointer shrink-0 active:scale-95"
-          >
-            <MdAdd size={18} />
-            Adicionar Livro
-          </Link>
-        </div>
-
-        {/* Lista de livros ou mensagens de estado */}
-        {carregando ? (
-          <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
-            <p className="text-base font-medium">Carregando livros...</p>
-          </div>
-        ) : livrosExibidos.length === 0 ? (
-          <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
-            <p className="text-base font-medium">
-              {termoBusca.trim()
-                ? `Nenhum livro ${abaAtiva === "ATIVO" ? "ativo" : "inativo"} encontrado para "${termoBusca}".`
-                : `Nenhum livro ${abaAtiva === "ATIVO" ? "ativo" : "inativo"} cadastrado.`}
-            </p>
-          </div>
-        ) : (
+      ) : (
           <div
-            key={`${termoBusca}-${abaAtiva}-${ordenacao}-${paginaAtual}`}
+            key={`${abaAtiva}-${ordenacao}-${paginaAtual}`}
             className="animate-fade-in duration-300"
           >
             <ListaLivro
@@ -320,7 +288,7 @@ export default function GerenciarLivros() {
             <Paginacao
               paginaAtual={paginaAtual}
               totalItens={livrosExibidos.length}
-              itensPorPagina={ITENS_POR_PAGINA}
+              itensPorPagina={itensPorPagina}
               nomeEntidade={abaAtiva === "ATIVO" ? "livros ativos" : "livros inativos"}
               nomeEntidadeSingular={abaAtiva === "ATIVO" ? "livro ativo" : "livro inativo"}
               aoMudarPagina={setPaginaAtual}
@@ -328,25 +296,23 @@ export default function GerenciarLivros() {
           </div>
         )}
 
-
         <ModalExcluir
           aberto={livroParaExcluir !== null}
+          titulo="Excluir livro?"
           mensagem={
             livroParaExcluir ? (
-              <div className="text-sm">
-                Tem certeza que deseja excluir a livro?
-                <span className="block font-bold text-gray-800 text-xs mt-0.75">
-                  Título:{" "}
-                  <span className="text-sm font-normal text-gray-600">
-                    {livroParaExcluir.titulo}
-                  </span>
-                </span>
-                 <span className="block font-bold text-gray-800 text-xs">
-                  Editora:{" "}
-                  <span className="text-sm font-normal text-gray-600">
-                    {livroParaExcluir.editora} 
-                  </span>
-                </span>
+              <div>
+                <p>Tem certeza que deseja excluir este livro?</p>
+                <div className="mt-3 rounded-xl bg-[#eef7f0] border border-[#d5ead9] p-3.5 space-y-1 text-[14.5px]">
+                  <p>
+                    <span className="font-semibold text-[#1e582d]">Título: </span>
+                    <span className="text-gray-800">{livroParaExcluir.titulo}</span>
+                  </p>
+                  <p>
+                    <span className="font-semibold text-[#1e582d]">Editora: </span>
+                    <span className="text-gray-800">{livroParaExcluir.editora}</span>
+                  </p>
+                </div>
               </div>
             ) : (
               ""
@@ -370,25 +336,26 @@ export default function GerenciarLivros() {
 
         <ModalDesativar
           aberto={livroParaDesativar !== null}
+          titulo="Desativar livro?"
           aviso="Atenção: ao desativar o livro, a quantidade total de exemplares será zerada."
           mensagem={
             livroParaDesativar ? (
-              <>
-                Tem certeza que deseja desativar o livro:
-                <span className="block font-bold text-gray-800 text-xs mt-0.75">
-                  Título:{" "}
-                  <span className="text-sm font-normal text-gray-600">
-                    {livroParaDesativar.titulo}
-                  </span>
-                </span>
-                 <span className="block font-bold text-gray-800 text-xs">
-                  Editora:{" "}
-                  <span className="text-sm font-normal text-gray-600">
-                    {livroParaDesativar.editora} 
-                  </span>
-                </span>
-              </>
-            ) : ""
+              <div>
+                <p>Tem certeza que deseja desativar este livro?</p>
+                <div className="mt-3 rounded-xl bg-[#eef7f0] border border-[#d5ead9] p-3.5 space-y-1 text-[14.5px]">
+                  <p>
+                    <span className="font-semibold text-[#1e582d]">Título: </span>
+                    <span className="text-gray-800">{livroParaDesativar.titulo}</span>
+                  </p>
+                  <p>
+                    <span className="font-semibold text-[#1e582d]">Editora: </span>
+                    <span className="text-gray-800">{livroParaDesativar.editora}</span>
+                  </p>
+                </div>
+              </div>
+            ) : (
+              ""
+            )
           }
           onCancelar={() => setLivroParaDesativar(null)}
           onConfirmar={async () => {
@@ -436,7 +403,6 @@ export default function GerenciarLivros() {
             }
           }}
         />
-      </main>
-    </div>
+    </PageShell>
   );
 }

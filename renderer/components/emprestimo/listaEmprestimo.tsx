@@ -1,5 +1,7 @@
 import { MdChecklist, MdClose } from "react-icons/md";
 import { Emprestimo, StatusEmprestimo } from "../../types/emprestimo";
+import { TABLE_COL_WIDTHS } from "../../utils/tableLayout";
+import StatusPill from "../StatusPill";
 
 interface ListaEmprestimoProps {
   emprestimos: Emprestimo[];
@@ -12,34 +14,8 @@ interface ListaEmprestimoProps {
 export const formatarData = (iso?: string | null) =>
   iso ? new Date(iso.length === 10 ? `${iso}T00:00:00` : iso).toLocaleDateString("pt-BR") : "—";
 
-const STATUS_STYLE: Record<StatusEmprestimo, { label: string; badge: string; dot: string }> = {
-  PENDENTE: {
-    label: "Pendente",
-    badge: "bg-[#fff4d6] text-[#b45309] border-[#fde3a1]",
-    dot: "bg-[#f59e0b]",
-  },
-  CONCLUIDO: {
-    label: "Concluído",
-    badge: "bg-[#d8f3dc] text-[#1e582d] border-[#c1e7c9]",
-    dot: "bg-[#2e8b45]",
-  },
-  CANCELADO: {
-    label: "Cancelado",
-    badge: "bg-[#fee2e2] text-[#b91c1c] border-[#fecaca]",
-    dot: "bg-[#dc2626]",
-  },
-};
-
 export function StatusBadge({ status }: { status: StatusEmprestimo }) {
-  const s = STATUS_STYLE[status];
-  return (
-    <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-semibold text-xs border ${s.badge}`}
-    >
-      <span className={`w-2 h-2 rounded-full ${s.dot}`} />
-      {s.label}
-    </span>
-  );
+  return <StatusPill status={status} />;
 }
 
 export default function ListaEmprestimo({
@@ -53,48 +29,42 @@ export default function ListaEmprestimo({
   const cancelado = modo === "cancelados";
 
   return (
-    <div className="w-full bg-white border border-[#D3E8D6] rounded-2xl overflow-hidden shadow-sm">
+    <div className="w-full bg-white border border-[#cfe5d4] rounded-2xl overflow-hidden shadow-xs">
       <div className="w-full overflow-x-auto">
-        <table className="w-full min-w-[900px] table-fixed text-left border-collapse">
+        <table className="w-full min-w-[860px] xl:min-w-[1320px] table-fixed text-left border-collapse">
           <colgroup>
-            {/* Grade idêntica nas 3 abas: nada "pula" ao trocar de aba.
-                Em "Pendentes" a coluna de data ocupa o espaço das duas datas (colSpan=2). */}
             <col />
-            <col className="hidden md:table-column" style={{ width: "15%" }} />
-            <col className="hidden lg:table-column" style={{ width: "12.5%" }} />
-            <col className="hidden lg:table-column" style={{ width: "12.5%" }} />
-            <col style={{ width: "13%" }} />
-            <col style={{ width: "13%" }} />
-            <col style={{ width: "240px" }} />
+            <col className="hidden xl:table-column" style={{ width: "14%" }} />
+            <col className="hidden xl:table-column" style={{ width: TABLE_COL_WIDTHS.dataRetirada }} />
+            <col className="hidden xl:table-column" style={{ width: TABLE_COL_WIDTHS.dataDevolucao }} />
+            <col style={{ width: TABLE_COL_WIDTHS.exemplares }} />
+            <col style={{ width: TABLE_COL_WIDTHS.status }} />
+            <col style={{ width: TABLE_COL_WIDTHS.acoes }} />
           </colgroup>
           <thead>
-            <tr className="bg-[#ebf5ed] border-b border-[#c8decb] text-sm font-semibold text-[#23582c]">
-              <th className="py-3.5 px-3 text-center">Professor responsável</th>
-              <th className="py-3.5 px-3 hidden md:table-cell text-center">Turma</th>
-              <th colSpan={historico ? 1 : 2} className="py-3.5 px-3 hidden lg:table-cell whitespace-nowrap text-center">
+            <tr className="bg-[#e8f4eb] border-b border-[#c5dfca] text-[15px] font-bold text-[#1e582d] leading-snug">
+              <th className="py-3 px-6 text-left whitespace-nowrap">Professor responsável</th>
+              <th className="py-3 px-4 hidden xl:table-cell text-left whitespace-nowrap">Turma</th>
+              <th colSpan={historico ? 1 : 2} className="py-3 px-3 hidden xl:table-cell text-center whitespace-nowrap">
                 {cancelado ? "Data solicitação" : "Data retirada"}
               </th>
               {historico && (
-                <th className="py-3.5 px-3 hidden lg:table-cell whitespace-nowrap text-center">
+                <th className="py-3 px-3 hidden xl:table-cell text-center whitespace-nowrap">
                   {cancelado ? "Data cancelamento" : "Data devolução"}
                 </th>
               )}
-              <th className="py-3.5 px-3 text-center">Exemplares emprestados</th>
-              <th className="py-3.5 px-3 text-center">
-                Status do empréstimo
-              </th>
-              <th className="py-3.5 px-3 text-center">
-                Ações
-              </th>
+              <th className="py-3 px-3 text-center whitespace-nowrap">Exemplares emprestados</th>
+              <th className="py-3 px-3 text-center whitespace-nowrap">Status do empréstimo</th>
+              <th className="py-3 px-3 text-center whitespace-nowrap">Ações</th>
             </tr>
           </thead>
 
-          <tbody className="divide-y divide-[#E6F0E8]">
+          <tbody className="divide-y divide-[#e6f0e8]">
             {emprestimos.length === 0 && (
               <tr>
                 <td
                   colSpan={7}
-                  className="py-10 text-center text-sm text-gray-500"
+                  className="py-12 text-center text-base font-medium text-gray-500"
                 >
                   {historico
                     ? "Nenhum empréstimo concluído ou cancelado."
@@ -104,50 +74,70 @@ export default function ListaEmprestimo({
             )}
 
             {emprestimos.map((e) => (
-              <tr key={e.id} className="transition-colors hover:bg-[#f6fbf7]">
-                <td className="py-3 px-3 text-center">
-                  <span className="text-sm font-medium text-gray-900 block">
+              <tr key={e.id} className="transition-colors hover:bg-[#f4faf6]">
+                <td className="py-2.5 px-6 text-left">
+                  <span
+                    title={e.professorNome}
+                    className="text-[15.5px] font-semibold text-gray-900 block leading-snug truncate max-w-full"
+                  >
                     {e.professorNome}
                   </span>
-                  <span className="block md:hidden text-xs text-gray-500 mt-0.5">
+                  <span
+                    title={e.turmaNome}
+                    className="block xl:hidden text-[13px] text-gray-600 mt-0.5 truncate max-w-full"
+                  >
+                    {e.turmaNome} · {formatarData(e.dataRetirada instanceof Date ? e.dataRetirada.toISOString() : e.dataRetirada)}
+                  </span>
+                </td>
+                <td className="py-2.5 px-4 hidden xl:table-cell text-[15px] font-medium text-gray-700 text-left">
+                  <span
+                    title={e.turmaNome}
+                    className="block leading-snug truncate max-w-full"
+                  >
                     {e.turmaNome}
                   </span>
                 </td>
-                <td className="py-3 px-3 hidden md:table-cell text-sm text-gray-700 text-center">
-                  {e.turmaNome}
-                </td>
-                <td colSpan={historico ? 1 : 2} className="py-3 px-3 hidden lg:table-cell text-sm text-gray-700 tabular-nums whitespace-nowrap text-center">
-                  {formatarData(  
-                      e.dataRetirada instanceof Date
+                <td
+                  colSpan={historico ? 1 : 2}
+                  className="py-2.5 px-3 hidden xl:table-cell text-[15px] font-medium text-gray-700 tabular-nums whitespace-nowrap text-center"
+                >
+                  {formatarData(
+                    e.dataRetirada instanceof Date
                       ? e.dataRetirada.toISOString()
                       : e.dataRetirada
-                    )}
+                  )}
                 </td>
                 {historico && (
-                  <td className="py-3 px-3 hidden lg:table-cell text-sm text-gray-700 tabular-nums whitespace-nowrap text-center">
-                    {formatarData(  
+                  <td className="py-2.5 px-3 hidden xl:table-cell text-[15px] font-medium text-gray-700 tabular-nums whitespace-nowrap text-center">
+                    {formatarData(
                       e.dataDevolucao instanceof Date
-                      ? e.dataDevolucao.toISOString()
-                      : e.dataDevolucao
+                        ? e.dataDevolucao.toISOString()
+                        : e.dataDevolucao
                     )}
                   </td>
                 )}
-                <td className="py-3 px-3 text-sm font-medium text-gray-900 text-center">
-                  {e.quantidadeExemplares}{" "}
-                  {e.quantidadeExemplares === 1 ? "exemplar" : "exemplares"}
+                <td className="py-2.5 px-3 text-center whitespace-nowrap">
+                  <div className="inline-flex items-baseline justify-center gap-1.5 w-[132px]">
+                    <span className="w-7 text-right font-semibold text-[15.5px] text-gray-900 tabular-nums">
+                      {e.quantidadeExemplares}
+                    </span>
+                    <span className="w-[92px] text-left font-medium text-[15px] text-gray-700">
+                      {e.quantidadeExemplares === 1 ? "exemplar" : "exemplares"}
+                    </span>
+                  </div>
                 </td>
-                <td className="py-3 px-3 whitespace-nowrap text-center">
-                  <StatusBadge status={e.status} />
+                <td className="py-2.5 px-3 whitespace-nowrap text-center">
+                  <StatusPill status={e.status} />
                 </td>
-                <td className="py-3 px-2">
-                  <div className="flex items-center justify-center gap-2">
+                <td className="py-2.5 px-3 text-center">
+                  <div className="flex items-center justify-center gap-2 shrink-0">
                     <button
                       type="button"
                       onClick={() => onVerDetalhes?.(e)}
-                      className="flex items-center gap-1.5 bg-[#389348] text-white px-3 py-1.5 text-xs rounded-lg font-medium hover:bg-[#2e7d3d] transition-colors cursor-pointer shrink-0"
+                      className="inline-flex items-center justify-center gap-1.5 w-[104px] h-8 bg-[#389348] text-white text-[13.5px] rounded-lg font-semibold hover:bg-[#2e7d3d] transition-colors cursor-pointer shrink-0"
                     >
-                      <MdChecklist size={15} />
-                      Ver detalhes
+                      <MdChecklist size={16} />
+                      Detalhes
                     </button>
 
                     {!historico && (
@@ -162,13 +152,13 @@ export default function ListaEmprestimo({
                               : undefined
                         }
                         onClick={() => onCancelar?.(e)}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg font-medium shrink-0 transition-colors ${
+                        className={`inline-flex items-center justify-center gap-1.5 w-[104px] h-8 text-[13.5px] rounded-lg font-semibold shrink-0 transition-colors ${
                           emprestimosComBaixas.has(e.id) || e.status !== "PENDENTE"
                             ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                            : "bg-[#dc3b3b] text-white hover:bg-[#c42e2e] cursor-pointer"
+                            : "bg-[#cf4a4a] text-white hover:bg-[#b83a3a] cursor-pointer"
                         }`}
                       >
-                        <MdClose size={15} />
+                        <MdClose size={16} />
                         Cancelar
                       </button>
                     )}

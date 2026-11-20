@@ -7,9 +7,11 @@ import {
   MdOutlineSchool,
   MdUndo,
 } from "react-icons/md";
-import Sidebar from "../../components/Sidebar";
+import PageShell from "../../components/PageShell";
+import EstadoLista from "../../components/EstadoLista";
 import SearchBar, { TipoOrdenacao } from "../../components/Searchbar";
 import Paginacao from "../../components/Paginacao";
+import { useItensPorPagina } from "../../hooks/useItensPorPagina";
 import ToastFeedback from "../../components/ToastFeedback";
 import ListaItensEmprestimo from "../../components/emprestimo/listaItensEmprestimo";
 import ModalDevolverExemplares from "../../components/modal/modalDevolverExemplares";
@@ -17,8 +19,6 @@ import { formatarData } from "../../components/emprestimo/listaEmprestimo";
 import { EmprestimoDetalhe, ItemEmprestimo } from "../../types/emprestimo";
 import { calcularPendente } from "../../utils/emprestimoItem";
 import ModalDevolverTodos from "../../components/modal/modalDevolverTodosEmprestimo";
-
-const ITENS_POR_PAGINA = 10;
 
 export default function DetalhesEmprestimo() {
   const router = useRouter();
@@ -254,9 +254,11 @@ export default function DetalhesEmprestimo() {
     );
   });
 
+  const itensPorPagina = useItensPorPagina({ alturaFixa: 365, alturaLinha: 56 });
+
   const totalPaginas = Math.max(
     1,
-    Math.ceil(itensExibidos.length / ITENS_POR_PAGINA)
+    Math.ceil(itensExibidos.length / itensPorPagina)
   );
 
   useEffect(() => {
@@ -265,11 +267,11 @@ export default function DetalhesEmprestimo() {
     }
   }, [totalPaginas, paginaAtual]);
 
-  const inicio = (paginaAtual - 1) * ITENS_POR_PAGINA;
+  const inicio = (paginaAtual - 1) * itensPorPagina;
 
   const itensPaginados = itensExibidos.slice(
     inicio,
-    inicio + ITENS_POR_PAGINA
+    inicio + itensPorPagina
   );
 
   const exemplaresPendentes =
@@ -283,149 +285,140 @@ export default function DetalhesEmprestimo() {
     emprestimo?.status !== "PENDENTE" || exemplaresPendentes === 0;
 
   return (
-    <div className="flex min-h-screen bg-white">
-      <Sidebar />
+    <PageShell
+      titulo="Detalhes do empréstimo"
+      acaoTopo={
+        <button
+          type="button"
+          onClick={() => router.push("/emprestimo")}
+          className="h-11 px-5 inline-flex items-center justify-center bg-[#2e8b45] text-white rounded-xl font-semibold text-[15px] hover:bg-[#236c35] transition-all whitespace-nowrap gap-2 shadow-sm cursor-pointer shrink-0 active:scale-95"
+        >
+          <MdArrowBack size={19} />
+          Voltar
+        </button>
+      }
+    >
+      <ToastFeedback
+        mensagem={feedback}
+        tipo="sucesso"
+        onClose={fecharFeedback}
+      />
 
-      <main className="flex-1 min-w-0 px-8 pt-6 pb-6 animate-fade-in">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-bold text-gray-800">
-            Detalhes do empréstimo
-          </h1>
+      <ToastFeedback
+        mensagem={erro}
+        tipo="erro"
+        onClose={fecharErro}
+      />
 
-          <button
-            type="button"
-            onClick={() => router.push("/emprestimo")}
-            className="h-11 px-6 flex items-center justify-center bg-[#2e8b45] text-white rounded-xl font-medium text-sm hover:bg-[#236c35] transition-all whitespace-nowrap gap-2 shadow-sm cursor-pointer shrink-0 active:scale-95"
-          >
-            <MdArrowBack size={18} />
-            Voltar
-          </button>
-        </div>
+      {carregando ? (
+        <EstadoLista mensagem="Carregando empréstimo..." />
+      ) : !emprestimo ? (
+        <EstadoLista mensagem={erro || "Empréstimo não encontrado."} />
+      ) : (
+        <>
+          {/* Resumo estruturado do empréstimo */}
+          <section className="bg-white border border-[#cfe5d4] rounded-2xl px-6 py-4 mb-5 shadow-xs">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-3">
+                <h2 className="text-[20px] font-bold text-[#1e582d]">
+                  Prof. {emprestimo.professorNome}
+                </h2>
+                <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-xl bg-[#eef7f0] border border-[#cde5d4] text-[14.5px] font-semibold text-[#1e582d]">
+                  <MdOutlineSchool size={18} className="text-[#2e8b45] shrink-0" />
+                  {emprestimo.turmaNome}
+                </span>
+              </div>
 
-        <ToastFeedback
-          mensagem={feedback}
-          tipo="sucesso"
-          onClose={fecharFeedback}
-        />
+              <div className="flex flex-wrap items-center gap-5 text-[15px] text-gray-700">
+                <span className="inline-flex items-center gap-2">
+                  <MdCalendarToday size={17} className="text-[#2e8b45] shrink-0" />
+                  <span>
+                    <strong className="font-semibold text-[#1e582d]">
+                      {emprestimo.status === "CANCELADO"
+                        ? "Solicitação: "
+                        : "Retirada: "}
+                    </strong>
+                    <span className="tabular-nums">
+                      {formatarData(
+                        emprestimo.dataRetirada instanceof Date
+                          ? emprestimo.dataRetirada.toISOString()
+                          : emprestimo.dataRetirada
+                      )}
+                    </span>
+                  </span>
+                </span>
 
-        <ToastFeedback
-          mensagem={erro}
-          tipo="erro"
-          onClose={fecharErro}
-        />
-
-        {carregando ? (
-          <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
-            <p className="text-base font-medium">
-              Carregando empréstimo...
-            </p>
-          </div>
-        ) : !emprestimo ? (
-          <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
-            <p className="text-base font-medium">
-              {erro || "Empréstimo não encontrado."}
-            </p>
-          </div>
-        ) : (
-          <>
-            {/* Cabeçalho do empréstimo fiel ao protótipo */}
-            <section className="bg-[#EEF7F0] rounded-2xl px-6 py-4 mb-6">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <div>
-                  <h2 className="text-xl font-bold text-[#245B2F]">
-                    Prof. {emprestimo.professorNome}
-                  </h2>
-
-                  <div className="flex flex-wrap items-center gap-2 mt-1 text-sm text-[#5AA365]">
-                    <span className="flex items-center gap-1.5">
-                      <MdCalendarToday size={15} className="text-[#5AA365] shrink-0" />
-                      <span>
+                {emprestimo.dataDevolucao ? (
+                  <span className="inline-flex items-center gap-2">
+                    <MdCalendarToday size={17} className="text-[#2e8b45] shrink-0" />
+                    <span>
+                      <strong className="font-semibold text-[#1e582d]">
                         {emprestimo.status === "CANCELADO"
-                          ? "Solicitação: "
-                          : "Retirada: "}
+                          ? "Cancelamento: "
+                          : "Devolução: "}
+                      </strong>
+                      <span className="tabular-nums">
                         {formatarData(
-                          emprestimo.dataRetirada instanceof Date
-                            ? emprestimo.dataRetirada.toISOString()
-                            : emprestimo.dataRetirada
+                          emprestimo.dataDevolucao instanceof Date
+                            ? emprestimo.dataDevolucao.toISOString()
+                            : emprestimo.dataDevolucao
                         )}
                       </span>
                     </span>
-
-                    {emprestimo.dataDevolucao ? (
-                      <>
-                        <span className="text-[#5AA365] opacity-40">•</span>
-                        <span>
-                          {emprestimo.status === "CANCELADO"
-                            ? "Cancelamento: "
-                            : "Devolução: "}
-                          {formatarData(
-                            emprestimo.dataDevolucao instanceof Date
-                              ? emprestimo.dataDevolucao.toISOString()
-                              : emprestimo.dataDevolucao
-                          )}
-                        </span>
-                      </>
-                    ) : null}
-
-                    <span className="text-[#5AA365] opacity-40">•</span>
-
-                    <span className="flex items-center gap-1.5">
-                      <MdMenuBook size={15} className="text-[#5AA365] shrink-0" />
-                      <span>
-                        {emprestimo.quantidadeExemplares}{" "}
-                        {emprestimo.quantidadeExemplares === 1
-                          ? "exemplar"
-                          : "exemplares"}
-                      </span>
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex items-center">
-                  <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#EAF5ED] border border-[#D0E6D6] text-sm font-medium text-[#245B2F]">
-                    <MdOutlineSchool size={16} className="text-[#245B2F] shrink-0" />
-                    {emprestimo.turmaNome}
                   </span>
-                </div>
+                ) : null}
+
+                <span className="inline-flex items-center gap-2">
+                  <MdMenuBook size={18} className="text-[#2e8b45] shrink-0" />
+                  <span className="font-semibold text-gray-900 tabular-nums">
+                    {emprestimo.quantidadeExemplares}{" "}
+                    <span className="font-medium text-gray-700">
+                      {emprestimo.quantidadeExemplares === 1
+                        ? "exemplar"
+                        : "exemplares"}
+                    </span>
+                  </span>
+                </span>
               </div>
-            </section>
-
-            {/* Busca e botão visual de devolver todos */}
-            <div className="flex items-center gap-4 mb-4 w-full">
-              <SearchBar
-                placeholder="Pesquisar por título ou editora..."
-                valorBusca={termoBusca}
-                onChangeBusca={setTermoBusca}
-                ordenacao={ordenacao}
-                onChangeOrdenacao={setOrdenacao}
-              />
-
-              <button
-                type="button"
-                disabled={devolverTodosDesabilitado}
-                onClick={abrirDevolverTodos}
-                className={`h-11 px-6 flex items-center justify-center rounded-xl font-medium text-sm whitespace-nowrap gap-2 shrink-0 ${
-                            devolverTodosDesabilitado
-                              ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                              : "bg-[#2e8b45] text-white shadow-sm hover:bg-[#236c35] cursor-pointer"
-                          }`}
-              >
-                <MdUndo size={18} />
-                Devolver todos
-              </button>
             </div>
+          </section>
 
-            {itensExibidos.length === 0 ? (
-              <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
-                <p className="text-base font-medium">
-                  {termoBusca.trim()
-                    ? `Nenhum livro encontrado para "${termoBusca}".`
-                    : "Este empréstimo não possui livros."}
-                </p>
-              </div>
-            ) : (
+          {/* Busca e botão visual de devolver todos */}
+          <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4 mb-3.5 w-full">
+            <SearchBar
+              placeholder="Pesquisar por título ou editora..."
+              valorBusca={termoBusca}
+              onChangeBusca={setTermoBusca}
+              ordenacao={ordenacao}
+              onChangeOrdenacao={setOrdenacao}
+            />
+
+            <button
+              type="button"
+              disabled={devolverTodosDesabilitado}
+              onClick={abrirDevolverTodos}
+              className={`h-11 px-5 sm:px-6 inline-flex items-center justify-center rounded-xl font-semibold text-[15px] whitespace-nowrap gap-2 shrink-0 transition-all ${
+                devolverTodosDesabilitado
+                  ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                  : "bg-[#2e8b45] text-white shadow-sm hover:bg-[#236c35] cursor-pointer active:scale-95"
+              }`}
+            >
+              <MdUndo size={19} />
+              Devolver todos
+            </button>
+          </div>
+
+          {itensExibidos.length === 0 ? (
+            <EstadoLista
+              mensagem={
+                termoBusca.trim()
+                  ? `Nenhum livro encontrado para "${termoBusca}".`
+                  : "Este empréstimo não possui livros."
+              }
+            />
+          ) : (
               <div
-                key={`${termoBusca}-${ordenacao}-${paginaAtual}`}
+                key={`${ordenacao}-${paginaAtual}`}
                 className="animate-fade-in duration-300"
               >
                 <ListaItensEmprestimo
@@ -438,7 +431,7 @@ export default function DetalhesEmprestimo() {
                   paginaAtual={paginaAtual}
                   totalItens={itensExibidos.length}
                   totalBalao={exemplaresPendentes}
-                  itensPorPagina={ITENS_POR_PAGINA}
+                  itensPorPagina={itensPorPagina}
                   nomeEntidade="exemplares pendentes"
                   nomeEntidadeSingular="exemplar pendente"
                   aoMudarPagina={setPaginaAtual}
@@ -464,7 +457,6 @@ export default function DetalhesEmprestimo() {
           onCancelar={fecharDevolverTodos}
           onConfirmar={confirmarDevolverTodos}
         />
-      </main>
-    </div>
+    </PageShell>
   );
 }
