@@ -1,132 +1,441 @@
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Sidebar from "../../components/Sidebar";
+import SearchBar, { TipoOrdenacao } from "../../components/Searchbar";
+import AbasStatus, { StatusAba } from "../../components/AbasStatus";
 import { Livro } from "../../types/livro";
+import ListaLivro from "../../components/livro/listaLivro";
+import Paginacao from "../../components/Paginacao";
 import { useRouter } from "next/router";
+import { MdAdd } from "react-icons/md";
 
-const livros: Livro[] = [
-  {
-    id: 1,
-    titulo: "Harry Potter",
-    editora: "Quixadá",
-    quantidadeTotal: 2,
-    ativo: true,
-  },
-  {
-    id: 2,
-    titulo: "Chapeuzinho Vermelho",
-    editora: "Itpajé",
-    quantidadeTotal: 2,
-    ativo: true,
-  },
-  {
-    id: 3,
-    titulo: "Os três Porquinhos",
-    editora: "Piquet Carneiro",
-    quantidadeTotal: 2,
-    ativo: true,
-  },
-  {
-    id: 4,
-    titulo: "A Bela Adormecida",
-    editora: "Quixeramobim",
-    quantidadeTotal: 2,
-    ativo: false,
-  },
-];
+import ModalExcluir from "../../components/modal/modalExcluir";
+import ModalAtivarLivro from "../../components/modal/ModalAtivaLivro";
+import ModalDesativar from "../../components/modal/modalDesativar";
+import ToastFeedback from "../../components/ToastFeedback";
 
 export default function GerenciarLivros() {
   const router = useRouter();
-  const mostrarSucesso = router.query.sucesso === "1";
-  const livrosAtivos = livros.filter((livro) => livro.ativo);
+  const sucesso = router.query.sucesso;
+  const mensagemSucesso =
+    sucesso === "1"
+      ? "Livro cadastrado com sucesso!"
+      : sucesso === "editado"
+        ? "Livro editado com sucesso!"
+        : sucesso === "editado_inativo"
+          ? "Livro editado com sucesso. Com 0 exemplares, ele foi desativado."
+          : null;
+
+  const [listaLivros, setListaLivros] = useState<Livro[]>([]);
+  const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState("");
+
+
+  const [livroParaExcluir, setLivroParaExcluir] = useState<Livro | null>(null);
+  const [livroExcluindo, setLivroExcluindo] = useState<number | null>(null);
+  const [livroParaAtivar, setLivroParaAtivar] = useState<Livro | null>(null);
+  const [livroParaDesativar, setLivroParaDesativar] = useState<Livro | null>(null);
+
+
+  const [termoBusca, setTermoBusca] = useState("");
+  const [abaAtiva, setAbaAtiva] = useState<StatusAba>("ATIVO");
+  const [ordenacao, setOrdenacao] = useState<TipoOrdenacao>("alfabetica");
+
+  const [paginaAtual, setPaginaAtual] = useState(1);
+  const ITENS_POR_PAGINA = 10; // 10 itens por página na visualização em lista
+
+  const [excluindo, setExcluindo] = useState(false);
+  const [recarregar, setRecarregar] = useState(0);
+  // const [feedback, setFeedback] = useState<{
+  //   tipo: "sucesso" | "erro";
+  //   texto: string;
+  // } | null>(null);
+
+  const [feedback, setFeedback] = useState("");
+
+  useEffect(() => {
+    if (!feedback) return;
+
+    const timer = setTimeout(() => {
+      setFeedback("");
+    }, 2500);
+  
+    return () => clearTimeout(timer);
+  }, [feedback]);
+
+   useEffect(() => {
+    const sucesso = router.query.sucesso;
+
+    if (sucesso === "1") {
+      setFeedback("Livro cadastrado com sucesso!");
+    }
+
+    if (sucesso === "editado") {
+      setFeedback("Livro editado com sucesso!");
+    }
+
+    if (sucesso === "editado_inativo") {
+      setAbaAtiva("INATIVO");
+    }
+  }, [router.query.sucesso]);
+
+
+  const handleExcluir = async (livro: Livro) => {
+    try {
+      const resposta = await window.ipc?.livro?.excluir(livro.id);
+
+      if (!resposta?.success) {
+        setErro(resposta?.error || "Erro ao excluir o livro.");
+        return; 
+      }
+
+      setListaLivros((livrosAtuais) =>
+        livrosAtuais.filter((item) => item.id !== livro.id)
+      );
+
+      setFeedback("Livro excluído com sucesso!");
+    } catch (error) {
+      setErro(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível excluir o livro."
+      );
+    }
+  };
+
+  const handleAtivar = async (livro: Livro) => {
+    try {
+      const resposta = await window.ipc?.livro?.ativar(livro.id, livro.quantidadeTotal);
+
+      if (!resposta?.success) {
+        setErro(resposta?.error || "Erro ao ativar livro.");
+        return; 
+      }
+
+      setRecarregar((n) => n + 1);
+      setFeedback("Livro ativado com sucesso!");
+    } catch (error) {
+      setErro(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível ativar o livro."
+      );
+    }
+  };
+
+  const handleDesativar = async (livro: Livro) => {
+    try {
+      const resposta = await window.ipc?.livro?.desativar(livro.id);
+
+      if (!resposta?.success) {
+        setErro(resposta?.error || "Erro ao desativar livro.");
+        return; 
+      }
+      
+      setRecarregar((n) => n + 1);
+      setFeedback("Livro desativado com sucesso!");
+    } catch (error) {
+      setErro(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível desativar o livro."
+      );
+    }
+  };
+
+  useEffect(() => {
+    setPaginaAtual(1);
+  }, [termoBusca, abaAtiva]);
+
+  useEffect(() => {
+    async function carregarLivros() {
+      try {
+        const resposta = await window.ipc.livro.consultar({
+          termo: termoBusca,
+          incluirInativos: true,
+        });
+
+        if (resposta?.success && Array.isArray(resposta.data)) {
+          // Mapeia os dados do backend para satisfazer a interface Livro
+          const livrosFormatados: Livro[] = resposta.data.map((item) => ({
+            ...item,
+            ativo: item.status === "ATIVO",
+            statusEmprestimo:
+              item.saldoDisponivel > 0 ? "DISPONIVEL" : "INDISPONIVEL",
+          })) as unknown as Livro[];
+
+          setListaLivros(livrosFormatados);
+        } else {
+          console.error("Erro ao consultar livros:", resposta?.error);
+          setListaLivros([]);
+        }
+      } catch (error) {
+        console.error("Erro ao chamar o IPC de livros:", error);
+        setListaLivros([]);
+      } finally {
+        setCarregando(false);
+      }
+    }
+
+    carregarLivros();
+  }, [termoBusca, recarregar]);
+
+  const livrosFiltradosPorAba = listaLivros.filter((livro) =>
+    abaAtiva === "ATIVO"
+      ? livro.status === "ATIVO" || livro.ativo === true
+      : livro.status !== "ATIVO" && livro.ativo !== true
+  );
+
+  const livrosExibidos = [...livrosFiltradosPorAba].sort((a, b) => {
+    if (ordenacao === "recentes") {
+      return (b.id ?? 0) - (a.id ?? 0);
+    }
+    return (a.titulo || "").localeCompare(b.titulo || "", "pt-BR");
+  });
+
+  const totalPaginas = Math.max(
+    1,
+    Math.ceil(livrosExibidos.length / ITENS_POR_PAGINA),
+  );
+
+  useEffect(() => {
+    if (paginaAtual > totalPaginas) {
+      setPaginaAtual(totalPaginas);
+    }
+  }, [totalPaginas, paginaAtual]);
+
+  const inicio = (paginaAtual - 1) * ITENS_POR_PAGINA;
+  const livrosPaginados = livrosExibidos.slice(
+    inicio,
+    inicio + ITENS_POR_PAGINA,
+  );
+
+  // Mesma regra do card: Desativar quando o livro tem histórico de empréstimos
+  const livroTemHistorico = livroParaExcluir
+    ? (livroParaExcluir.possuiHistorico ??
+      (livroParaExcluir.quantidadeEmprestada ?? 0) > 0)
+    : false;
+
+  async function confirmarExclusao() {
+    if (!livroParaExcluir) return;
+
+    setExcluindo(true);
+    setFeedback("Livro excluído com successo!");
+
+    try {
+      const resposta = await window.ipc.livro.excluir(livroParaExcluir.id);
+      setRecarregar((n) => n + 1);
+    } catch (error) {
+      setErro(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível excluir o livro."
+      )
+    } finally {
+      setExcluindo(false);
+      setLivroParaExcluir(null);
+    }
+  }
+
+  function confirmarAtivacao(quantidadeTotal: number) {
+    // Subtarefa 3: aqui entra a chamada ao backend
+    // quando o canal existir.
+    console.log("Ativar livro:", livroParaAtivar?.id, quantidadeTotal);
+    setLivroParaAtivar(null);
+  }
   return (
     <div className="flex min-h-screen bg-white">
       <Sidebar />
 
-      <main className="flex-1 p-8">
-        <h1 className="text-2xl font-bold text-gray-800 mb-6">
+      <main className="flex-1 min-w-0 px-8 pt-6 pb-6 animate-fade-in">
+        <h1 className="text-2xl font-bold text-gray-800 mb-4">
           Gerenciar livros
         </h1>
 
-        {mostrarSucesso && (
-          <div className="bg-[#d8f3dc] text-[#2e8b45] px-4 py-3 rounded-xl mb-6 text-sm font-medium">
-            ✓ Livro cadastrado com sucesso!
-          </div>
-        )}
+        <ToastFeedback
+          mensagem={feedback}
+          tipo="sucesso"
+          onClose={() => setFeedback("")}
+        />
 
-        <div className="flex items-center gap-3 mb-8">
-          <div className="flex-1 bg-gray-50 border border-[#2e8b45] rounded-full px-5 py-2.5 flex items-center justify-between text-gray-700 shadow-sm">
-            <input
-              type="text"
-              placeholder="Barra de busca"
-              className="bg-transparent placeholder-gray-400 text-gray-800 outline-none w-full text-sm"
-            />
-            <span className="text-[#2e8b45]">🔍</span>
-          </div>
+        <ToastFeedback
+          mensagem={erro}
+          tipo="erro"
+          onClose={() => setErro("")}
+        />
+
+        {/* Abas de status: Ativos e Inativos */}
+        <AbasStatus
+          abaAtiva={abaAtiva}
+          onChangeAba={setAbaAtiva}
+        />
+
+
+        {/* Barra de busca e botão de adicionar */}
+        <div className="flex items-center gap-4 mb-4 w-full">
+          <SearchBar
+            placeholder="Pesquisar livro por título ou editora..."
+            valorBusca={termoBusca}
+            onChangeBusca={setTermoBusca}
+            ordenacao={ordenacao}
+            onChangeOrdenacao={setOrdenacao}
+          />
 
           <Link
             href="/livro/cadastro_livro"
-            className="bg-[#2e8b45] px-5 py-2.5 rounded-full text-white font-medium text-sm flex items-center gap-1 hover:bg-[#236c35] transition-colors"
+            className="h-11 px-6 flex items-center justify-center bg-[#2e8b45] text-white rounded-xl font-medium text-sm hover:bg-[#236c35] transition-all whitespace-nowrap gap-2 shadow-sm cursor-pointer shrink-0 active:scale-95"
           >
-            + Adicionar Livro
+            <MdAdd size={18} />
+            Adicionar Livro
           </Link>
         </div>
 
-        <div className="grid grid-cols-3 gap-6">
-          {livrosAtivos.map((livro) => (
-            <div
-              className={`border-2 rounded-3xl p-5 shadow-sm hover:shadow-md transition-all ${
-                livro.ativo
-                  ? "border-[#2e8b45] bg-white hover:border-[#236c35]"
-                  : "border-gray-300 bg-gray-50 opacity-60"
-              }`}
-              key={livro.id}
-            >
-              <h3
-                className={`font-bold text-base ${
-                  livro.ativo ? "text-[#2e8b45]" : "text-gray-600"
-                }`}
-              >
-                {livro.titulo}
-              </h3>
+        {/* Lista de livros ou mensagens de estado */}
+        {carregando ? (
+          <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
+            <p className="text-base font-medium">Carregando livros...</p>
+          </div>
+        ) : livrosExibidos.length === 0 ? (
+          <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
+            <p className="text-base font-medium">
+              {termoBusca.trim()
+                ? `Nenhum livro ${abaAtiva === "ATIVO" ? "ativo" : "inativo"} encontrado para "${termoBusca}".`
+                : `Nenhum livro ${abaAtiva === "ATIVO" ? "ativo" : "inativo"} cadastrado.`}
+            </p>
+          </div>
+        ) : (
+          <div
+            key={`${termoBusca}-${abaAtiva}-${ordenacao}-${paginaAtual}`}
+            className="animate-fade-in duration-300"
+          >
+            <ListaLivro
+              livros={livrosPaginados}
+              livroExcluindo={livroExcluindo}
+              onEditar={(l) => router.push(`/livro/${l.id}`)}
+              onDesativar={(livro) => setLivroParaDesativar(livro)}
+              onAtivar={(livro) => setLivroParaAtivar(livro)}
+              onExcluir={(livro) => setLivroParaExcluir(livro)}
+            />
 
-              <p
-                className={`text-xs mt-0.5 ${
-                  livro.ativo ? "text-[#2e8b45]" : "text-gray-400"
-                }`}
-              >
-                {livro.editora}
-              </p>
+            <Paginacao
+              paginaAtual={paginaAtual}
+              totalItens={livrosExibidos.length}
+              itensPorPagina={ITENS_POR_PAGINA}
+              nomeEntidade={abaAtiva === "ATIVO" ? "livros ativos" : "livros inativos"}
+              nomeEntidadeSingular={abaAtiva === "ATIVO" ? "livro ativo" : "livro inativo"}
+              aoMudarPagina={setPaginaAtual}
+            />
+          </div>
+        )}
 
-              <div className="flex items-center justify-between mt-3">
-                <span
-                  className={`text-xs px-3 py-1 rounded-full font-medium ${
-                    livro.ativo
-                      ? "bg-[#d8f3dc] text-[#2e8b45]"
-                      : "bg-gray-300 text-gray-700"
-                  }`}
-                >
-                  {livro.quantidadeTotal} exemplares
+
+        <ModalExcluir
+          aberto={livroParaExcluir !== null}
+          mensagem={
+            livroParaExcluir ? (
+              <div className="text-sm">
+                Tem certeza que deseja excluir a livro?
+                <span className="block font-bold text-gray-800 text-xs mt-0.75">
+                  Título:{" "}
+                  <span className="text-sm font-normal text-gray-600">
+                    {livroParaExcluir.titulo}
+                  </span>
                 </span>
-
-                <div className="text-right">
-                  {livro.ativo === false && (
-                    <span className="block text-[10px] bg-gray-400 text-white px-2 py-0.5 rounded-full mb-1">
-                      Desativado
-                    </span>
-                  )}
-
-                  <button
-                    className={`text-xs font-semibold hover:underline ${
-                      livro.ativo ? "text-[#2e8b45]" : "text-gray-500"
-                    }`}
-                  >
-                    Ver detalhes &gt;
-                  </button>
-                </div>
+                 <span className="block font-bold text-gray-800 text-xs">
+                  Editora:{" "}
+                  <span className="text-sm font-normal text-gray-600">
+                    {livroParaExcluir.editora} 
+                  </span>
+                </span>
               </div>
-            </div>
-          ))}
-        </div>
+            ) : (
+              ""
+            )
+          }
+          onCancelar={() => setLivroParaExcluir(null)}
+          onConfirmar={async () => {
+            if (!livroParaExcluir) return;
+
+            const livro = livroParaExcluir;
+
+            setLivroExcluindo(livroParaExcluir.id);
+            setLivroParaExcluir(null);
+
+            setTimeout(async () => {
+              await handleExcluir(livro);
+              setLivroExcluindo(null);
+            }, 200);
+          }}
+        />
+
+        <ModalDesativar
+          aberto={livroParaDesativar !== null}
+          aviso="Atenção: ao desativar o livro, a quantidade total de exemplares será zerada."
+          mensagem={
+            livroParaDesativar ? (
+              <>
+                Tem certeza que deseja desativar o livro:
+                <span className="block font-bold text-gray-800 text-xs mt-0.75">
+                  Título:{" "}
+                  <span className="text-sm font-normal text-gray-600">
+                    {livroParaDesativar.titulo}
+                  </span>
+                </span>
+                 <span className="block font-bold text-gray-800 text-xs">
+                  Editora:{" "}
+                  <span className="text-sm font-normal text-gray-600">
+                    {livroParaDesativar.editora} 
+                  </span>
+                </span>
+              </>
+            ) : ""
+          }
+          onCancelar={() => setLivroParaDesativar(null)}
+          onConfirmar={async () => {
+            if (!livroParaDesativar) return;
+
+            const livro = livroParaDesativar;
+
+            setLivroParaDesativar(null);
+
+            await handleDesativar(livro)
+          }}
+        />
+        
+        
+
+        <ModalAtivarLivro
+          livro={livroParaAtivar}
+          onCancelar={() => setLivroParaAtivar(null)}
+          onConfirmar={async (quantidadeTotal) => {
+            if (!livroParaAtivar) return;
+
+            const livro = livroParaAtivar;
+
+            setLivroParaAtivar(null);
+
+            try {
+              const resposta = await window.ipc?.livro?.ativar(
+                livro.id,
+                quantidadeTotal
+              );
+
+              if (!resposta?.success) {
+                setErro(resposta?.error || "Erro ao ativar livro.");
+                return;
+              }
+
+              setRecarregar((n) => n + 1);
+              setFeedback("Livro ativado com sucesso!");
+            } catch (error) {
+              setErro(
+                error instanceof Error
+                  ? error.message
+                  : "Não foi possível ativar o livro."
+              );
+            }
+          }}
+        />
       </main>
     </div>
   );

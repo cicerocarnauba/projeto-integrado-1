@@ -1,10 +1,26 @@
 export interface CadastroLivroDTO {
-    titulo : string;
-    editora : string;
-    quantidadeTotal : number;
+  titulo: string;
+  editora: string;
+  quantidadeTotal: number;
 }
 
+export type StatusLivro = 'ATIVO' | 'INATIVO';
+export type StatusEmprestimo =
+  | 'nunca_emprestado'
+  | 'emprestado_e_devolvido'
+  | 'emprestado_atualmente'
+  | 'DISPONIVEL'
+  | 'INDISPONIVEL';
+
 export interface Livro extends CadastroLivroDTO {
-    id : number;
-    ativo: boolean;
+  id: number;
+  quantidadeEmprestada?: number;
+  saldoDisponivel?: number;
+  status: StatusLivro;
+  dataCadastro?: Date | string;
+  dataAtualizacao?: Date | string;
+  ativo?: boolean;
+  statusEmprestimo?: StatusEmprestimo;
+  possuiHistorico?: boolean;
+  possuiEmprestimoPendente?: boolean;
 }
