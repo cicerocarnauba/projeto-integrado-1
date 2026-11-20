@@ -1,13 +1,13 @@
 import { useEffect } from "react";
-import { MdCheck, MdClose } from "react-icons/md";
+import { MdCheck, MdClear, MdClose } from "react-icons/md";
 
 interface ModalConfirmarEmprestimoProps {
   aberto: boolean;
   titulo: string;
-  // Aceita JSX para destacar uma palavra em negrito (ex.: <strong>realizar</strong>)
   mensagem: React.ReactNode;
   textoCancelar?: string;
   textoConfirmar?: string;
+  variante?: "primario" | "perigo";
   onCancelar: () => void;
   onConfirmar: () => void;
 }
@@ -18,10 +18,10 @@ export default function ModalConfirmarEmprestimo({
   mensagem,
   textoCancelar = "Cancelar",
   textoConfirmar = "Confirmar",
+  variante = "primario",
   onCancelar,
   onConfirmar,
 }: ModalConfirmarEmprestimoProps) {
-  // Esc fecha o popup (mesmo efeito do botão vermelho)
   useEffect(() => {
     if (!aberto) return;
 
@@ -35,11 +35,12 @@ export default function ModalConfirmarEmprestimo({
 
   if (!aberto) return null;
 
+  const isPerigo = variante === "perigo";
+
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 backdrop-blur-[2px] p-4 animate-fade-in"
       onMouseDown={(e) => {
-        // Clicar no fundo escuro equivale ao botão vermelho
         if (e.target === e.currentTarget) onCancelar();
       }}
     >
@@ -47,24 +48,26 @@ export default function ModalConfirmarEmprestimo({
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-confirmar-emprestimo-titulo"
-        className="w-full max-w-lg bg-white rounded-2xl shadow-2xl p-6"
+        className="w-full max-w-md bg-white border border-[#dcece0] rounded-2xl shadow-2xl p-6"
       >
         <h2
           id="modal-confirmar-emprestimo-titulo"
-          className="text-xl font-bold text-gray-900 mb-3"
+          className="text-xl font-bold text-gray-900"
         >
           {titulo}
         </h2>
 
-        <p className="text-base text-gray-600 leading-relaxed">{mensagem}</p>
+        <div className="mt-2 text-base text-gray-600 leading-relaxed">
+          {mensagem}
+        </div>
 
-        <div className="flex justify-end items-center gap-3 mt-8">
+        <div className="flex justify-end items-center gap-3 mt-6">
           <button
             type="button"
             onClick={onCancelar}
-            className="flex items-center justify-center gap-1.5 min-w-28 px-5 py-2.5 rounded-lg text-sm font-medium text-white bg-[#cf4a4a] hover:bg-red-600 transition-colors active:scale-95 cursor-pointer"
+            className="h-10 inline-flex items-center justify-center gap-1.5 px-5 rounded-xl text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-colors active:scale-95 cursor-pointer"
           >
-            <MdClose size={18} />
+            <MdClear size={17} />
             {textoCancelar}
           </button>
 
@@ -72,9 +75,13 @@ export default function ModalConfirmarEmprestimo({
             type="button"
             onClick={onConfirmar}
             autoFocus
-            className="flex items-center justify-center gap-1.5 min-w-28 px-5 py-2.5 rounded-lg text-sm font-medium text-white bg-[#2e8b45] hover:bg-[#236c35] transition-colors active:scale-95 cursor-pointer"
+            className={`h-10 inline-flex items-center justify-center gap-1.5 px-5 rounded-xl text-sm font-semibold text-white transition-colors active:scale-95 cursor-pointer ${
+              isPerigo
+                ? "bg-[#cf4a4a] hover:bg-[#b83a3a]"
+                : "bg-[#2e8b45] hover:bg-[#236c35]"
+            }`}
           >
-            <MdCheck size={18} />
+            {isPerigo ? <MdClose size={17} /> : <MdCheck size={17} />}
             {textoConfirmar}
           </button>
         </div>

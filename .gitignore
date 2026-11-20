@@ -83,3 +83,4 @@ Thumbs.db
 reqp1.md
 hup1.md
 renderer/next-env.d.ts
+*.tsbuildinfo

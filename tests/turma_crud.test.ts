@@ -1,8 +1,8 @@
 import { describe, it, beforeEach } from 'node:test';
 import assert from 'node:assert';
 import Database from 'better-sqlite3';
-import { TurmaDAO } from '../../main/daos/TurmaDAO.ts';
-import { TurmaController } from '../../main/controllers/TurmaController.ts';
+import { TurmaDAO } from '../main/daos/TurmaDAO.ts';
+import { TurmaController } from '../main/controllers/TurmaController.ts';
 
 describe('Testes Unitários - CRUD Turma (HU13, HU14, HU16, HU17, HU18)', () => {
   let db: Database.Database;

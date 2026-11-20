@@ -18,6 +18,10 @@ interface SidebarProps {
 // O padrão é sempre abrir a barra expandida (recolhida = false)
 let sessionRecolhida = false;
 
+export function isSidebarRecolhida(): boolean {
+  return sessionRecolhida;
+}
+
 export default function Sidebar({ activePath, className = "" }: SidebarProps) {
   const router = useRouter();
   const currentPath = activePath ?? router.pathname;
@@ -27,10 +31,21 @@ export default function Sidebar({ activePath, className = "" }: SidebarProps) {
 
   useEffect(() => {
     setMontado(true);
-    // Limpa chave antiga do localStorage se existir para não forçar fechamento
     try {
       localStorage.removeItem("sidebar_recolhida");
     } catch (_) {}
+
+    function sincronizarResponsivo() {
+      if (window.innerWidth < 1024) {
+        setRecolhida(true);
+      } else {
+        setRecolhida(sessionRecolhida);
+      }
+    }
+
+    sincronizarResponsivo();
+    window.addEventListener("resize", sincronizarResponsivo);
+    return () => window.removeEventListener("resize", sincronizarResponsivo);
   }, []);
 
   const toggleSidebar = () => {
@@ -71,9 +86,9 @@ export default function Sidebar({ activePath, className = "" }: SidebarProps) {
   return (
     <aside
       suppressHydrationWarning
-      className={`sticky top-0 h-screen bg-[#2e8b45] text-white flex flex-col justify-between select-none shrink-0 overflow-hidden ${
+      className={`sticky top-0 h-screen bg-[#2e8b45] text-white flex flex-col justify-between select-none shrink-0 overflow-hidden shadow-md ${
         montado ? "transition-[width] duration-300 ease-in-out" : "transition-none"
-      } z-40 px-4 py-6 ${recolhida ? "w-20" : "w-72 xl:w-80"} ${className}`}
+      } z-40 px-4 py-6 ${recolhida ? "w-20" : "w-[304px]"} ${className}`}
     >
       <div className="flex flex-col w-full">
         {/* Cabeçalho da Sidebar com Toggle */}
@@ -83,7 +98,7 @@ export default function Sidebar({ activePath, className = "" }: SidebarProps) {
               recolhida ? "w-0 opacity-0" : "w-auto opacity-100 delay-100"
             }`}
           >
-            <h2 className="text-xl font-bold text-white tracking-wide whitespace-nowrap pl-2">
+            <h2 className="text-xl font-bold text-white tracking-tight whitespace-nowrap pl-2.5">
               Menu
             </h2>
           </div>
@@ -91,7 +106,7 @@ export default function Sidebar({ activePath, className = "" }: SidebarProps) {
           <button
             type="button"
             onClick={toggleSidebar}
-            className={`w-10 h-10 shrink-0 flex items-center justify-center rounded-xl text-white/90 hover:text-white hover:bg-[#236c35] active:scale-95 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/30 mr-1 ${
+            className={`w-10 h-10 shrink-0 flex items-center justify-center rounded-xl border border-white/20 text-white/95 hover:text-white hover:bg-[#236c35] active:scale-95 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/30 mr-1 ${
               recolhida ? "mx-auto mr-auto" : ""
             }`}
             title={recolhida ? "Expandir menu lateral" : "Recolher menu lateral"}
@@ -107,7 +122,7 @@ export default function Sidebar({ activePath, className = "" }: SidebarProps) {
         </div>
 
         {/* Links de navegação */}
-        <nav className="flex flex-col gap-2.5 text-sm font-medium w-full">
+        <nav className="flex flex-col gap-2 text-base font-medium w-full">
           {menuItems.map((item) => {
             const Icon = item.icon;
             return (
@@ -115,21 +130,21 @@ export default function Sidebar({ activePath, className = "" }: SidebarProps) {
                 key={item.href}
                 href={item.href}
                 title={recolhida ? item.label : undefined}
-                className={`flex items-center h-12 w-full rounded-xl transition-colors duration-200 group relative overflow-hidden ${
+                className={`flex items-center h-[50px] w-full rounded-xl transition-colors duration-200 group relative overflow-hidden ${
                   item.ativo
-                    ? "bg-[#216331] font-semibold shadow-sm text-white"
-                    : "text-white/90 hover:text-white hover:bg-[#236c35]"
+                    ? "bg-[#1f6130] font-semibold shadow-xs ring-1 ring-white/15 text-white"
+                    : "text-white/92 hover:text-white hover:bg-[#247037]"
                 }`}
               >
-                {/* Ícone fixo em tamanho e centralização: sempre 48px de largura (w-12 h-12) */}
-                <div className="w-12 h-12 flex items-center justify-center shrink-0">
+                {/* Ícone fixo em tamanho e centralização: sempre 48px de largura */}
+                <div className="w-12 h-[50px] flex items-center justify-center shrink-0">
                   <Icon
-                    size={22}
+                    size={23}
                     className="shrink-0 transition-transform duration-200 group-hover:scale-110"
                   />
                 </div>
 
-                {/* Conteúdo expansível: Label completo (sem cortar) + Seta Padronizada em linha reta */}
+                {/* Conteúdo expansível: Label completo + Seta padronizada */}
                 <div
                   className={`flex items-center justify-between flex-1 min-w-0 overflow-hidden transition-opacity ease-in-out ${
                     recolhida
@@ -137,14 +152,14 @@ export default function Sidebar({ activePath, className = "" }: SidebarProps) {
                       : "opacity-100 duration-200 delay-100"
                   }`}
                 >
-                  <span className="whitespace-nowrap text-sm pl-1 font-medium">
+                  <span className="whitespace-nowrap text-base pl-0.5">
                     {item.label}
                   </span>
 
-                  <div className="w-8 h-12 shrink-0 flex items-center justify-center mr-1">
+                  <div className="w-8 h-[50px] shrink-0 flex items-center justify-center mr-1">
                     <MdChevronRight
-                      size={18}
-                      className="text-white/70 group-hover:text-white group-hover:translate-x-0.5 transition-all shrink-0"
+                      size={19}
+                      className="text-white/75 group-hover:text-white group-hover:translate-x-0.5 transition-all shrink-0"
                     />
                   </div>
                 </div>
