@@ -11,9 +11,9 @@ export default function AtivarButton({
     <button
       type="button"
       onClick={onClick}
-      className="flex items-center justify-center gap-1.5 w-[88px] bg-[#2e8b45] text-white py-1.5 text-xs rounded-lg font-medium hover:bg-[#236c35] transition-colors cursor-pointer shrink-0"
-    > 
-      <MdCheckCircleOutline size={14}/>
+      className="inline-flex items-center justify-center gap-1.5 w-[98px] h-8 bg-[#2e8b45] text-white text-[13.5px] rounded-lg font-semibold hover:bg-[#236c35] transition-colors cursor-pointer shrink-0"
+    >
+      <MdCheckCircleOutline size={16} />
       Ativar
     </button>
   );
