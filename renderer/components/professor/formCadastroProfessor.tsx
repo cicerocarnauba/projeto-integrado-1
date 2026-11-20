@@ -32,8 +32,6 @@ export default function FormCadastroProfessor() {
         return; 
       }
 
-      console.log("Professor cadastrado:", resposta.data);
-
       router.push("/professor?sucesso=1");
     } catch (error) {
       const mensagem =

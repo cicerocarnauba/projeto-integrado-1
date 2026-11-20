@@ -25,8 +25,7 @@ export default function FormCadastroTurma() {
         setErro(resposta.error || "Não foi possível cadastrar turma.");
         return;
       }
-      
-      console.log("Turma cadastrada:", resposta.data);
+
       router.push("/turma?sucesso=1");
     } catch(error) {
       const mensagem =

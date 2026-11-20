@@ -30,8 +30,6 @@ export default function FormCadastroLivro() {
         return;
       }
 
-      console.log("Livro cadastrado:", resposta.data);
-
       router.push("/livro?sucesso=1");
     } catch (error) {
       const mensagem =

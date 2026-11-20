@@ -18,26 +18,15 @@ import ToastFeedback from "../../components/ToastFeedback";
 
 export default function GerenciarLivros() {
   const router = useRouter();
-  const sucesso = router.query.sucesso;
-  const mensagemSucesso =
-    sucesso === "1"
-      ? "Livro cadastrado com sucesso!"
-      : sucesso === "editado"
-        ? "Livro editado com sucesso!"
-        : sucesso === "editado_inativo"
-          ? "Livro editado com sucesso. Com 0 exemplares, ele foi desativado."
-          : null;
 
   const [listaLivros, setListaLivros] = useState<Livro[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
 
-
   const [livroParaExcluir, setLivroParaExcluir] = useState<Livro | null>(null);
   const [livroExcluindo, setLivroExcluindo] = useState<number | null>(null);
   const [livroParaAtivar, setLivroParaAtivar] = useState<Livro | null>(null);
   const [livroParaDesativar, setLivroParaDesativar] = useState<Livro | null>(null);
-
 
   const [termoBusca, setTermoBusca] = useState("");
   const [abaAtiva, setAbaAtiva] = useState<StatusAba>("ATIVO");
@@ -48,11 +37,6 @@ export default function GerenciarLivros() {
 
   const [excluindo, setExcluindo] = useState(false);
   const [recarregar, setRecarregar] = useState(0);
-  // const [feedback, setFeedback] = useState<{
-  //   tipo: "sucesso" | "erro";
-  //   texto: string;
-  // } | null>(null);
-
   const [feedback, setFeedback] = useState("");
 
   useEffect(() => {

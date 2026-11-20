@@ -1,5 +1,5 @@
 import { MdChecklist, MdClose } from "react-icons/md";
-import { Emprestimo, StatusEmprestimo } from "../../types/emprestimo";
+import { Emprestimo } from "../../types/emprestimo";
 import { TABLE_COL_WIDTHS } from "../../utils/tableLayout";
 import StatusPill from "../StatusPill";
 
@@ -13,10 +13,6 @@ interface ListaEmprestimoProps {
 
 export const formatarData = (iso?: string | null) =>
   iso ? new Date(iso.length === 10 ? `${iso}T00:00:00` : iso).toLocaleDateString("pt-BR") : "—";
-
-export function StatusBadge({ status }: { status: StatusEmprestimo }) {
-  return <StatusPill status={status} />;
-}
 
 export default function ListaEmprestimo({
   emprestimos,

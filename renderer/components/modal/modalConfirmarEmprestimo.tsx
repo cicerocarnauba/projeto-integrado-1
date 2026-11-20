@@ -57,9 +57,9 @@ export default function ModalConfirmarEmprestimo({
           {titulo}
         </h2>
 
-        <p className="mt-2 text-[15px] text-gray-600 leading-relaxed">
+        <div className="mt-2 text-[15px] text-gray-600 leading-relaxed">
           {mensagem}
-        </p>
+        </div>
 
         <div className="flex justify-end items-center gap-3 mt-6">
           <button

@@ -1,10 +1,6 @@
 import React from "react";
 import { MdMenuBook } from "react-icons/md";
 
-export function IconeLivroCMEI({ className = "w-14 h-14 sm:w-16 sm:h-16" }: { className?: string }) {
-  return <MdMenuBook className={`${className} text-white`} aria-hidden="true" />;
-}
-
 export default function HeaderHome() {
   return (
     <header className="flex flex-col items-center justify-center text-center">

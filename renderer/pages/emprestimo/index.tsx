@@ -8,7 +8,7 @@ import Paginacao from "../../components/Paginacao";
 import { useItensPorPagina } from "../../hooks/useItensPorPagina";
 import ToastFeedback from "../../components/ToastFeedback";
 import ListaEmprestimo from "../../components/emprestimo/listaEmprestimo";
-import ModalConfirmarAcao from "../../components/modal/ModalConfirmacaoEmprestimo";
+import ModalConfirmarAcao from "../../components/modal/modalConfirmarEmprestimo";
 import { Emprestimo } from "../../types/emprestimo";
 import type { ItemEmprestimoConsultaDTO } from "../../../main/entities/ConsultaEmprestimo";
 
