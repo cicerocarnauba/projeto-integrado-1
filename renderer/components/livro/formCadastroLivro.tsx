@@ -66,10 +66,10 @@ export default function FormCadastroLivro() {
   return (
     <form
       onSubmit={salvar}
-      className="w-full bg-[#eef7f0] rounded-2xl p-8 shadow-xs"
+      className="w-full bg-[#eef7f0] border border-[#cfe5d4] rounded-2xl p-8 shadow-xs"
     >
       {erro && (
-        <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3.5 text-[15px] text-red-700">
           {erro}
         </div>
       )}
@@ -77,8 +77,8 @@ export default function FormCadastroLivro() {
       {/* Campos do formulário */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-6">
         <div className="md:col-span-12">
-          <label className="text-sm font-semibold text-[#1e582d] mb-2 block">
-            Título do Livro
+          <label className="text-[15px] font-semibold text-[#1e582d] mb-2 block">
+            Título do livro
           </label>
           <input
             type="text"
@@ -86,12 +86,12 @@ export default function FormCadastroLivro() {
             placeholder="Ex: Dom Casmurro"
             value={titulo}
             onChange={(e) => setTitulo(e.target.value)}
-            className="w-full h-11 bg-white border border-[#cde5d3] rounded-xl px-4 text-sm text-gray-800 placeholder:text-gray-400 outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20"
+            className="w-full h-12 bg-white border border-[#cde5d3] rounded-xl px-4 text-[15.5px] text-gray-900 placeholder:text-gray-400 outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20"
           />
         </div>
 
         <div className="md:col-span-8">
-          <label className="text-sm font-semibold text-[#1e582d] mb-2 block">
+          <label className="text-[15px] font-semibold text-[#1e582d] mb-2 block">
             Editora
           </label>
           <input
@@ -100,20 +100,20 @@ export default function FormCadastroLivro() {
             placeholder="Ex: Ática"
             value={editora}
             onChange={(e) => setEditora(e.target.value)}
-            className="w-full h-11 bg-white border border-[#cde5d3] rounded-xl px-4 text-sm text-gray-800 placeholder:text-gray-400 outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20"
+            className="w-full h-12 bg-white border border-[#cde5d3] rounded-xl px-4 text-[15.5px] text-gray-900 placeholder:text-gray-400 outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20"
           />
         </div>
 
         <div className="md:col-span-4">
-          <label className="text-sm font-semibold text-[#1e582d] mb-2 block whitespace-nowrap">
+          <label className="text-[15px] font-semibold text-[#1e582d] mb-2 block whitespace-nowrap">
             Exemplares
           </label>
-          <div className="w-full h-11 bg-white border border-[#cde5d3] rounded-xl p-1 flex items-center justify-between shadow-2xs focus-within:border-[#2e8b45] focus-within:ring-2 focus-within:ring-[#2e8b45]/20">
+          <div className="w-full h-12 bg-white border border-[#cde5d3] rounded-xl p-1 flex items-center justify-between shadow-2xs focus-within:border-[#2e8b45] focus-within:ring-2 focus-within:ring-[#2e8b45]/20">
             <button
               type="button"
               onClick={decrementar}
               disabled={quantidadeTotal <= 1 || salvando}
-              className="w-9 h-9 rounded-lg bg-[#eef7f0] text-[#1e582d] hover:bg-[#2e8b45] hover:text-white disabled:opacity-30 disabled:hover:bg-[#eef7f0] disabled:hover:text-[#1e582d] disabled:cursor-not-allowed transition-colors flex items-center justify-center font-bold text-base cursor-pointer select-none"
+              className="w-10 h-10 rounded-lg bg-[#eef7f0] text-[#1e582d] hover:bg-[#2e8b45] hover:text-white disabled:opacity-30 disabled:hover:bg-[#eef7f0] disabled:hover:text-[#1e582d] disabled:cursor-not-allowed transition-colors flex items-center justify-center font-bold text-lg cursor-pointer select-none"
             >
               −
             </button>
@@ -130,14 +130,14 @@ export default function FormCadastroLivro() {
               onBlur={() => {
                 if (quantidadeTotal < 1) setQuantidadeTotal(1);
               }}
-              className="w-12 text-center font-bold text-sm text-gray-800 outline-none bg-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              className="w-14 text-center font-bold text-base text-gray-900 tabular-nums outline-none bg-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             />
 
             <button
               type="button"
               onClick={incrementar}
               disabled={salvando}
-              className="w-9 h-9 rounded-lg bg-[#eef7f0] text-[#1e582d] hover:bg-[#2e8b45] hover:text-white transition-colors flex items-center justify-center font-bold text-base cursor-pointer select-none disabled:opacity-30 disabled:cursor-not-allowed"
+              className="w-10 h-10 rounded-lg bg-[#eef7f0] text-[#1e582d] hover:bg-[#2e8b45] hover:text-white transition-colors flex items-center justify-center font-bold text-lg cursor-pointer select-none disabled:opacity-30 disabled:cursor-not-allowed"
             >
               +
             </button>
@@ -147,9 +147,9 @@ export default function FormCadastroLivro() {
 
       {/* Efeito em tempo real da quantidade escolhida */}
       <div className="mb-8 space-y-3">
-        <p className="text-sm text-[#245B2F]">
+        <p className="text-[15px] text-[#245B2F]">
           Exemplares disponíveis para empréstimo:{" "}
-          <span className="font-bold">{quantidadeTotal}</span>
+          <span className="font-bold tabular-nums">{quantidadeTotal}</span>
         </p>
       </div>
 
@@ -159,18 +159,18 @@ export default function FormCadastroLivro() {
           type="button"
           onClick={cancelar}
           disabled={salvando}
-          className="flex items-center gap-1.5 px-6 py-2.5 rounded-xl text-sm font-medium text-white bg-[#cf4a4a] hover:bg-[#b83a3a] transition-colors shadow-xs active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          className="h-11 inline-flex items-center justify-center gap-2 px-6 rounded-xl text-[15px] font-semibold text-white bg-[#cf4a4a] hover:bg-[#b83a3a] transition-colors shadow-xs active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <MdClear size={18} />
+          <MdClear size={19} />
           Cancelar
         </button>
 
         <button
           type="submit"
           disabled={salvando}
-          className="flex items-center gap-1.5 bg-[#2e8b45] hover:bg-[#236c35] text-white px-7 py-2.5 rounded-xl text-sm font-medium transition-all shadow-sm active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          className="h-11 inline-flex items-center justify-center gap-2 bg-[#2e8b45] hover:bg-[#236c35] text-white px-7 rounded-xl text-[15px] font-semibold transition-all shadow-sm active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <MdCheck size={18} />
+          <MdCheck size={19} />
           {salvando ? "Salvando..." : "Confirmar"}
         </button>
       </div>
