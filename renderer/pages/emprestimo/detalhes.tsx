@@ -1,3 +1,4 @@
+
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import {
@@ -52,6 +53,19 @@ export default function DetalhesEmprestimo() {
   useEffect(() => {
     setPaginaAtual(1);
   }, [termoBusca]);
+
+  // Aviso vindo da tela de avaria (?sucesso=avaria_registrada).
+  // Limpa o parâmetro da URL para não reaparecer ao recarregar a página.
+  useEffect(() => {
+    if (!router.isReady) return;
+
+    if (router.query.sucesso === "avaria_registrada") {
+      setFeedback("Avaria registrada com sucesso!");
+      router.replace(`/emprestimo/detalhes?id=${id}`, undefined, {
+        shallow: true,
+      });
+    }
+  }, [router.isReady, router.query.sucesso, id]);
 
   useEffect(() => {
     if (!router.isReady) return;
@@ -425,6 +439,11 @@ export default function DetalhesEmprestimo() {
                   itens={itensPaginados}
                   statusEmprestimo={emprestimo.status}
                   onDevolver={abrirDevolucao}
+                  onRegistrarAvaria={(item) =>
+                    router.push(
+                      `/emprestimo/avaria?id=${emprestimo.id}&itemId=${item.id}`
+                    )
+                  }
                 />
 
                 <Paginacao

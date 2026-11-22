@@ -1,3 +1,4 @@
+
 import { MdOutlineReport, MdReplay } from "react-icons/md";
 import {
   ItemEmprestimo,
@@ -14,6 +15,8 @@ interface ListaItensEmprestimoProps {
   statusEmprestimo?: StatusEmprestimo;
   /** Chamado ao clicar em "Devolver" de um item pendente. */
   onDevolver?: (item: ItemEmprestimo) => void;
+  /** Chamado ao clicar em "Avaria" de um item pendente. */
+  onRegistrarAvaria?: (item: ItemEmprestimo) => void;
 }
 
 function AvariaBadges({ item }: { item: ItemEmprestimo }) {
@@ -42,6 +45,7 @@ export default function ListaItensEmprestimo({
   itens,
   statusEmprestimo,
   onDevolver,
+  onRegistrarAvaria,
 }: ListaItensEmprestimoProps) {
   const btnBase =
     "inline-flex items-center justify-center gap-1.5 w-[104px] h-8 text-sm rounded-lg font-semibold shrink-0 transition-colors whitespace-nowrap";
@@ -78,6 +82,25 @@ export default function ListaItensEmprestimo({
 
               const pendente = calcularPendente(item);
               const devolvida = item.quantidadeDevolvida ?? 0;
+              const perdida = item.quantidadePerdida ?? 0;
+              const danificada = item.quantidadeDanificada ?? 0;
+
+              // Resumo das baixas já feitas no item (devolução e avaria),
+              // para o total emprestado bater com o saldo pendente.
+              const resumoBaixas = [
+                devolvida > 0
+                  ? `${devolvida} ${devolvida === 1 ? "devolvido" : "devolvidos"}`
+                  : null,
+                perdida > 0
+                  ? `${perdida} ${perdida === 1 ? "perdido" : "perdidos"}`
+                  : null,
+                danificada > 0
+                  ? `${danificada} ${danificada === 1 ? "danificado" : "danificados"}`
+                  : null,
+                `${pendente} ${pendente === 1 ? "pendente" : "pendentes"}`,
+              ]
+                .filter(Boolean)
+                .join(" · ");
 
               const emprestimoFinalizado =
                 statusEmprestimo !== undefined && statusEmprestimo !== "PENDENTE";
@@ -128,11 +151,9 @@ export default function ListaItensEmprestimo({
                       </span>
                     </div>
 
-                    {devolvida > 0 && (
-                      <span className="block text-xs font-medium text-[#2e8b45] mt-0.5 whitespace-nowrap tabular-nums">
-                        {devolvida} {devolvida === 1 ? "devolvido" : "devolvidos"}
-                        {" · "}
-                        {pendente} {pendente === 1 ? "pendente" : "pendentes"}
+                    {(devolvida > 0 || perdida > 0 || danificada > 0) && (
+                      <span className="block text-xs font-medium text-[#2e8b45] mt-0.5 tabular-nums">
+                        {resumoBaixas}
                       </span>
                     )}
                   </td>
@@ -163,10 +184,11 @@ export default function ListaItensEmprestimo({
 
                       <button
                         type="button"
-                        disabled={acoesDesabilitadas}
+                        disabled={devolverDesabilitado}
                         title="Registrar avaria"
+                        onClick={() => onRegistrarAvaria?.(item)}
                         className={
-                          acoesDesabilitadas
+                          devolverDesabilitado
                             ? btnInativo
                             : `${btnBase} bg-[#cf4a4a] text-white hover:bg-[#b83a3a] cursor-pointer`
                         }
