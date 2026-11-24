@@ -326,7 +326,7 @@ export default function GerenciarProfessores() {
             <ListaProfessor
               professores={professoresPaginados}
               professorExcluindo={professorExcluindo}
-              onEditar={(p) => router.push(`/professor/${p.id}`)}
+              onEditar={(p) => router.push(`/professor/editar_professor?id=${p.id}`)}
               onAtivar={(p) => {
                 limparMensagens();
                 setProfessorParaAtivar(p);

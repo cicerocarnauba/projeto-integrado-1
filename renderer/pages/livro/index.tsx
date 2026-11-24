@@ -263,7 +263,7 @@ export default function GerenciarLivros() {
             <ListaLivro
               livros={livrosPaginados}
               livroExcluindo={livroExcluindo}
-              onEditar={(l) => router.push(`/livro/${l.id}`)}
+              onEditar={(l) => router.push(`/livro/editar_livro?id=${l.id}`)}
               onDesativar={(livro) => setLivroParaDesativar(livro)}
               onAtivar={(livro) => setLivroParaAtivar(livro)}
               onExcluir={(livro) => setLivroParaExcluir(livro)}
