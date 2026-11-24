@@ -1,6 +1,4 @@
-
-import {MdDelete, MdClear} from "react-icons/md"
-
+import { MdDelete, MdClear } from "react-icons/md";
 import React from "react";
 
 interface ModalExcluirProps {
@@ -23,13 +21,20 @@ export default function ModalExcluir({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-6">
-        <h2 className="text-lg font-bold text-gray-800">
-          {titulo}
-        </h2>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 backdrop-blur-[2px] p-4 animate-fade-in"
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) onCancelar();
+      }}
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        className="w-full max-w-md bg-white border border-[#dcece0] rounded-2xl shadow-2xl p-6"
+      >
+        <h2 className="text-xl font-bold text-gray-900">{titulo}</h2>
 
-        <div className="mt-2 text-sm text-gray-600">
+        <div className="mt-2 text-base text-gray-600 leading-relaxed">
           {mensagem}
         </div>
 
@@ -37,18 +42,18 @@ export default function ModalExcluir({
           <button
             type="button"
             onClick={onCancelar}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-100 transition-colors cursor-pointer"
+            className="h-10 inline-flex items-center justify-center gap-1.5 px-5 rounded-xl text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-colors cursor-pointer"
           >
-            <MdClear size={16} />
+            <MdClear size={17} />
             Cancelar
           </button>
 
           <button
             type="button"
             onClick={onConfirmar}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-white bg-[#cf4a4a] hover:bg-[#b83a3a] transition-colors cursor-pointer"
+            className="h-10 inline-flex items-center justify-center gap-1.5 px-5 rounded-xl text-sm font-semibold text-white bg-[#cf4a4a] hover:bg-[#b83a3a] transition-colors cursor-pointer"
           >
-            <MdDelete size={16}/>
+            <MdDelete size={17} />
             Excluir
           </button>
         </div>

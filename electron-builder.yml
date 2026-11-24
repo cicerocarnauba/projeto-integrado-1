@@ -1,21 +1,36 @@
 appId: com.crechemariadelourdes.biblioteca
 productName: LivroCMEI
+npmRebuild: false
 directories:
   output: dist
   buildResources: resources
 files:
-  - from: .
-    filter:
-      - package.json
-      - app
+  - app/**/*
+  - package.json
+asarUnpack:
+  - "**/node_modules/better-sqlite3/**/*"
 linux:
+  icon: resources/icons
   maintainer: contato@crechemariadelourdes.com
   target:
     - AppImage
     - deb
 win:
+  icon: resources/icon.ico
   target:
-    - nsis
+    - target: portable
+      arch:
+        - x64
+    - target: nsis
+      arch:
+        - x64
+portable:
+  artifactName: "${productName}-${version}-Portatil.${ext}"
 nsis:
+  artifactName: "${productName}-Instalador-${version}.${ext}"
   oneClick: false
+  perMachine: false
   allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: LivroCMEI

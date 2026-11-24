@@ -1,18 +1,28 @@
-# Sistema de Gerenciamento de Acervo de Biblioteca Escolar
-> **Creche Maria de Lourdes — Município de Piquet Carneiro**
+# LivroCMEI — Sistema de Gerenciamento de Acervo de Biblioteca Escolar
+> **CEMEI Professora Maria de Lourdes Demasceno Marques — Município de Piquet Carneiro**
 
-Sistema desktop offline desenvolvido para facilitar e digitalizar o controle de acervo e empréstimos de livros na Creche Maria de Lourdes, substituindo o controle manual em cadernos físicos por uma aplicação instalável moderna e ágil.
+Aplicação desktop 100% offline desenvolvida para digitalizar e facilitar o controle de acervo e empréstimos de livros da biblioteca escolar, substituindo o registro manual em cadernos físicos por uma interface instalável, rápida e acessível.
+
+---
+
+## Funcionalidades
+
+* **Gerenciar Empréstimos**: registro de empréstimos com múltiplos livros, consulta por abas (Pendentes, Concluídos e Cancelados), visualização de detalhes, devolução parcial ou total de exemplares e cancelamento com regras de integridade.
+* **Gerenciar Livros**: cadastro, edição, controle de total de exemplares e saldo disponível, exclusão (quando sem histórico) e ativação/desativação.
+* **Gerenciar Professores**: cadastro, edição, validação de e-mail único, exclusão (quando sem histórico) e ativação/desativação.
+* **Gerenciar Turmas**: cadastro, edição, exclusão (quando sem histórico) e ativação/desativação.
+* **Usabilidade e Offline**: busca e ordenação em todas as listagens, paginação dinâmica adaptada à altura da janela, ícones locais via `react-icons` e banco SQLite local sem dependência de internet.
 
 ---
 
 ## Arquitetura e Tecnologias
 
-* **Aplicação Desktop**: [Nextron](https://github.com/saltyshiomix/nextron) (integração entre Next.js e Electron)
-* **Frontend (Telas)**: Next.js (React) com estilização em Tailwind CSS
-* **Backend (Lógica Local)**: Node.js nativo do Electron, executando regras de negócio e validações
-* **Banco de Dados**: SQLite (arquivo .db local, sem necessidade de instalar servidor de banco)
-* **Conteiner de Desenvolvimento**: Docker (dockerfile + docker-compose.yml)
-* **Integração Contínua**: GitHub Actions com validação estrita de Conventional Commits
+* **Aplicação Desktop**: [Nextron](https://github.com/saltyshiomix/nextron) (Electron + Next.js)
+* **Frontend (Renderer)**: Next.js 16, React 19, TypeScript, Tailwind CSS v4 e `react-icons`
+* **Backend (Main)**: Node.js no processo principal do Electron, organizado em camadas (`entities`, `daos`, `controllers`, `ipc`)
+* **Banco de Dados**: SQLite local via `better-sqlite3`
+* **Testes**: Node Test Runner (`node:test`) com TypeScript nativo
+* **Integração Contínua**: GitHub Actions com validação de Conventional Commits
 
 ---
 
@@ -20,20 +30,31 @@ Sistema desktop offline desenvolvido para facilitar e digitalizar o controle de 
 
 ```text
 .
-├── .github/
-│   └── workflows/
-│       └── conventional-commits.yml   # Pipeline CI para validação de commits
-├── main/                              # Processo Principal do Electron (Backend / Node.js)
-│   └── .gitkeep                       # Conexão com SQLite e regras
-├── renderer/                          # Processo de Renderização (Frontend / Next.js)
-│   └── .gitkeep                       # Telas, componentes e Tailwind CSS
-├── dockerfile                         # Container Node 20 com ferramentas para SQLite
-├── docker-compose.yml                 # Orquestração do ambiente de desenvolvimento
-├── .commitlintrc.json                 # Regras de Conventional Commits
-├── .editorconfig                      # Padronização de formatação entre editores
-├── .gitignore                         # Arquivos ignorados pelo Git
-├── package.json                       # Scripts e dependências do projeto
-└── README.md                          # Guia do Repositório
+├── .github/workflows/           # Pipelines CI (validação de commits)
+├── .githooks/                   # Hooks locais do Git (commitlint e proteção da main)
+├── main/                        # Processo Principal do Electron (Backend / Node.js)
+│   ├── controllers/             # Regras de negócio e orquestração
+│   ├── daos/                    # Acesso a dados no SQLite
+│   ├── database/                # Conexão, schema e migrações locais
+│   ├── entities/                # Entidades e validações de domínio
+│   ├── helpers/                 # Auxiliares de janela do Electron
+│   ├── ipc/                     # Handlers ipcMain por módulo
+│   ├── main.ts                  # Ponto de entrada do Electron
+│   └── preload.ts / preload.cjs # Ponte segura contextBridge (window.ipc)
+├── renderer/                    # Processo de Renderização (Frontend / Next.js)
+│   ├── components/              # Componentes compartilhados, tabelas, formulários e modais
+│   ├── hooks/                   # Hooks customizados (ex.: paginação dinâmica)
+│   ├── pages/                   # Rotas da aplicação (início, empréstimo, livro, professor, turma)
+│   ├── public/                  # Ativos estáticos e ícones locais
+│   ├── styles/                  # Estilos globais e Tailwind CSS v4
+│   ├── types/                   # Tipagens TypeScript do frontend
+│   └── utils/                   # Utilitários de layout e cálculos de interface
+├── tests/                       # Suíte de testes unitários (node:test)
+├── electron-builder.yml         # Configuração dos executáveis desktop
+├── dockerfile / docker-compose.yml
+├── .commitlintrc.json           # Regras de Conventional Commits
+├── package.json                 # Scripts e dependências do projeto
+└── README.md
 ```
 
 ---
@@ -41,124 +62,78 @@ Sistema desktop offline desenvolvido para facilitar e digitalizar o controle de 
 ## Como Executar o Projeto
 
 ### Pré-requisitos
-* [Node.js 20+](https://nodejs.org/) instalado na máquina (ou Docker).
-
-### Guia de Desenvolvimento Passo a Passo 
-
-#### Frontend (pasta `renderer/`)
-1. **Estrutura de Páginas**: Criar as rotas e telas dentro da pasta `renderer/pages/` (ou `renderer/app/`).
-2. **Componentes de Interface**: Desenvolver componentes reutilizáveis (tabelas de listagem, formulários, modais de confirmação e filtros) com React e Tailwind CSS.
-3. **Comunicação com o Backend**: Invocar as operações do sistema via IPC (`window.ipc.invoke`), exibindo os dados retornados e tratando mensagens de validação para a usuária.
-4. **Isolamento**: O frontend não acessa arquivos locais nem o banco diretamente; todas as operações devem solicitar dados ao backend via IPC.
-
-#### Backend (pasta `main/`)
-1. **Gerenciamento do Electron**: Configurar o arquivo `main/background.ts` para inicializar a janela desktop e o ciclo de vida do aplicativo.
-2. **Persistência com SQLite**: Configurar o driver de banco de dados (como `better-sqlite3`) para gerenciar a criação de tabelas e operações no arquivo local `.db`.
-3. **Regras de Negócio e Validações**: Implementar toda a lógica do sistema (cálculos de estoque, verificações de duplicidade e integridade dos dados).
-4. **Exposição dos Serviços via IPC**: Registrar os manipuladores no processo principal (`ipcMain.handle(...)`) e expô-los com segurança no `main/preload.ts` para que as telas possam chamá-los.
-
-#### Fluxo de Integração (Front <-> Back)
-* **No Frontend**: `const resultado = await window.ipc.invoke('cadastrar-livro', dadosDoLivro);`
-* **No Backend**: `ipcMain.handle('cadastrar-livro', async (event, dados) => { /* valida regras e grava no SQLite */ });`
+* [Node.js 22.6+](https://nodejs.org/) (recomendado Node.js 24+, necessário para `--experimental-transform-types` nos scripts `dev` e `test`).
 
 ### Modo Desenvolvimento Local
 1. Instale as dependências:
    ```bash
    npm install
    ```
-2. Inicie a aplicação desktop em modo de desenvolvimento (com hot-reload):
+2. Inicie a aplicação desktop em modo de desenvolvimento:
    ```bash
    npm run dev
    ```
 
-### Executando com Docker
-Se preferir rodar o ambiente de desenvolvimento isolado em contêiner:
-```bash
-docker compose up -d
-```
-
-### Gerando os Executáveis Desktop (.exe e .AppImage)
-
-Os arquivos compilados finais são gerados automaticamente dentro da pasta `dist/`.
-
-* **Gerar instalador para Windows (.exe):**
-  ```bash
-  npm run build:win
-  ```
-  Gera o instalador NSIS completo (`dist/LivroCMEI Setup 1.0.0.exe`).
-
-* **Gerar executável para Linux (.AppImage):**
-  ```bash
-  npm run build:linux
-  ```
-  Gera o executável portátil (`dist/LivroCMEI-1.0.0.AppImage`).
-
-* **Gerar todos os executáveis configurados:**
-  ```bash
-  npm run build
-  ```
+### Scripts Disponíveis
+| Comando | Descrição |
+| :--- | :--- |
+| `npm run dev` | Inicia o Electron + Next.js em modo de desenvolvimento |
+| `npm test` | Executa toda a suíte de testes unitários (`tests/*.test.ts`) |
+| `npm run build` | Gera os pacotes de produção configurados |
+| `npm run build:win` | Gera o instalador para Windows em `dist/` (`.exe`) |
+| `npm run build:linux` | Gera o executável portátil para Linux em `dist/` (`.AppImage`) |
+| `npm run lint:commit:last` | Valida a última mensagem de commit com o commitlint |
 
 > [!NOTE]
-> **Atenção:** Os arquivos executáveis gerados na pasta `dist/` **não são e nem devem ser enviados para o Git** (já estão protegidos pelo `.gitignore`). O repositório armazena apenas o código-fonte. O executável para a creche deve ser distribuído diretamente aos usuários ou anexado na aba de **Releases** do GitHub.
+> Os executáveis compilados em `dist/` não são versionados no Git (protegidos pelo `.gitignore`). A distribuição para a creche deve ser feita pelos binários gerados ou pela aba **Releases** do GitHub.
+
+---
+
+## Comunicação entre Frontend e Backend (IPC)
+
+O frontend não acessa o banco SQLite diretamente. Toda operação passa pela ponte tipada exposta em `main/preload.ts` (`window.ipc`) e registrada nos handlers em `main/ipc/`:
+
+* **Frontend**: `const resposta = await window.ipc.livro.cadastrar({ titulo, editora, quantidadeTotal });`
+* **Backend**: `ipcMain.handle('livro:cadastrar', async (_event, dados) => { ... });`
+
+Os módulos expostos seguem o padrão de namespace: `window.ipc.livro`, `window.ipc.professor`, `window.ipc.turma` e `window.ipc.emprestimo`.
 
 ---
 
 ## Fluxo de Branches e Proteção da `main`
 
-Para manter a estabilidade do projeto, adotamos o seguinte fluxo:
-
 1. **Branch `main` (Produção/Estável)**:
-   * **Bloqueada para push direto**. Qualquer tentativa de `git push origin main` será cancelada automaticamente por um Git hook local e pelas regras do GitHub.
-   * Modificações na `main` são feitas **exclusivamente através de Pull Requests (PR)** aprovados.
-
+   * Bloqueada para push direto. Alterações entram apenas via Pull Request aprovado.
 2. **Branch `develop` (Integração)**:
-   * Branch padrão para envio de novas funcionalidades integradas e testes em conjunto.
-   * Permite push direto dos membros da equipe.
-
-3. **Branches de Funcionalidades (`feature/...`)**:
-   * Sempre crie uma nova branch a partir da `develop`:
+   * Branch principal de integração das funcionalidades da equipe.
+3. **Branches de trabalho (`feature/...`, `fix/...`, `refactor/...`)**:
+   * Crie sempre a partir da `develop`:
      ```bash
      git checkout develop
      git pull origin develop
-     git checkout -b feature/nome-da-sua-feature
+     git checkout -b feature/nome-da-funcionalidade
      ```
-   * Conclua sua funcionalidade, teste os commits e abra um Pull Request para a `develop`.
+   * Ao finalizar, valide os testes (`npm test`) e abra um Pull Request para a `develop`.
 
 ---
 
 ## Padrão de Commits (Conventional Commits)
 
-O repositório possui uma pipeline de CI no **GitHub Actions** que valida todos os commits enviados em **Pushes** e **Pull Requests**. Commits fora do padrão **serão rejeitados**.
+O repositório valida automaticamente os commits no GitHub Actions e nos hooks locais:
 
-### Estrutura da Mensagem:
 ```text
 <tipo>(<escopo opcional>): <descrição objetiva>
 ```
 
-### Tipos Permitidos:
 | Tipo | Quando Usar | Exemplo |
 | :--- | :--- | :--- |
-| `feat` | Uma nova funcionalidade | `feat(livros): adicionar listagem de acervo ativo` |
-| `fix` | Correção de um bug | `fix(emprestimos): corrigir cálculo de saldo disponível` |
-| `docs` | Alterações puramente na documentação | `docs: atualizar exemplos no README` |
-| `style` | Formatação de código que não altera significado | `style: aplicar identação e remover ponto e vírgula` |
-| `refactor` | Mudança de código que não corrige bug nem adiciona feature | `refactor: simplificar consulta de professores` |
-| `test` | Adição ou correção de testes | `test(turmas): adicionar testes unitários de validação` |
-| `build` | Mudanças que afetam o build ou dependências externas | `build: adicionar dependência do better-sqlite3` |
-| `ci` | Mudanças nas configurações de CI (GitHub Actions) | `ci: ajustar workflow de validação de commits` |
-| `chore` | Tarefas rotineiras que não alteram código de produção | `chore: atualizar regras do .gitignore` |
-| `revert` | Reversão de um commit anterior | `revert: reverter commit anterior` |
-
-### Exemplos Práticos:
-* [Válido] `feat(livro): implementar validacao de duplicidade por titulo e editora`
-* [Válido] `fix: impedir exclusao de turma com emprestimo pendente`
-* [Válido] `docs: incluir instrucoes de build do executavel`
-* [Inválido] `subindo alteracoes` (Sem tipo válido)
-* [Inválido] `adicionado tela` (Não segue a convenção tipo: mensagem)
-* [Inválido] `WIP` (Proibido)
-
-### Testando seus commits localmente:
-Você pode testar se a sua mensagem de commit é válida antes de fazer o push:
-```bash
-npm run lint:commit:last
-```
+| `feat` | Nova funcionalidade | `feat(livro): adicionar filtro por status` |
+| `fix` | Correção de bug | `fix(emprestimo): corrigir calculo de saldo disponivel` |
+| `docs` | Alterações de documentação | `docs: atualizar instrucoes no README` |
+| `style` | Ajustes visuais ou de formatação | `style(tabelas): padronizar alinhamento das colunas` |
+| `refactor` | Refatoração sem alterar comportamento | `refactor(ui): extrair componente PageShell` |
+| `test` | Adição ou ajuste de testes | `test(turma): adicionar testes unitarios de CRUD` |
+| `build` | Alterações de build ou dependências | `build: atualizar configuracao do electron-builder` |
+| `ci` | Ajustes de pipelines CI | `ci: ajustar workflow de validacao de commits` |
+| `chore` | Tarefas rotineiras e manutenção | `chore: atualizar regras do .gitignore` |
+| `revert` | Reversão de commit anterior | `revert: desfazer alteracao anterior` |

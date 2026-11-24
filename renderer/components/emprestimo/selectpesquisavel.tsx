@@ -153,12 +153,12 @@ export default function SelectPesquisavel({
         }}
         onKeyDown={aoPressionarTecla}
         // pr-10 reserva o espaço da seta: o texto nunca passa por baixo dela
-        className="w-full h-11 bg-white border border-[#cde5d3] rounded-xl pl-4 pr-10 text-sm text-gray-800 placeholder:text-gray-600 truncate outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20 disabled:opacity-60 disabled:cursor-not-allowed"
+        className="w-full h-12 bg-white border border-[#cde5d3] rounded-xl pl-4 pr-10 text-base text-gray-900 placeholder:text-gray-400 truncate outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20 disabled:opacity-60 disabled:cursor-not-allowed"
       />
 
       {/* Seta sempre à mesma distância da borda direita, em todos os campos */}
       <MdKeyboardArrowDown
-        size={20}
+        size={22}
         aria-hidden="true"
         className={`pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 transition-transform ${
           aberto ? "rotate-180" : ""
@@ -169,10 +169,10 @@ export default function SelectPesquisavel({
         <ul
           id={`${id}-lista`}
           role="listbox"
-          className="absolute z-30 mt-1 w-full max-h-60 overflow-auto bg-white border border-[#cde5d3] rounded-xl shadow-lg py-1"
+          className="absolute z-30 mt-1.5 w-full max-h-64 overflow-auto bg-white border border-[#cde5d3] rounded-xl shadow-xl py-1.5"
         >
           {filtradas.length === 0 ? (
-            <li className="px-4 py-3 text-sm text-gray-500">{mensagemVazia}</li>
+            <li className="px-4 py-3 text-base text-gray-500">{mensagemVazia}</li>
           ) : (
             filtradas.map((opcao, indice) => (
               <li
@@ -187,7 +187,7 @@ export default function SelectPesquisavel({
                   escolher(opcao);
                 }}
                 onMouseEnter={() => !opcao.desabilitada && setIndiceAtivo(indice)}
-                className={`flex items-center justify-between gap-3 px-4 py-2.5 text-sm ${
+                className={`flex items-center justify-between gap-3 px-4 py-2.5 text-base ${
                   opcao.desabilitada
                     ? "text-gray-400 cursor-not-allowed"
                     : "cursor-pointer text-gray-800"
@@ -199,7 +199,7 @@ export default function SelectPesquisavel({
               >
                 <span className="truncate">{opcao.label}</span>
                 {opcao.extra && (
-                  <span className="shrink-0 text-xs text-[#5AA365]">
+                  <span className="shrink-0 text-xs font-semibold text-[#2e8b45] tabular-nums">
                     {opcao.extra}
                   </span>
                 )}

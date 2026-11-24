@@ -98,29 +98,32 @@ export default function ModalAtivarLivro({
   const semValor = quantidade.trim() === "" || isNaN(valorAtual);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-6">
-        <h2 className="text-lg font-bold text-gray-800">
-          Ativar livro?
-        </h2>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 backdrop-blur-[2px] p-4 animate-fade-in"
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget && !carregando) onCancelar();
+      }}
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        className="w-full max-w-md bg-white border border-[#dcece0] rounded-2xl shadow-2xl p-6"
+      >
+        <h2 className="text-xl font-bold text-gray-900">Ativar livro?</h2>
 
-        <p className="mt-2 text-sm text-gray-600">
+        <p className="mt-2 text-base text-gray-600 leading-relaxed">
           Informe a nova quantidade total de exemplares:
         </p>
 
-        <div className="mt-4 rounded-xl bg-[#eef7f0] p-4">
-          <span className="block font-bold text-gray-800 text-xs mt-0.75">
-            Título:{" "}
-            <span className="text-sm font-normal text-gray-600">
-              {livro.titulo}
-            </span>
-          </span>
-            <span className="block font-bold text-gray-800 text-xs">
-            Editora:{" "}
-            <span className="text-sm font-normal text-gray-600">
-              {livro.editora} 
-            </span>
-          </span>
+        <div className="mt-3 rounded-xl bg-[#eef7f0] border border-[#d5ead9] p-3.5 space-y-1 text-sm">
+          <p>
+            <span className="font-semibold text-[#1e582d]">Título: </span>
+            <span className="text-gray-800">{livro.titulo}</span>
+          </p>
+          <p>
+            <span className="font-semibold text-[#1e582d]">Editora: </span>
+            <span className="text-gray-800">{livro.editora}</span>
+          </p>
         </div>
 
         {mensagemErro && (
@@ -132,7 +135,7 @@ export default function ModalAtivarLivro({
           </div>
         )}
 
-        <label className="text-sm font-semibold text-[#1e582d] mt-5 mb-2 block">
+        <label className="text-base font-semibold text-[#1e582d] mt-5 mb-2 block">
           Nova quantidade total de exemplares
         </label>
 
@@ -140,12 +143,8 @@ export default function ModalAtivarLivro({
           <button
             type="button"
             onClick={decrementar}
-            disabled={
-              carregando ||
-              semValor ||
-              valorAtual <= minimo
-            }
-            className="w-10 h-10 rounded-lg bg-[#eef7f0] text-[#1e582d] hover:bg-[#2e8b45] hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center justify-center font-bold text-base cursor-pointer select-none"
+            disabled={carregando || semValor || valorAtual <= minimo}
+            className="w-10 h-10 rounded-lg bg-[#eef7f0] text-[#1e582d] hover:bg-[#2e8b45] hover:text-white disabled:opacity-30 disabled:hover:bg-[#eef7f0] disabled:hover:text-[#1e582d] disabled:cursor-not-allowed transition-colors flex items-center justify-center font-bold text-lg cursor-pointer select-none"
           >
             −
           </button>
@@ -163,21 +162,21 @@ export default function ModalAtivarLivro({
             onKeyDown={(e) => {
               if (e.key === "Enter") confirmar();
             }}
-            className="w-full text-center font-bold text-base text-gray-800 outline-none bg-transparent placeholder:text-gray-300 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            className="w-full text-center font-bold text-base text-gray-900 tabular-nums outline-none bg-transparent placeholder:text-gray-300 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
           />
 
           <button
             type="button"
             onClick={incrementar}
             disabled={carregando}
-            className="w-10 h-10 rounded-lg bg-[#eef7f0] text-[#1e582d] hover:bg-[#2e8b45] hover:text-white transition-colors flex items-center justify-center font-bold text-base cursor-pointer select-none disabled:opacity-30 disabled:cursor-not-allowed"
+            className="w-10 h-10 rounded-lg bg-[#eef7f0] text-[#1e582d] hover:bg-[#2e8b45] hover:text-white transition-colors flex items-center justify-center font-bold text-lg cursor-pointer select-none disabled:opacity-30 disabled:cursor-not-allowed"
           >
             +
           </button>
         </div>
 
         {emprestados > 0 && (
-          <p className="text-xs text-[#5AA365] mt-2">
+          <p className="text-sm font-medium text-[#2e8b45] mt-2">
             Mínimo de {minimo}: {emprestados}{" "}
             {emprestados === 1
               ? "exemplar emprestado"
@@ -190,9 +189,9 @@ export default function ModalAtivarLivro({
             type="button"
             onClick={onCancelar}
             disabled={carregando}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-100 transition-colors cursor-pointer disabled:opacity-50"
+            className="h-10 inline-flex items-center justify-center gap-1.5 px-5 rounded-xl text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-colors cursor-pointer disabled:opacity-50"
           >
-            <MdClear size={16} />
+            <MdClear size={17} />
             Cancelar
           </button>
 
@@ -200,9 +199,9 @@ export default function ModalAtivarLivro({
             type="button"
             onClick={confirmar}
             disabled={carregando}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-white bg-[#2e8b45] hover:bg-[#236c35] transition-colors cursor-pointer disabled:opacity-50"
+            className="h-10 inline-flex items-center justify-center gap-1.5 px-5 rounded-xl text-sm font-semibold text-white bg-[#2e8b45] hover:bg-[#236c35] transition-colors cursor-pointer disabled:opacity-50"
           >
-            <MdCheck size={16} />
+            <MdCheck size={17} />
             {carregando ? "Ativando..." : "Ativar"}
           </button>
         </div>

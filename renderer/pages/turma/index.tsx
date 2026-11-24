@@ -4,11 +4,13 @@ import { useEffect, useState } from "react";
 
 import { useRouter } from "next/router";
 
-import Sidebar from "../../components/Sidebar";
+import PageShell from "../../components/PageShell";
+import EstadoLista from "../../components/EstadoLista";
 import SearchBar, { TipoOrdenacao } from "../../components/Searchbar";
 import AbasStatus, { StatusAba } from "../../components/AbasStatus";
 import ListaTurma from "../../components/turma/listaTurma";
 import Paginacao from "../../components/Paginacao";
+import { useItensPorPagina } from "../../hooks/useItensPorPagina";
 
 import ModalExcluir from "../../components/modal/modalExcluir";
 import ModalAtivar from "../../components/modal/modalAtivar";
@@ -51,19 +53,24 @@ export default function GerenciarTurmas() {
   }, [feedback]);
 
   useEffect(() => {
+    if (!router.isReady) return;
     const sucesso = router.query.sucesso;
 
     if (sucesso === "1") {
       setFeedback("Turma cadastrada com sucesso!");
-    }
-
-    if (sucesso === "editado") {
+      router.replace("/turma", undefined, { shallow: true });
+    } else if (sucesso === "editado") {
       setFeedback("Turma editada com sucesso!");
+      router.replace("/turma", undefined, { shallow: true });
+    } else if (sucesso === "editado_inativo") {
+      setAbaAtiva("INATIVO");
+      setFeedback("Turma editada com sucesso!");
+      router.replace("/turma", undefined, { shallow: true });
     }
-  }, [router.query.sucesso]);
+  }, [router.isReady, router.query.sucesso]);
 
   const [paginaAtual, setPaginaAtual] = useState(1);
-  const ITENS_POR_PAGINA = 10; // 10 itens por página na visualização em lista
+  const itensPorPagina = useItensPorPagina();
 
   useEffect(() => {
     setPaginaAtual(1);
@@ -115,7 +122,7 @@ export default function GerenciarTurmas() {
 
   const totalPaginas = Math.max(
     1,
-    Math.ceil(turmasExibidas.length / ITENS_POR_PAGINA)
+    Math.ceil(turmasExibidas.length / itensPorPagina)
   );
 
   useEffect(() => {
@@ -124,10 +131,10 @@ export default function GerenciarTurmas() {
     }
   }, [totalPaginas, paginaAtual]);
 
-  const inicio = (paginaAtual - 1) * ITENS_POR_PAGINA;
+  const inicio = (paginaAtual - 1) * itensPorPagina;
   const turmasPaginadas = turmasExibidas.slice(
     inicio,
-    inicio + ITENS_POR_PAGINA
+    inicio + itensPorPagina
   );
 
   const handleExcluir = async (turma: Turma) => {
@@ -194,75 +201,70 @@ export default function GerenciarTurmas() {
     }
   };
 
+  const totalAtivos = turmas.filter((t) => t.status === "ATIVO").length;
+  const totalInativos = turmas.length - totalAtivos;
+
   return (
-    <div className="flex min-h-screen bg-white">
-      <Sidebar />
+    <PageShell titulo="Gerenciar turmas">
+      {/* Abas de status: Turmas Ativas e Turmas Inativas */}
+      <AbasStatus
+        abaAtiva={abaAtiva}
+        onChangeAba={setAbaAtiva}
+        labelAtivos="Turmas Ativas"
+        labelInativos="Turmas Inativas"
+        totalAtivos={totalAtivos}
+        totalInativos={totalInativos}
+      />
 
-      <main className="flex-1 min-w-0 px-8 pt-6 pb-6 animate-fade-in">
-        <h1 className="text-2xl font-bold text-gray-800 mb-4">
-          Gerenciar turmas
-        </h1>
-
-        {/* Abas de status: Ativos e Inativos */}
-        <AbasStatus
-          abaAtiva={abaAtiva}
-          onChangeAba={setAbaAtiva}
+      {/* Barra de busca e botão de adicionar */}
+      <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4 mb-3.5 w-full">
+        <SearchBar
+          placeholder="Pesquisar turmas por nome..."
+          valorBusca={termoBusca}
+          onChangeBusca={setTermoBusca}
+          ordenacao={ordenacao}
+          onChangeOrdenacao={setOrdenacao}
         />
 
+        <Link
+          href="/turma/cadastro_turma"
+          className="h-11 px-5 sm:px-6 inline-flex items-center justify-center bg-[#2e8b45] text-white rounded-xl font-semibold text-base hover:bg-[#236c35] transition-all whitespace-nowrap gap-2 shadow-sm cursor-pointer shrink-0 active:scale-95"
+        >
+          <MdAdd size={20} />
+          Adicionar turma
+        </Link>
+      </div>
 
-        {/* Barra de busca e botão de adicionar */}
-        <div className="flex items-center gap-4 mb-4 w-full">
-          <SearchBar 
-            placeholder="Pesquisar turmas por nome." 
-            valorBusca={termoBusca}
-            onChangeBusca={setTermoBusca}
-            ordenacao={ordenacao}
-            onChangeOrdenacao={setOrdenacao}
-          />
+      {feedback && (
+        <ToastFeedback
+          mensagem={feedback}
+          tipo="sucesso"
+          onClose={() => setFeedback("")}
+        />
+      )}
 
-          <Link
-            href="/turma/cadastro_turma"
-            className="h-11 px-6 flex items-center justify-center bg-[#2e8b45] text-white rounded-xl font-medium text-sm hover:bg-[#236c35] transition-all whitespace-nowrap gap-2 shadow-sm cursor-pointer shrink-0 active:scale-95"
-          >
-            <MdAdd size={18} />
-            Adicionar turma
-          </Link>
-        </div>
+      {erro && (
+        <ToastFeedback
+          mensagem={erro}
+          tipo="erro"
+          onClose={() => setErro("")}
+        />
+      )}
 
-        {feedback && (
-          <ToastFeedback
-            mensagem={feedback}
-            tipo="sucesso"
-            onClose={() => setFeedback("")}
-          />
-        )}
-
-        {erro && (
-          <ToastFeedback
-            mensagem={erro}
-            tipo="erro"
-            onClose={() => setErro("")}
-          />
-        )}
-        
-        {carregada ? (
-          <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
-            <p className="text-base font-medium">
-              Carregando turmas...
-            </p>
-          </div>
-        ): turmasExibidas.length === 0 ? (
-          <div className="w-full bg-[#eef7f0] rounded-2xl p-12 text-center text-[#1e582d]">
-            <p className="text-base font-medium">
-              {termoBusca.trim()
-                ? `Nenhuma turma ${abaAtiva === "ATIVO" ? "ativa" : "inativa"} encontrada para "${termoBusca}".`
-                : `Nenhuma turma ${abaAtiva === "ATIVO" ? "ativa" : "inativa"} cadastrada.`}
-            </p>
-          </div>
-        ) : (
+      {carregada ? (
+        <EstadoLista mensagem="Carregando turmas..." />
+      ) : turmasExibidas.length === 0 ? (
+        <EstadoLista
+          mensagem={
+            termoBusca.trim()
+              ? `Nenhuma turma ${abaAtiva === "ATIVO" ? "ativa" : "inativa"} encontrada para "${termoBusca}".`
+              : `Nenhuma turma ${abaAtiva === "ATIVO" ? "ativa" : "inativa"} cadastrada.`
+          }
+        />
+      ) : (
           <div
-            key={`${termoBusca}-${abaAtiva}-${ordenacao}-${paginaAtual}`}
-            className="animate-fade-in duration-500"
+            key={`${abaAtiva}-${ordenacao}-${paginaAtual}`}
+            className="animate-fade-in duration-300"
           >
             <ListaTurma
               turmas={turmasPaginadas}
@@ -281,7 +283,7 @@ export default function GerenciarTurmas() {
             <Paginacao
               paginaAtual={paginaAtual}
               totalItens={turmasExibidas.length}
-              itensPorPagina={ITENS_POR_PAGINA}
+              itensPorPagina={itensPorPagina}
               nomeEntidade={abaAtiva === "ATIVO" ? "turmas ativas" : "turmas inativas"}
               nomeEntidadeSingular={abaAtiva === "ATIVO" ? "turma ativa" : "turma inativa"}
               aoMudarPagina={setPaginaAtual}
@@ -291,17 +293,16 @@ export default function GerenciarTurmas() {
 
         <ModalExcluir
           aberto={turmaParaExcluir !== null}
+          titulo="Excluir turma?"
           mensagem={
             turmaParaExcluir ? (
-              <>
-                Tem certeza que deseja excluir a turma:
-                <span className="block font-bold text-gray-800 text-xs mt-0.75">
-                  Nome:{" "}
-                  <span className="text-sm font-normal text-gray-600">
-                    {turmaParaExcluir.nome}
-                  </span>
-                </span>
-              </>
+              <div>
+                <p>Tem certeza que deseja excluir esta turma?</p>
+                <div className="mt-3 rounded-xl bg-[#eef7f0] border border-[#d5ead9] p-3.5 text-sm">
+                  <span className="font-semibold text-[#1e582d]">Nome: </span>
+                  <span className="text-gray-800">{turmaParaExcluir.nome}</span>
+                </div>
+              </div>
             ) : (
               ""
             )
@@ -324,17 +325,16 @@ export default function GerenciarTurmas() {
 
         <ModalDesativar
           aberto={turmaParaDesativar !== null}
+          titulo="Desativar turma?"
           mensagem={
             turmaParaDesativar ? (
-              <>
-                Tem certeza que deseja desativar a turma:
-                <span className="block font-bold text-gray-800 text-xs mt-0.75">
-                  Nome:{" "}
-                  <span className="text-sm font-normal text-gray-600">
-                    {turmaParaDesativar.nome}
-                  </span>
-                </span>
-              </>
+              <div>
+                <p>Tem certeza que deseja desativar esta turma?</p>
+                <div className="mt-3 rounded-xl bg-[#eef7f0] border border-[#d5ead9] p-3.5 text-sm">
+                  <span className="font-semibold text-[#1e582d]">Nome: </span>
+                  <span className="text-gray-800">{turmaParaDesativar.nome}</span>
+                </div>
+              </div>
             ) : (
               ""
             )
@@ -353,17 +353,16 @@ export default function GerenciarTurmas() {
 
         <ModalAtivar
           aberto={turmaParaAtivar !== null}
+          titulo="Ativar turma?"
           mensagem={
             turmaParaAtivar ? (
-              <>
-                Tem certeza que deseja ativar a turma:
-                <span className="block font-bold text-gray-800 text-xs mt-0.75">
-                  Nome:{" "}
-                  <span className="text-sm font-normal text-gray-600">
-                    {turmaParaAtivar.nome}
-                  </span>
-                </span>
-              </>
+              <div>
+                <p>Tem certeza que deseja ativar esta turma?</p>
+                <div className="mt-3 rounded-xl bg-[#eef7f0] border border-[#d5ead9] p-3.5 text-sm">
+                  <span className="font-semibold text-[#1e582d]">Nome: </span>
+                  <span className="text-gray-800">{turmaParaAtivar.nome}</span>
+                </div>
+              </div>
             ) : (
               ""
             )
@@ -379,8 +378,6 @@ export default function GerenciarTurmas() {
             await handleAtivar(turma);
           }}
         />
-
-      </main>
-    </div>
+    </PageShell>
   );
 }

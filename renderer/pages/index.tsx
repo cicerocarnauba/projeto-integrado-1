@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import Head from "next/head";
 import HeaderHome from "../components/home/HeaderHome";
 import CardModulo, { ModuloItem } from "../components/home/CardModulo";
-import Sidebar from "../components/Sidebar";
+import Sidebar, { isSidebarRecolhida } from "../components/Sidebar";
 
 const modulos: ModuloItem[] = [
   {
@@ -38,10 +38,14 @@ export default function Home() {
   });
   const [targetHref, setTargetHref] = useState<string | null>(null);
 
+  const [sidebarRecolhida, setSidebarRecolhida] = useState(false);
+
   useEffect(() => {
+    setSidebarRecolhida(isSidebarRecolhida());
     if (typeof window !== "undefined" && window.location.search.includes("anim=expand")) {
       const timer = setTimeout(() => {
         setIsTransitioning(false);
+        window.history.replaceState(null, "", "/");
       }, 50);
       return () => clearTimeout(timer);
     }
@@ -49,6 +53,7 @@ export default function Home() {
 
   const handleSelectModulo = (href: string) => {
     if (isTransitioning) return;
+    setSidebarRecolhida(isSidebarRecolhida());
     setTargetHref(href);
     setIsTransitioning(true);
 
@@ -57,17 +62,19 @@ export default function Home() {
     }, 480);
   };
 
+  const larguraSidebarTransicao = sidebarRecolhida ? "w-20" : "w-[304px]";
+
   return (
     <>
       <Head>
         <title>LivroCMEI - Início</title>
       </Head>
 
-      <div className="h-screen w-full bg-white flex overflow-hidden select-none relative">
+      <div className="h-screen w-full bg-[#f8fbf9] flex overflow-hidden select-none relative">
         <div
           className={`h-screen bg-[#2e8b45] text-white flex flex-col relative shrink-0 overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
             isTransitioning
-              ? "w-80 shadow-2xl"
+              ? `${larguraSidebarTransicao} shadow-2xl`
               : "w-full rounded-none"
           }`}
         >
@@ -101,7 +108,7 @@ export default function Home() {
 
             {/* Rodapé */}
             <div className="flex-1 flex items-end justify-center pt-2 sm:pt-4 pb-2">
-              <footer className="text-center text-white/75 text-xs">
+              <footer className="text-center text-white/85 text-sm font-medium">
                 <p>CEMEI Professora Maria de Lourdes Demasceno Marques • Piquet Carneiro</p>
               </footer>
             </div>
@@ -119,7 +126,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="flex-1 h-screen bg-white" />
+        <div className="flex-1 h-screen bg-[#f8fbf9]" />
       </div>
     </>
   );

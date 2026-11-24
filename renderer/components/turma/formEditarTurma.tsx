@@ -91,21 +91,20 @@ export default function FormEditarTurma({ turma }: FormEditarTurmaProps) {
     <form
       onSubmit={salvar}
       noValidate
-      className="w-full bg-[#eef7f0] rounded-2xl p-8 shadow-xs"
+      className="w-full bg-[#eef7f0] border border-[#cfe5d4] rounded-2xl p-8 shadow-xs"
     >
       {erro && (
         <div
           role="alert"
-          className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+          className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3.5 text-base text-red-700"
         >
           {erro}
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-6">
-        
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-8">
         <div className="md:col-span-12">
-          <label className="text-sm font-semibold text-[#1e582d] mb-2 block">
+          <label className="text-base font-semibold text-[#1e582d] mb-2 block">
             Nome da turma
           </label>
           <input
@@ -116,29 +115,28 @@ export default function FormEditarTurma({ turma }: FormEditarTurmaProps) {
               limparErro();
               setNome(e.target.value);
             }}
-            className="w-full h-11 bg-white border border-[#cde5d3] rounded-xl px-4 text-sm text-gray-800 placeholder:text-gray-400 outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20 disabled:opacity-60"
+            className="w-full h-12 bg-white border border-[#cde5d3] rounded-xl px-4 text-base text-gray-900 placeholder:text-gray-400 outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20 disabled:opacity-60"
           />
         </div>
-    </div>
-
+      </div>
 
       <div className="flex justify-end items-center gap-3">
         <button
           type="button"
           onClick={cancelar}
           disabled={salvando}
-          className="flex items-center gap-1.5 px-6 py-2.5 rounded-xl text-sm font-medium text-white bg-[#cf4a4a] hover:bg-[#b83a3a] transition-colors shadow-xs active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          className="h-11 inline-flex items-center justify-center gap-2 px-6 rounded-xl text-base font-semibold text-white bg-[#cf4a4a] hover:bg-[#b83a3a] transition-colors shadow-xs active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <MdClear size={16} />
+          <MdClear size={19} />
           Cancelar edição
         </button>
 
         <button
           type="submit"
           disabled={salvando}
-          className="flex items-center gap-1.5 bg-[#2e8b45] hover:bg-[#236c35] text-white px-7 py-2.5 rounded-xl text-sm font-medium transition-all shadow-sm active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          className="h-11 inline-flex items-center justify-center gap-2 bg-[#2e8b45] hover:bg-[#236c35] text-white px-7 rounded-xl text-base font-semibold transition-all shadow-sm active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <MdCheck size={16} />
+          <MdCheck size={19} />
           {salvando ? "Salvando..." : "Confirmar edição"}
         </button>
       </div>

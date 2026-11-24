@@ -20,9 +20,9 @@ import { registerEmprestimoHandlers } from './ipc/emprestimoHandlers';
 
 const isProd = process.env.NODE_ENV === 'production';
 
-if (isProd) {
-  serve({ directory: 'app' });
-} else {
+const loadURL = isProd ? serve({ directory: 'app' }) : null;
+
+if (!isProd) {
   app.setPath('userData', `${app.getPath('appData')} (development)`);
 }
 
@@ -89,6 +89,8 @@ function resolveIcon(): Electron.NativeImage | null {
   const mainWindow = createWindow('main', {
     width: 1200,
     height: 800,
+    title: 'LivroCMEI',
+    autoHideMenuBar: true,
     icon: icon ?? undefined,
     webPreferences: {
       preload: preloadPath,
@@ -97,12 +99,16 @@ function resolveIcon(): Electron.NativeImage | null {
     },
   });
 
+  if (isProd) {
+    mainWindow.setMenuBarVisibility(false);
+  }
+
   if (icon) {
     mainWindow.setIcon(icon);
   }
 
-  if (isProd) {
-    await mainWindow.loadURL('app://./index.html');
+  if (isProd && loadURL) {
+    await loadURL(mainWindow);
   } else {
     const port = process.argv[2];
     await mainWindow.loadURL(`http://localhost:${port}/`);

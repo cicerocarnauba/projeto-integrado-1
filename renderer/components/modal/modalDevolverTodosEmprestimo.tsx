@@ -1,4 +1,4 @@
-import { MdClose, MdUndo } from "react-icons/md";
+import { MdClear, MdUndo } from "react-icons/md";
 
 interface ModalDevolverTodosProps {
   aberto: boolean;
@@ -19,32 +19,39 @@ export default function ModalDevolverTodos({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 backdrop-blur-[2px] p-4 animate-fade-in"
       onClick={() => !salvando && onCancelar()}
     >
       <div
         role="dialog"
         aria-modal="true"
-        className="w-full max-w-lg rounded-3xl bg-white p-8 shadow-xl"
+        className="w-full max-w-md border border-[#dcece0] rounded-2xl bg-white p-6 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-2xl font-bold text-gray-800">
+        <h2 className="text-xl font-bold text-gray-900">
           Devolver todos os exemplares?
         </h2>
-        <p className="mt-3 text-gray-500">
-          Tem certeza que deseja devolver todos os exemplares emprestados?
+        <p className="mt-2 text-base text-gray-600 leading-relaxed">
+          Tem certeza que deseja devolver todos os exemplares pendentes deste empréstimo?
         </p>
 
-        {erro && <p className="mt-3 text-sm text-red-600">{erro}</p>}
+        {erro && (
+          <div
+            role="alert"
+            className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+          >
+            {erro}
+          </div>
+        )}
 
-        <div className="mt-8 flex justify-end gap-4">
+        <div className="mt-6 flex justify-end gap-3">
           <button
             type="button"
             disabled={salvando}
             onClick={onCancelar}
-            className="flex items-center gap-2 rounded-xl bg-[#dc3b3b] px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-[#c42e2e] disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+            className="h-10 inline-flex items-center justify-center gap-1.5 px-5 rounded-xl text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-colors disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
           >
-            <MdClose size={18} />
+            <MdClear size={17} />
             Cancelar
           </button>
 
@@ -52,9 +59,9 @@ export default function ModalDevolverTodos({
             type="button"
             disabled={salvando}
             onClick={onConfirmar}
-            className="flex items-center gap-2 rounded-xl bg-[#389348] px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-[#2e7d3d] disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+            className="h-10 inline-flex items-center justify-center gap-1.5 px-5 rounded-xl text-sm font-semibold text-white bg-[#2e8b45] hover:bg-[#236c35] transition-colors disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
           >
-            <MdUndo size={18} />
+            <MdUndo size={17} />
             {salvando ? "Devolvendo..." : "Devolver"}
           </button>
         </div>

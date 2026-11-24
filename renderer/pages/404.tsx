@@ -1,5 +1,6 @@
 import Head from "next/head";
 import Link from "next/link";
+import { MdArrowBack, MdWarningAmber } from "react-icons/md";
 
 export default function Custom404() {
   return (
@@ -13,11 +14,9 @@ export default function Custom404() {
 
         {/* Card de Erro 404 */}
         <div className="bg-white border-2 border-[#2e8b45] rounded-3xl p-8 sm:p-10 max-w-md w-full shadow-2xl text-center text-gray-800">
-          {/* Ícone de aviso de perigo*/}
+          {/* Ícone de aviso de perigo */}
           <div className="w-16 h-16 rounded-2xl bg-amber-100 flex items-center justify-center mx-auto mb-4 text-amber-600">
-            <span className="material-symbols-outlined text-4xl">
-              warning
-            </span>
+            <MdWarningAmber className="text-4xl" aria-hidden="true" />
           </div>
 
           <span className="text-xs font-bold uppercase tracking-wider text-amber-800 bg-amber-100 px-3 py-1 rounded-full">
@@ -28,14 +27,12 @@ export default function Custom404() {
             Página não encontrada
           </h1>
 
-          {/* Botão para voltar à Home*/}
+          {/* Botão para voltar à Home */}
           <Link
             href="/"
             className="w-full bg-[#2e8b45] hover:bg-[#236c35] text-white py-3 px-6 rounded-full font-medium text-sm flex items-center justify-center gap-2 transition-colors shadow-sm"
           >
-            <span className="material-symbols-outlined text-base">
-              arrow_back
-            </span>
+            <MdArrowBack size={18} aria-hidden="true" />
             <span>Voltar para o Início</span>
           </Link>
         </div>
