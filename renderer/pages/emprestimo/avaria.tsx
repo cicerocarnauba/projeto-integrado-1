@@ -21,14 +21,14 @@ interface ContadorProps {
 
 function Contador({ rotulo, valor, max, desabilitado, onChange }: ContadorProps) {
   const botao =
-    "h-9 w-9 inline-flex items-center justify-center rounded-lg bg-[#eef7f0] text-[#1e582d] font-bold transition-all cursor-pointer hover:bg-[#d8f3dc] active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#eef7f0]";
+    "h-10 w-10 inline-flex items-center justify-center rounded-lg bg-[#eef7f0] text-[#1e582d] font-bold transition-all cursor-pointer hover:bg-[#d8f3dc] active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#eef7f0]";
 
   return (
-    <div className="flex-1 min-w-[220px] max-w-[320px]">
-      <span className="block text-sm font-semibold text-[#1e582d] mb-2">
+    <div className="flex-1 min-w-[260px] max-w-[440px]">
+      <span className="block text-base font-semibold text-gray-800 mb-2">
         {rotulo}
       </span>
-      <div className="h-12 px-1.5 flex items-center justify-between bg-white border border-[#cfe5d4] rounded-xl">
+      <div className="h-14 px-2 flex items-center justify-between bg-white border border-[#cfe5d4] rounded-xl">
         <button
           type="button"
           aria-label={`Diminuir ${rotulo}`}
@@ -55,13 +55,23 @@ function Contador({ rotulo, valor, max, desabilitado, onChange }: ContadorProps)
   );
 }
 
-function CampoLeitura({ rotulo, valor }: { rotulo: string; valor: string | number }) {
+function CampoLeitura({
+  rotulo,
+  valor,
+  centralizado = false,
+}: {
+  rotulo: string;
+  valor: string | number;
+  centralizado?: boolean;
+}) {
   return (
     <div>
-      <span className="block text-sm font-semibold text-[#1e582d] mb-2">
-        {rotulo}
-      </span>
-      <div className="h-12 px-4 flex items-center bg-white border border-[#cfe5d4] rounded-xl text-gray-900">
+      <span className="block text-base text-gray-700 mb-2">{rotulo}</span>
+      <div
+        className={`h-14 px-5 flex items-center bg-white border border-[#cfe5d4] rounded-xl text-base text-gray-900 ${
+          centralizado ? "justify-center" : ""
+        }`}
+      >
         {valor}
       </div>
     </div>
@@ -206,21 +216,25 @@ export default function RegistrarAvaria() {
       ) : bloqueado ? (
         <EstadoLista mensagem="Não é possível registrar avaria para este item." />
       ) : (
-        <section className="bg-[#eef7f0] rounded-2xl p-6 sm:p-8 max-w-5xl">
-          <div className="space-y-5">
+        <section className="bg-[#eef7f0] rounded-3xl p-8 sm:p-10 w-full">
+          <div className="space-y-6">
             <CampoLeitura rotulo="Título do Livro" valor={item.livroTitulo} />
 
-            <div className="grid grid-cols-1 sm:grid-cols-[1fr_260px] gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-[1fr_440px] gap-6">
               <CampoLeitura rotulo="Editora" valor={item.editora} />
-              <CampoLeitura rotulo="Exemplares emprestados" valor={pendente} />
+              <CampoLeitura
+                rotulo="Exemplares emprestados"
+                valor={pendente}
+                centralizado
+              />
             </div>
           </div>
 
-          <hr className="my-6 border-[#cfe5d4]" />
+          <hr className="my-8 border-[#cfe5d4]" />
 
-          <h2 className="text-base font-bold text-[#1e582d] mb-4">Avarias</h2>
+          <h2 className="text-lg font-bold text-[#1e582d] mb-5">Avarias</h2>
 
-          <div className="flex flex-wrap gap-5">
+          <div className="flex flex-wrap gap-8">
             <Contador
               rotulo="Exemplares perdidos"
               valor={perdidos}
@@ -237,6 +251,11 @@ export default function RegistrarAvaria() {
             />
           </div>
 
+          <p className="mt-6 text-base text-gray-700">
+            Exemplares emprestados:{" "}
+            <span className="font-bold text-[#1e582d]">{pendente}</span>
+          </p>
+
           {somaInvalida ? (
             <p role="alert" className="mt-4 text-sm font-medium text-red-600">
               A soma de perdidos e danificados não pode ser maior que os
@@ -244,12 +263,12 @@ export default function RegistrarAvaria() {
             </p>
           ) : null}
 
-          <div className="mt-8 flex justify-end gap-3">
+          <div className="mt-10 flex justify-end gap-3">
             <button
               type="button"
               onClick={voltar}
               disabled={salvando}
-              className="h-12 px-6 inline-flex items-center gap-2 rounded-xl bg-[#d94848] text-white font-semibold hover:bg-[#b93a3a] transition-all cursor-pointer active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
+              className="h-14 px-8 inline-flex items-center gap-2 rounded-xl bg-[#d94848] text-white text-base font-semibold hover:bg-[#b93a3a] transition-all cursor-pointer active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
             >
               <MdClose size={20} />
               Cancelar
@@ -258,7 +277,7 @@ export default function RegistrarAvaria() {
               type="button"
               onClick={() => setModalAberto(true)}
               disabled={registrarDesabilitado}
-              className={`h-12 px-6 inline-flex items-center gap-2 rounded-xl font-semibold transition-all ${
+              className={`h-14 px-8 inline-flex items-center gap-2 rounded-xl text-base font-semibold transition-all ${
                 registrarDesabilitado
                   ? "bg-gray-200 text-gray-400 cursor-not-allowed"
                   : "bg-[#2e8b45] text-white hover:bg-[#236c35] cursor-pointer active:scale-95"
