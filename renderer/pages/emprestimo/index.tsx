@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import { MdAdd } from "react-icons/md";
 import PageShell from "../../components/PageShell";
@@ -237,7 +237,13 @@ const filtradosPorAba = emprestimosAgrupados
     [emprestimosAgrupados]
   );
 
-  const itensPorPagina = useItensPorPagina();
+  const containerListaRef = useRef<HTMLDivElement>(null);
+  const itensPorPagina = useItensPorPagina({
+    containerRef: containerListaRef,
+    alturaLinha: 54,
+    alturaLinhaCompacta: 57,
+    breakpointCompacto: 1536,
+  });
 
   const totalPaginas = Math.max(
     1,
@@ -257,7 +263,7 @@ const filtradosPorAba = emprestimosAgrupados
   );
 
   const abaClass = (ativa: boolean) =>
-    `pb-2.5 px-1 text-base font-semibold border-b-[3px] transition-colors cursor-pointer inline-flex items-center gap-2 whitespace-nowrap ${
+    `pb-2 xl:pb-2.5 px-1 text-sm xl:text-base font-semibold border-b-[3px] transition-colors cursor-pointer inline-flex items-center gap-2 whitespace-nowrap ${
       ativa
         ? "text-[#1e582d] border-[#2e8b45]"
         : "text-gray-500 border-transparent hover:text-gray-800 hover:border-[#cde5d4]"
@@ -275,7 +281,7 @@ const filtradosPorAba = emprestimosAgrupados
       <ToastFeedback mensagem={feedback} tipo="sucesso" onClose={fecharFeedback} />
       <ToastFeedback mensagem={erro} tipo="erro" onClose={fecharErro} />
 
-      <div className="flex flex-wrap gap-6 sm:gap-8 border-b border-[#D3E8D6] mb-3.5">
+      <div className="flex flex-wrap gap-4 sm:gap-6 xl:gap-8 border-b border-[#D3E8D6] mb-2.5 xl:mb-3.5 shrink-0">
         <button
           type="button"
           className={abaClass(aba === "pendentes")}
@@ -326,7 +332,7 @@ const filtradosPorAba = emprestimosAgrupados
         </button>
       </div>
 
-      <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4 mb-3.5 w-full">
+      <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 sm:gap-3.5 mb-2.5 xl:mb-3.5 w-full shrink-0">
         <SearchBar
           placeholder="Pesquisar por professor, turma ou data..."
           valorBusca={termoBusca}
@@ -338,27 +344,28 @@ const filtradosPorAba = emprestimosAgrupados
         <button
           type="button"
           onClick={() => router.push("/emprestimo/novo")}
-          className="h-11 px-5 sm:px-6 inline-flex items-center justify-center bg-[#2e8b45] text-white rounded-xl font-semibold text-base hover:bg-[#236c35] transition-all whitespace-nowrap gap-2 shadow-sm cursor-pointer shrink-0 active:scale-95"
+          className="h-10 xl:h-11 px-4 sm:px-5 xl:px-6 inline-flex items-center justify-center bg-[#2e8b45] text-white rounded-xl font-semibold text-sm xl:text-base hover:bg-[#236c35] transition-all whitespace-nowrap gap-2 shadow-sm cursor-pointer shrink-0 active:scale-95"
         >
           <MdAdd size={20} />
           Realizar empréstimo
         </button>
       </div>
 
-      {carregando ? (
-        <EstadoLista mensagem="Carregando empréstimos..." />
-      ) : emprestimosExibidos.length === 0 ? (
-        <EstadoLista
-          mensagem={
-            termoBusca.trim()
-              ? `Nenhum empréstimo ${nomeAba} encontrado para "${termoBusca}".`
-              : `Nenhum empréstimo ${nomeAba}.`
-          }
-        />
-      ) : (
+      <div ref={containerListaRef} className="flex-1 min-h-0 flex flex-col">
+        {carregando ? (
+          <EstadoLista mensagem="Carregando empréstimos..." />
+        ) : emprestimosExibidos.length === 0 ? (
+          <EstadoLista
+            mensagem={
+              termoBusca.trim()
+                ? `Nenhum empréstimo ${nomeAba} encontrado para "${termoBusca}".`
+                : `Nenhum empréstimo ${nomeAba}.`
+            }
+          />
+        ) : (
           <div
             key={`${aba}-${ordenacao}-${paginaAtual}`}
-            className="animate-fade-in duration-300"
+            className="animate-fade-in duration-300 flex flex-col min-h-0"
           >
             <ListaEmprestimo
               modo={aba}
@@ -384,6 +391,7 @@ const filtradosPorAba = emprestimosAgrupados
             />
           </div>
         )}
+      </div>
 
         <ModalConfirmarAcao
           aberto={emprestimoParaCancelar !== null}
