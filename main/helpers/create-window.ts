@@ -75,9 +75,21 @@ export const createWindow = (
 
   state = ensureVisibleOnSomeDisplay(restore())
 
+  const primaryWorkArea = screen.getPrimaryDisplay().workArea
+  const safeMinWidth =
+    typeof options.minWidth === 'number'
+      ? Math.min(options.minWidth, primaryWorkArea.width)
+      : undefined
+  const safeMinHeight =
+    typeof options.minHeight === 'number'
+      ? Math.min(options.minHeight, primaryWorkArea.height)
+      : undefined
+
   const win = new BrowserWindow({
-    ...state,
     ...options,
+    ...state,
+    ...(safeMinWidth !== undefined ? { minWidth: safeMinWidth } : {}),
+    ...(safeMinHeight !== undefined ? { minHeight: safeMinHeight } : {}),
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: true,

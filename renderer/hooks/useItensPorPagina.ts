@@ -3,7 +3,9 @@ import { RefObject, useEffect, useState } from "react";
 interface UseItensPorPaginaOptions {
   /** Contêiner flex-1 que envolve a tabela e a paginação para medição exata. */
   containerRef?: RefObject<HTMLElement | null>;
-  /** Espaço vertical fixo estimado como fallback quando containerRef não é informado (px). */
+  /** Elemento do contêiner via callback ref (útil quando montado condicionalmente). */
+  containerEl?: HTMLElement | null;
+  /** Espaço vertical fixo estimado como fallback quando o contêiner não é informado (px). */
   alturaFixa?: number;
   /** Altura de cada linha da tabela em modo amplo de 1 linha (px). */
   alturaLinha?: number;
@@ -24,6 +26,7 @@ interface UseItensPorPaginaOptions {
  */
 export function useItensPorPagina({
   containerRef,
+  containerEl,
   alturaFixa = 290,
   alturaLinha = 54,
   alturaLinhaCompacta = 57,
@@ -41,7 +44,7 @@ export function useItensPorPagina({
           ? alturaLinhaCompacta
           : alturaLinha;
 
-      const container = containerRef?.current;
+      const container = containerEl ?? containerRef?.current;
 
       if (container && container.clientHeight > 0) {
         const theadEl = container.querySelector("thead");
@@ -82,7 +85,7 @@ export function useItensPorPagina({
 
     let resizeObserver: ResizeObserver | null = null;
     let mutationObserver: MutationObserver | null = null;
-    const container = containerRef?.current;
+    const container = containerEl ?? containerRef?.current;
 
     if (container && typeof ResizeObserver !== "undefined") {
       resizeObserver = new ResizeObserver(() => calcular());
@@ -102,6 +105,7 @@ export function useItensPorPagina({
     };
   }, [
     containerRef,
+    containerEl,
     alturaFixa,
     alturaLinha,
     alturaLinhaCompacta,

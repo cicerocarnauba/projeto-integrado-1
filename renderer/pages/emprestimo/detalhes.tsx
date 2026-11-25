@@ -1,5 +1,5 @@
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import {
   MdArrowBack,
@@ -268,9 +268,10 @@ export default function DetalhesEmprestimo() {
     );
   });
 
-  const containerListaRef = useRef<HTMLDivElement>(null);
+  const [containerListaEl, setContainerListaEl] =
+    useState<HTMLDivElement | null>(null);
   const itensPorPagina = useItensPorPagina({
-    containerRef: containerListaRef,
+    containerEl: containerListaEl,
     alturaFixa: 330,
     alturaLinha: 58,
     alturaLinhaCompacta: 58,
@@ -332,13 +333,9 @@ export default function DetalhesEmprestimo() {
       />
 
       {carregando ? (
-        <div ref={containerListaRef} className="flex-1 min-h-0 flex flex-col">
-          <EstadoLista mensagem="Carregando empréstimo..." />
-        </div>
+        <EstadoLista mensagem="Carregando empréstimo..." />
       ) : !emprestimo ? (
-        <div ref={containerListaRef} className="flex-1 min-h-0 flex flex-col">
-          <EstadoLista mensagem={erro || "Empréstimo não encontrado."} />
-        </div>
+        <EstadoLista mensagem={erro || "Empréstimo não encontrado."} />
       ) : (
         <>
           {/* Resumo estruturado do empréstimo */}
@@ -433,7 +430,7 @@ export default function DetalhesEmprestimo() {
             </button>
           </div>
 
-          <div ref={containerListaRef} className="flex-1 min-h-0 flex flex-col">
+          <div ref={setContainerListaEl} className="flex-1 min-h-0 flex flex-col">
             {itensExibidos.length === 0 ? (
               <EstadoLista
                 mensagem={
