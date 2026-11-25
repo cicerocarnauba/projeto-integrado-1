@@ -12,13 +12,18 @@ export const createWindow = (
   const key = 'window-state'
   const name = `window-state-${windowName}`
   const store = new Store<Record<string, any>>({ name })
-  const defaultSize = {
-    width: options.width,
-    height: options.height,
+  const getSafeDefaultSize = () => {
+    const workArea = screen.getPrimaryDisplay().workArea
+    const targetWidth = Math.min(options.width ?? 1200, workArea.width)
+    const targetHeight = Math.min(options.height ?? 800, workArea.height)
+    return {
+      width: targetWidth,
+      height: targetHeight,
+    }
   }
-  let state = {}
+  let state: Record<string, any> = {}
 
-  const restore = () => store.get(key, defaultSize)
+  const restore = () => store.get(key, getSafeDefaultSize())
 
   const getCurrentPosition = () => {
     const position = win.getPosition()
@@ -33,6 +38,8 @@ export const createWindow = (
 
   const windowWithinBounds = (windowState: any, bounds: any) => {
     return (
+      typeof windowState.x === 'number' &&
+      typeof windowState.y === 'number' &&
       windowState.x >= bounds.x &&
       windowState.y >= bounds.y &&
       windowState.x + windowState.width <= bounds.x + bounds.width &&
@@ -41,16 +48,17 @@ export const createWindow = (
   }
 
   const resetToDefaults = () => {
-    const bounds = screen.getPrimaryDisplay().bounds
-    return Object.assign({}, defaultSize, {
-      x: (bounds.width - defaultSize.width!) / 2,
-      y: (bounds.height - defaultSize.height!) / 2,
+    const workArea = screen.getPrimaryDisplay().workArea
+    const safeSize = getSafeDefaultSize()
+    return Object.assign({}, safeSize, {
+      x: workArea.x + Math.max(0, Math.floor((workArea.width - safeSize.width) / 2)),
+      y: workArea.y + Math.max(0, Math.floor((workArea.height - safeSize.height) / 2)),
     })
   }
 
   const ensureVisibleOnSomeDisplay = (windowState: any) => {
     const visible = screen.getAllDisplays().some((display) => {
-      return windowWithinBounds(windowState, display.bounds)
+      return windowWithinBounds(windowState, display.workArea)
     })
     if (!visible) {
       return resetToDefaults()
