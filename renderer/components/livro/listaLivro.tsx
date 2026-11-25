@@ -26,28 +26,27 @@ export default function ListaLivro({
   return (
     <div className="w-full bg-white border border-[#cfe5d4] rounded-2xl overflow-hidden shadow-xs">
       <table className="w-full text-left border-collapse table-fixed">
-        <colgroup>
-          <col />
-          <col className="hidden xl:table-column w-[20%]" />
-          <col className={TABLE_COL_CLASSES.exemplares} />
-          <col className={TABLE_COL_CLASSES.status} />
-          <col className={TABLE_COL_CLASSES.acoes} />
-        </colgroup>
         <thead>
           <tr className="bg-[#e8f4eb] border-b border-[#c5dfca] text-xs xl:text-sm font-bold text-[#1e582d] leading-snug">
-            <th className="py-2.5 xl:py-3 px-4 xl:px-6 text-left whitespace-nowrap">
+            <th className="py-2.5 xl:py-3 px-4 xl:px-5 text-left truncate">
               Título do livro
             </th>
-            <th className="py-2.5 xl:py-3 px-4 hidden xl:table-cell text-left whitespace-nowrap">
+            <th className="py-2.5 xl:py-3 px-3 hidden xl:table-cell w-[18%] text-left truncate">
               Editora
             </th>
-            <th className="py-2.5 xl:py-3 px-2 xl:px-3 text-center whitespace-nowrap">
+            <th
+              className={`py-2.5 xl:py-3 px-2 ${TABLE_COL_CLASSES.exemplares} text-center truncate`}
+            >
               Total de exemplares
             </th>
-            <th className="py-2.5 xl:py-3 px-2 xl:px-3 text-center whitespace-nowrap">
+            <th
+              className={`py-2.5 xl:py-3 px-2 ${TABLE_COL_CLASSES.status} text-center truncate`}
+            >
               Status do livro
             </th>
-            <th className="py-2.5 xl:py-3 px-2 xl:px-3 text-center whitespace-nowrap">
+            <th
+              className={`py-2.5 xl:py-3 px-2 ${TABLE_COL_CLASSES.acoes} text-center truncate`}
+            >
               Ações
             </th>
           </tr>
@@ -69,7 +68,7 @@ export default function ListaLivro({
                   estaExcluindo ? "opacity-0 scale-95" : "opacity-100 scale-100"
                 } ${ativo ? "bg-white" : "bg-[#fbfdfb]"}`}
               >
-                <td className="py-2 xl:py-2.5 px-4 xl:px-6 text-left">
+                <td className="py-2 xl:py-2.5 px-4 xl:px-5 text-left overflow-hidden">
                   <span
                     title={livro.titulo}
                     className={`text-sm xl:text-base font-semibold block leading-snug truncate max-w-full ${
@@ -85,7 +84,7 @@ export default function ListaLivro({
                     {livro.editora}
                   </span>
                 </td>
-                <td className="py-2 xl:py-2.5 px-4 hidden xl:table-cell text-left">
+                <td className="py-2 xl:py-2.5 px-3 hidden xl:table-cell text-left overflow-hidden">
                   <span
                     title={livro.editora}
                     className={`text-sm xl:text-base font-normal block leading-snug truncate max-w-full ${
@@ -95,7 +94,7 @@ export default function ListaLivro({
                     {livro.editora}
                   </span>
                 </td>
-                <td className="py-2 xl:py-2.5 px-2 xl:px-3 text-center whitespace-nowrap">
+                <td className="py-2 xl:py-2.5 px-2 text-center whitespace-nowrap overflow-hidden">
                   <div className="inline-flex items-baseline justify-center gap-1.5">
                     <span
                       className={`w-6 text-right font-normal text-sm xl:text-base tabular-nums ${

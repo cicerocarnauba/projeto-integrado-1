@@ -26,24 +26,22 @@ export default function ListaProfessor({
   return (
     <div className="w-full bg-white border border-[#cfe5d4] rounded-2xl overflow-hidden shadow-xs">
       <table className="w-full text-left border-collapse table-fixed">
-        <colgroup>
-          <col />
-          <col className="hidden xl:table-column w-[28%]" />
-          <col className={TABLE_COL_CLASSES.status} />
-          <col className={TABLE_COL_CLASSES.acoes} />
-        </colgroup>
         <thead>
           <tr className="bg-[#e8f4eb] border-b border-[#c5dfca] text-xs xl:text-sm font-bold text-[#1e582d] leading-snug">
-            <th className="py-2.5 xl:py-3 px-4 xl:px-6 text-left whitespace-nowrap">
+            <th className="py-2.5 xl:py-3 px-4 xl:px-5 text-left truncate">
               Nome do professor
             </th>
-            <th className="py-2.5 xl:py-3 px-4 hidden xl:table-cell text-left whitespace-nowrap">
+            <th className="py-2.5 xl:py-3 px-3 hidden xl:table-cell w-[26%] text-left truncate">
               E-mail
             </th>
-            <th className="py-2.5 xl:py-3 px-2 xl:px-3 text-center whitespace-nowrap">
+            <th
+              className={`py-2.5 xl:py-3 px-2 ${TABLE_COL_CLASSES.status} text-center truncate`}
+            >
               Status do professor
             </th>
-            <th className="py-2.5 xl:py-3 px-2 xl:px-3 text-center whitespace-nowrap">
+            <th
+              className={`py-2.5 xl:py-3 px-2 ${TABLE_COL_CLASSES.acoes} text-center truncate`}
+            >
               Ações
             </th>
           </tr>
@@ -62,7 +60,7 @@ export default function ListaProfessor({
                   estaExcluindo ? "opacity-0 scale-95" : "opacity-100 scale-100"
                 } ${ativo ? "bg-white" : "bg-[#fbfdfb]"}`}
               >
-                <td className="py-2 xl:py-2.5 px-4 xl:px-6 text-left">
+                <td className="py-2 xl:py-2.5 px-4 xl:px-5 text-left overflow-hidden">
                   <span
                     title={`${professor.primeiroNome} ${professor.sobrenome}`}
                     className={`text-sm xl:text-base font-semibold block leading-snug truncate max-w-full ${
@@ -78,7 +76,7 @@ export default function ListaProfessor({
                     {professor.email}
                   </span>
                 </td>
-                <td className="py-2 xl:py-2.5 px-4 hidden xl:table-cell text-left">
+                <td className="py-2 xl:py-2.5 px-3 hidden xl:table-cell text-left overflow-hidden">
                   <span
                     title={professor.email}
                     className={`text-sm xl:text-base font-normal block leading-snug truncate max-w-full ${
@@ -88,10 +86,10 @@ export default function ListaProfessor({
                     {professor.email}
                   </span>
                 </td>
-                <td className="py-2 xl:py-2.5 px-2 xl:px-3 text-center">
+                <td className="py-2 xl:py-2.5 px-2 text-center overflow-hidden">
                   <StatusPill status={ativo ? "ATIVO" : "INATIVO"} />
                 </td>
-                <td className="py-2 xl:py-2.5 px-2 xl:px-3 text-center">
+                <td className="py-2 xl:py-2.5 px-2 text-center overflow-hidden">
                   <div className="flex items-center justify-center gap-1.5 xl:gap-2 shrink-0">
                     {ativo ? (
                       <>

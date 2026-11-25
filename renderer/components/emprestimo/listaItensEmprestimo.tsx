@@ -49,39 +49,39 @@ export default function ListaItensEmprestimo({
   onRegistrarAvaria,
 }: ListaItensEmprestimoProps) {
   const btnBase =
-    "inline-flex items-center justify-center gap-1 xl:gap-1.5 w-[90px] xl:w-[98px] 2xl:w-[104px] h-8 text-xs xl:text-sm rounded-lg font-semibold shrink-0 transition-colors whitespace-nowrap";
+    "inline-flex items-center justify-center gap-1 xl:gap-1.5 w-[90px] xl:w-[96px] 2xl:w-[98px] h-8 text-xs xl:text-sm rounded-lg font-semibold shrink-0 transition-colors whitespace-nowrap";
 
   const btnInativo = `${btnBase} bg-gray-200 text-gray-400 cursor-not-allowed`;
 
   return (
     <div className="w-full bg-white border border-[#cfe5d4] rounded-2xl overflow-hidden shadow-xs">
       <table className="w-full table-fixed text-left border-collapse">
-        <colgroup>
-          <col />
-          <col className="hidden 2xl:table-column w-[16%]" />
-          <col className={TABLE_COL_CLASSES.exemplares} />
-          <col className={TABLE_COL_CLASSES.statusCurto} />
-          <col className={TABLE_COL_CLASSES.avaria} />
-          <col className={TABLE_COL_CLASSES.acoes} />
-        </colgroup>
         <thead>
           <tr className="bg-[#e8f4eb] border-b border-[#c5dfca] text-xs xl:text-sm font-bold text-[#1e582d] leading-snug">
-            <th className="py-2.5 xl:py-3 px-4 xl:px-6 text-left whitespace-nowrap">
+            <th className="py-2.5 xl:py-3 px-4 xl:px-5 text-left truncate">
               Título
             </th>
-            <th className="py-2.5 xl:py-3 px-4 hidden 2xl:table-cell text-left whitespace-nowrap">
+            <th className="py-2.5 xl:py-3 px-3 hidden 2xl:table-cell w-[16%] text-left truncate">
               Editora
             </th>
-            <th className="py-2.5 xl:py-3 px-2 xl:px-3 text-center whitespace-nowrap">
+            <th
+              className={`py-2.5 xl:py-3 px-2 ${TABLE_COL_CLASSES.exemplares} text-center truncate`}
+            >
               Exemplares emprestados
             </th>
-            <th className="py-2.5 xl:py-3 px-2 xl:px-3 text-center whitespace-nowrap">
+            <th
+              className={`py-2.5 xl:py-3 px-2 ${TABLE_COL_CLASSES.statusCurto} text-center truncate`}
+            >
               Status do livro
             </th>
-            <th className="py-2.5 xl:py-3 px-2 xl:px-3 text-center whitespace-nowrap">
+            <th
+              className={`py-2.5 xl:py-3 px-1.5 xl:px-2 ${TABLE_COL_CLASSES.avaria} text-center truncate`}
+            >
               Avaria
             </th>
-            <th className="py-2.5 xl:py-3 px-2 xl:px-3 text-center whitespace-nowrap">
+            <th
+              className={`py-2.5 xl:py-3 px-2 ${TABLE_COL_CLASSES.acoes} text-center truncate`}
+            >
               Ações
             </th>
           </tr>
@@ -125,7 +125,7 @@ export default function ListaItensEmprestimo({
                 key={item.id}
                 className="transition-colors hover:bg-[#f4faf6]"
               >
-                <td className="py-2 2xl:py-2.5 px-4 xl:px-6 text-left">
+                <td className="py-2 2xl:py-2.5 px-4 xl:px-5 text-left overflow-hidden">
                   <span
                     title={item.livroTitulo}
                     className="text-sm xl:text-base font-semibold text-gray-900 block leading-snug truncate max-w-full"
@@ -140,7 +140,7 @@ export default function ListaItensEmprestimo({
                   </span>
                 </td>
 
-                <td className="py-2 2xl:py-2.5 px-4 hidden 2xl:table-cell text-left text-base font-normal text-gray-700">
+                <td className="py-2 2xl:py-2.5 px-3 hidden 2xl:table-cell text-left text-sm xl:text-base font-normal text-gray-700 overflow-hidden">
                   <span
                     title={item.editora}
                     className="block leading-snug truncate max-w-full"
@@ -149,7 +149,7 @@ export default function ListaItensEmprestimo({
                   </span>
                 </td>
 
-                <td className="py-2 2xl:py-2.5 px-2 xl:px-3 text-center">
+                <td className="py-2 2xl:py-2.5 px-2 text-center overflow-hidden">
                   <div className="inline-flex items-baseline justify-center gap-1.5">
                     <span className="w-6 text-right font-normal text-sm xl:text-base text-gray-700 tabular-nums">
                       {item.quantidadeEmprestada}
