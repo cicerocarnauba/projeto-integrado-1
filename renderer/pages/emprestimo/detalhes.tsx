@@ -268,7 +268,15 @@ export default function DetalhesEmprestimo() {
     );
   });
 
-  const itensPorPagina = useItensPorPagina({ alturaFixa: 365, alturaLinha: 56 });
+  const [containerListaEl, setContainerListaEl] =
+    useState<HTMLDivElement | null>(null);
+  const itensPorPagina = useItensPorPagina({
+    containerEl: containerListaEl,
+    alturaFixa: 330,
+    alturaLinha: 58,
+    alturaLinhaCompacta: 58,
+    breakpointCompacto: 1536,
+  });
 
   const totalPaginas = Math.max(
     1,
@@ -305,7 +313,7 @@ export default function DetalhesEmprestimo() {
         <button
           type="button"
           onClick={() => router.push("/emprestimo")}
-          className="h-11 px-5 inline-flex items-center justify-center bg-[#2e8b45] text-white rounded-xl font-semibold text-base hover:bg-[#236c35] transition-all whitespace-nowrap gap-2 shadow-sm cursor-pointer shrink-0 active:scale-95"
+          className="h-10 xl:h-11 px-4 xl:px-5 inline-flex items-center justify-center bg-[#2e8b45] text-white rounded-xl font-semibold text-sm xl:text-base hover:bg-[#236c35] transition-all whitespace-nowrap gap-2 shadow-sm cursor-pointer shrink-0 active:scale-95"
         >
           <MdArrowBack size={19} />
           Voltar
@@ -331,21 +339,21 @@ export default function DetalhesEmprestimo() {
       ) : (
         <>
           {/* Resumo estruturado do empréstimo */}
-          <section className="bg-white border border-[#cfe5d4] rounded-2xl px-6 py-4 mb-5 shadow-xs">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <div className="flex flex-wrap items-center gap-3">
-                <h2 className="text-xl font-bold text-[#1e582d]">
+          <section className="bg-white border border-[#cfe5d4] rounded-2xl px-4 sm:px-5 xl:px-6 py-2.5 xl:py-3.5 mb-2.5 xl:mb-4 shadow-xs shrink-0">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
+              <div className="flex flex-wrap items-center gap-2.5 xl:gap-3">
+                <h2 className="text-lg xl:text-xl font-bold text-[#1e582d]">
                   Prof. {emprestimo.professorNome}
                 </h2>
-                <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-xl bg-[#eef7f0] border border-[#cde5d4] text-sm font-semibold text-[#1e582d]">
-                  <MdOutlineSchool size={18} className="text-[#2e8b45] shrink-0" />
+                <span className="inline-flex items-center gap-1.5 xl:gap-2 px-3 py-0.5 xl:px-3.5 xl:py-1 rounded-xl bg-[#eef7f0] border border-[#cde5d4] text-xs xl:text-sm font-semibold text-[#1e582d]">
+                  <MdOutlineSchool size={17} className="text-[#2e8b45] shrink-0" />
                   {emprestimo.turmaNome}
                 </span>
               </div>
 
-              <div className="flex flex-wrap items-center gap-5 text-base text-gray-700">
-                <span className="inline-flex items-center gap-2">
-                  <MdCalendarToday size={17} className="text-[#2e8b45] shrink-0" />
+              <div className="flex flex-wrap items-center gap-4 xl:gap-5 text-sm xl:text-base text-gray-700">
+                <span className="inline-flex items-center gap-1.5 xl:gap-2">
+                  <MdCalendarToday size={16} className="text-[#2e8b45] shrink-0" />
                   <span>
                     <strong className="font-semibold text-[#1e582d]">
                       {emprestimo.status === "CANCELADO"
@@ -363,8 +371,8 @@ export default function DetalhesEmprestimo() {
                 </span>
 
                 {emprestimo.dataDevolucao ? (
-                  <span className="inline-flex items-center gap-2">
-                    <MdCalendarToday size={17} className="text-[#2e8b45] shrink-0" />
+                  <span className="inline-flex items-center gap-1.5 xl:gap-2">
+                    <MdCalendarToday size={16} className="text-[#2e8b45] shrink-0" />
                     <span>
                       <strong className="font-semibold text-[#1e582d]">
                         {emprestimo.status === "CANCELADO"
@@ -382,8 +390,8 @@ export default function DetalhesEmprestimo() {
                   </span>
                 ) : null}
 
-                <span className="inline-flex items-center gap-2">
-                  <MdMenuBook size={18} className="text-[#2e8b45] shrink-0" />
+                <span className="inline-flex items-center gap-1.5 xl:gap-2">
+                  <MdMenuBook size={17} className="text-[#2e8b45] shrink-0" />
                   <span className="font-semibold text-gray-900 tabular-nums">
                     {emprestimo.quantidadeExemplares}{" "}
                     <span className="font-medium text-gray-700">
@@ -398,7 +406,7 @@ export default function DetalhesEmprestimo() {
           </section>
 
           {/* Busca e botão visual de devolver todos */}
-          <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4 mb-3.5 w-full">
+          <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 sm:gap-3.5 mb-2.5 xl:mb-3.5 w-full shrink-0">
             <SearchBar
               placeholder="Pesquisar por título ou editora..."
               valorBusca={termoBusca}
@@ -411,7 +419,7 @@ export default function DetalhesEmprestimo() {
               type="button"
               disabled={devolverTodosDesabilitado}
               onClick={abrirDevolverTodos}
-              className={`h-11 px-5 sm:px-6 inline-flex items-center justify-center rounded-xl font-semibold text-base whitespace-nowrap gap-2 shrink-0 transition-all ${
+              className={`h-10 xl:h-11 px-4 sm:px-5 xl:px-6 inline-flex items-center justify-center rounded-xl font-semibold text-sm xl:text-base whitespace-nowrap gap-2 shrink-0 transition-all ${
                 devolverTodosDesabilitado
                   ? "bg-gray-200 text-gray-400 cursor-not-allowed"
                   : "bg-[#2e8b45] text-white shadow-sm hover:bg-[#236c35] cursor-pointer active:scale-95"
@@ -422,18 +430,19 @@ export default function DetalhesEmprestimo() {
             </button>
           </div>
 
-          {itensExibidos.length === 0 ? (
-            <EstadoLista
-              mensagem={
-                termoBusca.trim()
-                  ? `Nenhum livro encontrado para "${termoBusca}".`
-                  : "Este empréstimo não possui livros."
-              }
-            />
-          ) : (
+          <div ref={setContainerListaEl} className="flex-1 min-h-0 flex flex-col">
+            {itensExibidos.length === 0 ? (
+              <EstadoLista
+                mensagem={
+                  termoBusca.trim()
+                    ? `Nenhum livro encontrado para "${termoBusca}".`
+                    : "Este empréstimo não possui livros."
+                }
+              />
+            ) : (
               <div
                 key={`${ordenacao}-${paginaAtual}`}
-                className="animate-fade-in duration-300"
+                className="animate-fade-in duration-300 flex flex-col min-h-0"
               >
                 <ListaItensEmprestimo
                   itens={itensPaginados}
@@ -457,8 +466,9 @@ export default function DetalhesEmprestimo() {
                 />
               </div>
             )}
-          </>
-        )}
+          </div>
+        </>
+      )}
 
         <ModalDevolverExemplares
           aberto={itemParaDevolver !== null}

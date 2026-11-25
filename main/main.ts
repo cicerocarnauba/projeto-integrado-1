@@ -89,6 +89,8 @@ function resolveIcon(): Electron.NativeImage | null {
   const mainWindow = createWindow('main', {
     width: 1200,
     height: 800,
+    minWidth: 960,
+    minHeight: 560,
     title: 'LivroCMEI',
     autoHideMenuBar: true,
     icon: icon ?? undefined,

@@ -23,7 +23,7 @@ export interface ItemSelecionado {
 }
 
 const inputBase =
-  "w-full h-12 bg-white border border-[#cde5d3] rounded-xl px-4 text-base text-gray-900 outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20 disabled:opacity-60";
+  "w-full h-10 xl:h-12 bg-white border border-[#cde5d3] rounded-xl px-3.5 xl:px-4 text-sm xl:text-base text-gray-900 outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20 disabled:opacity-60";
 
 export default function FormRealizarEmprestimo() {
   const router = useRouter();
@@ -261,21 +261,21 @@ export default function FormRealizarEmprestimo() {
     <form
       noValidate
       onSubmit={abrirModalRealizar}
-      className="w-full bg-[#eef7f0] border border-[#cfe5d4] rounded-2xl p-8 shadow-xs"
+      className="w-full flex-1 min-h-0 flex flex-col bg-[#eef7f0] border border-[#cfe5d4] rounded-2xl p-4 sm:p-5 xl:p-7 shadow-xs"
     >
       {erro && (
         <div
           role="alert"
-          className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3.5 text-base text-red-700"
+          className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm xl:text-base text-red-700 shrink-0"
         >
           {erro}
         </div>
       )}
 
       {/* Professor, turma e data */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 pb-6 border-b border-[#cde5d3]">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-3.5 xl:gap-5 pb-4 xl:pb-5 border-b border-[#cde5d3] shrink-0">
         <div className="md:col-span-5">
-          <label className="text-base font-semibold text-[#1e582d] mb-2 block">
+          <label className="text-sm xl:text-base font-semibold text-[#1e582d] mb-1.5 xl:mb-2 block">
             Professor <span className="text-red-500">*</span>
           </label>
           <SelectPesquisavel
@@ -298,7 +298,7 @@ export default function FormRealizarEmprestimo() {
         </div>
 
         <div className="md:col-span-4">
-          <label className="text-base font-semibold text-[#1e582d] mb-2 block">
+          <label className="text-sm xl:text-base font-semibold text-[#1e582d] mb-1.5 xl:mb-2 block">
             Turma <span className="text-red-500">*</span>
           </label>
           <SelectPesquisavel
@@ -321,7 +321,7 @@ export default function FormRealizarEmprestimo() {
         </div>
 
         <div className="md:col-span-3">
-          <label className="text-base font-semibold text-[#1e582d] mb-2 block">
+          <label className="text-sm xl:text-base font-semibold text-[#1e582d] mb-1.5 xl:mb-2 block">
             Data do empréstimo
           </label>
           <input
@@ -335,14 +335,14 @@ export default function FormRealizarEmprestimo() {
       </div>
 
       {/* Adicionar livros */}
-      <div className="pt-6">
-        <h2 className="text-lg font-bold text-[#1e582d] mb-4">
+      <div className="pt-3.5 xl:pt-5 shrink-0">
+        <h2 className="text-base xl:text-lg font-bold text-[#1e582d] mb-2.5 xl:mb-3.5">
           Adicionar livros ao empréstimo
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 xl:gap-4 items-end">
           <div className="md:col-span-6">
-            <label className="text-base font-semibold text-[#1e582d] mb-2 block">
+            <label className="text-sm xl:text-base font-semibold text-[#1e582d] mb-1.5 xl:mb-2 block">
               Livro
             </label>
             <SelectPesquisavel
@@ -370,15 +370,15 @@ export default function FormRealizarEmprestimo() {
           </div>
 
           <div className="md:col-span-2">
-            <label className="text-base font-semibold text-[#1e582d] mb-2 block">
+            <label className="text-sm xl:text-base font-semibold text-[#1e582d] mb-1.5 xl:mb-2 block">
               Quantidade
             </label>
-            <div className="w-full h-12 bg-white border border-[#cde5d3] rounded-xl p-1 flex items-center justify-between focus-within:border-[#2e8b45] focus-within:ring-2 focus-within:ring-[#2e8b45]/20">
+            <div className="w-full h-10 xl:h-12 bg-white border border-[#cde5d3] rounded-xl p-1 flex items-center justify-between focus-within:border-[#2e8b45] focus-within:ring-2 focus-within:ring-[#2e8b45]/20">
               <button
                 type="button"
                 onClick={decrementar}
                 disabled={quantidade <= 1}
-                className="w-10 h-10 rounded-lg bg-[#eef7f0] text-[#1e582d] hover:bg-[#2e8b45] hover:text-white disabled:opacity-30 disabled:hover:bg-[#eef7f0] disabled:hover:text-[#1e582d] disabled:cursor-not-allowed transition-colors flex items-center justify-center font-bold text-lg cursor-pointer select-none"
+                className="w-8 h-8 xl:w-10 xl:h-10 rounded-lg bg-[#eef7f0] text-[#1e582d] hover:bg-[#2e8b45] hover:text-white disabled:opacity-30 disabled:hover:bg-[#eef7f0] disabled:hover:text-[#1e582d] disabled:cursor-not-allowed transition-colors flex items-center justify-center font-bold text-base xl:text-lg cursor-pointer select-none"
               >
                 −
               </button>
@@ -388,14 +388,14 @@ export default function FormRealizarEmprestimo() {
                 min={1}
                 value={quantidade}
                 onChange={(e) => alterarQuantidade(e.target.value)}
-                className="w-10 text-center font-bold text-base text-gray-900 tabular-nums outline-none bg-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                className="w-9 xl:w-10 text-center font-bold text-sm xl:text-base text-gray-900 tabular-nums outline-none bg-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               />
 
               <button
                 type="button"
                 onClick={incrementar}
                 disabled={!livroSelecionado || quantidade >= restante}
-                className="w-10 h-10 rounded-lg bg-[#eef7f0] text-[#1e582d] hover:bg-[#2e8b45] hover:text-white disabled:opacity-30 disabled:hover:bg-[#eef7f0] disabled:hover:text-[#1e582d] disabled:cursor-not-allowed transition-colors flex items-center justify-center font-bold text-lg cursor-pointer select-none"
+                className="w-8 h-8 xl:w-10 xl:h-10 rounded-lg bg-[#eef7f0] text-[#1e582d] hover:bg-[#2e8b45] hover:text-white disabled:opacity-30 disabled:hover:bg-[#eef7f0] disabled:hover:text-[#1e582d] disabled:cursor-not-allowed transition-colors flex items-center justify-center font-bold text-base xl:text-lg cursor-pointer select-none"
               >
                 +
               </button>
@@ -407,9 +407,9 @@ export default function FormRealizarEmprestimo() {
               type="button"
               onClick={adicionarLivro}
               disabled={!podeAdicionar}
-              className="w-full h-12 inline-flex items-center justify-center gap-2 whitespace-nowrap bg-[#2e8b45] hover:bg-[#236c35] text-white rounded-xl text-base font-semibold transition-all active:scale-95 cursor-pointer disabled:bg-[#9cc9a8] disabled:hover:bg-[#9cc9a8] disabled:active:scale-100 disabled:cursor-not-allowed"
+              className="w-full h-10 xl:h-12 px-3 inline-flex items-center justify-center gap-1.5 xl:gap-2 whitespace-nowrap bg-[#2e8b45] hover:bg-[#236c35] text-white rounded-xl text-sm xl:text-base font-semibold transition-all active:scale-95 cursor-pointer disabled:bg-[#9cc9a8] disabled:hover:bg-[#9cc9a8] disabled:active:scale-100 disabled:cursor-not-allowed"
             >
-              <MdAdd size={20} />
+              <MdAdd size={19} />
               Adicionar ao empréstimo
             </button>
           </div>
@@ -417,7 +417,7 @@ export default function FormRealizarEmprestimo() {
 
         {/* Saldo do livro escolhido e aviso de quantidade acima do saldo */}
         {livroSelecionado && (
-          <p className="mt-2.5 text-base text-[#245B2F]">
+          <p className="mt-2 text-xs xl:text-sm text-[#245B2F]">
             Saldo disponível:{" "}
             <span className="font-bold tabular-nums">{livroSelecionado.saldoDisponivel}</span>
             {jaAdicionado > 0 && (
@@ -432,7 +432,7 @@ export default function FormRealizarEmprestimo() {
         {avisoQuantidade && (
           <div
             role="alert"
-            className="mt-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3.5 text-base text-red-700"
+            className="mt-2.5 rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700"
           >
             {avisoQuantidade}
           </div>
@@ -440,34 +440,34 @@ export default function FormRealizarEmprestimo() {
       </div>
 
       {/* Livros selecionados */}
-      <div className="mt-6">
-        <p className="text-sm font-bold text-[#1e582d] mb-2">
+      <div className="mt-3.5 xl:mt-5 flex-1 min-h-[84px] flex flex-col">
+        <p className="text-xs xl:text-sm font-bold text-[#1e582d] mb-1.5 xl:mb-2 shrink-0">
           Livros selecionados ({itens.length})
         </p>
 
-        <div className="w-full bg-white border border-[#cde5d3] rounded-xl overflow-hidden">
+        <div className="w-full flex-1 min-h-0 bg-white border border-[#cde5d3] rounded-xl overflow-y-auto">
           {itens.length === 0 ? (
-            <p className="px-4 py-7 text-center text-base text-gray-500">
+            <div className="h-full min-h-[68px] px-4 py-4 flex items-center justify-center text-center text-sm xl:text-base text-gray-500">
               Nenhum livro adicionado ao empréstimo ainda.
-            </p>
+            </div>
           ) : (
             <ul className="divide-y divide-[#e6f0e8]">
               {itens.map((item) => (
                 <li
                   key={item.livroId}
-                  className="flex items-center justify-between gap-4 px-5 py-3.5 hover:bg-[#f7fbf8] transition-colors"
+                  className="flex items-center justify-between gap-4 px-4 xl:px-5 py-2.5 xl:py-3 hover:bg-[#f7fbf8] transition-colors"
                 >
                   <div className="min-w-0">
-                    <p className="text-base font-semibold text-gray-900 truncate">
+                    <p className="text-sm xl:text-base font-semibold text-gray-900 truncate">
                       {item.titulo}
                     </p>
-                    <p className="text-sm text-gray-600 truncate">
+                    <p className="text-xs xl:text-sm text-gray-600 truncate">
                       Editora: {item.editora}
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-4 shrink-0">
-                    <span className="px-3 py-1 rounded-lg bg-[#eef7f0] border border-[#cde5d4] text-sm font-bold text-[#1e582d] tabular-nums">
+                  <div className="flex items-center gap-3 xl:gap-4 shrink-0">
+                    <span className="px-2.5 xl:px-3 py-1 rounded-lg bg-[#eef7f0] border border-[#cde5d4] text-xs xl:text-sm font-bold text-[#1e582d] tabular-nums">
                       {item.quantidade} {item.quantidade === 1 ? "exemplar" : "exemplares"}
                     </span>
 
@@ -476,9 +476,9 @@ export default function FormRealizarEmprestimo() {
                       onClick={() => removerLivro(item.livroId)}
                       aria-label={`Remover ${item.titulo}`}
                       title="Remover livro da lista"
-                      className="w-9 h-9 rounded-lg text-[#cf4a4a] hover:bg-red-50 transition-colors flex items-center justify-center cursor-pointer"
+                      className="w-8 h-8 xl:w-9 xl:h-9 rounded-lg text-[#cf4a4a] hover:bg-red-50 transition-colors flex items-center justify-center cursor-pointer"
                     >
-                      <MdDelete size={20} />
+                      <MdDelete size={19} />
                     </button>
                   </div>
                 </li>
@@ -491,19 +491,19 @@ export default function FormRealizarEmprestimo() {
       {erroEnvio && (
         <div
           role="alert"
-          className="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3.5 text-base text-red-700"
+          className="mt-3 rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700 shrink-0"
         >
           {erroEnvio}
         </div>
       )}
 
       {/* Ações */}
-      <div className="flex justify-end items-center gap-3 mt-7">
+      <div className="flex justify-end items-center gap-3 mt-4 xl:mt-5 shrink-0">
         <button
           type="button"
           onClick={tentarCancelar}
           disabled={salvando}
-          className="h-11 inline-flex items-center justify-center gap-2 px-6 rounded-xl text-base font-semibold text-white bg-[#cf4a4a] hover:bg-[#b83a3a] transition-colors shadow-xs active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          className="h-10 xl:h-11 inline-flex items-center justify-center gap-2 px-5 xl:px-6 rounded-xl text-sm xl:text-base font-semibold text-white bg-[#cf4a4a] hover:bg-[#b83a3a] transition-colors shadow-xs active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <MdClear size={19} />
           Cancelar
@@ -512,7 +512,7 @@ export default function FormRealizarEmprestimo() {
         <button
           type="submit"
           disabled={!podeConfirmar || salvando}
-          className="h-11 inline-flex items-center justify-center gap-2 bg-[#2e8b45] hover:bg-[#236c35] text-white px-7 rounded-xl text-base font-semibold transition-all shadow-sm active:scale-95 cursor-pointer disabled:bg-[#9cc9a8] disabled:hover:bg-[#9cc9a8] disabled:active:scale-100 disabled:cursor-not-allowed"
+          className="h-10 xl:h-11 inline-flex items-center justify-center gap-2 bg-[#2e8b45] hover:bg-[#236c35] text-white px-6 xl:px-7 rounded-xl text-sm xl:text-base font-semibold transition-all shadow-sm active:scale-95 cursor-pointer disabled:bg-[#9cc9a8] disabled:hover:bg-[#9cc9a8] disabled:active:scale-100 disabled:cursor-not-allowed"
         >
           <MdCheck size={19} />
           {salvando ? "Confirmando..." : "Confirmar empréstimo"}

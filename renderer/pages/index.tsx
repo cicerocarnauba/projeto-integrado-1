@@ -62,7 +62,9 @@ export default function Home() {
     }, 480);
   };
 
-  const larguraSidebarTransicao = sidebarRecolhida ? "w-20" : "w-[304px]";
+  const larguraSidebarTransicao = sidebarRecolhida
+    ? "w-[72px] xl:w-20"
+    : "w-[256px] xl:w-[284px] 2xl:w-[304px]";
 
   return (
     <>

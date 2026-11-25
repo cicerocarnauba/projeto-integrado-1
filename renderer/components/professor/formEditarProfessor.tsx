@@ -110,7 +110,7 @@ export default function FormEditarProfessor({
     <form
       onSubmit={salvar}
       noValidate
-      className="w-full bg-[#eef7f0] border border-[#cfe5d4] rounded-2xl p-8 shadow-xs"
+      className="w-full bg-[#eef7f0] border border-[#cfe5d4] rounded-2xl p-5 sm:p-6 xl:p-8 shadow-xs"
     >
       {erro && (
         <div

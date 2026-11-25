@@ -21,13 +21,13 @@ export default function DesativarButton({
       onClick={disabled ? undefined : onClick}
       disabled={disabled}
       title={title || defaultTitle}
-      className={`inline-flex items-center justify-center gap-1.5 w-[98px] h-8 text-sm rounded-lg font-semibold transition-colors shrink-0 ${
+      className={`inline-flex items-center justify-center gap-1 xl:gap-1.5 w-[88px] xl:w-[96px] 2xl:w-[98px] h-8 text-xs xl:text-sm rounded-lg font-semibold transition-colors shrink-0 ${
         disabled
           ? "bg-gray-200 text-gray-400 cursor-not-allowed"
           : "bg-[#cf4a4a] text-white hover:bg-[#b83a3a] cursor-pointer"
       }`}
     >
-      <MdRemoveCircleOutline size={16} />
+      <MdRemoveCircleOutline size={15} />
       Desativar
     </button>
   );

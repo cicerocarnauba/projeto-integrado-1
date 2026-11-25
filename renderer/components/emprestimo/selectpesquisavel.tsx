@@ -153,7 +153,7 @@ export default function SelectPesquisavel({
         }}
         onKeyDown={aoPressionarTecla}
         // pr-10 reserva o espaço da seta: o texto nunca passa por baixo dela
-        className="w-full h-12 bg-white border border-[#cde5d3] rounded-xl pl-4 pr-10 text-base text-gray-900 placeholder:text-gray-400 truncate outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20 disabled:opacity-60 disabled:cursor-not-allowed"
+        className="w-full h-10 xl:h-12 bg-white border border-[#cde5d3] rounded-xl pl-3.5 xl:pl-4 pr-10 text-sm xl:text-base text-gray-900 placeholder:text-gray-400 truncate outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20 disabled:opacity-60 disabled:cursor-not-allowed"
       />
 
       {/* Seta sempre à mesma distância da borda direita, em todos os campos */}

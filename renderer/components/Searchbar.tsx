@@ -37,16 +37,16 @@ export default function SearchBar({
   return (
     <div className="flex flex-col flex-1 min-w-0">
       {/* Linha da barra de busca e botão de ordenar */}
-      <div className="flex items-center gap-3 w-full">
+      <div className="flex items-center gap-2.5 xl:gap-3 w-full">
         {/* Campo de Busca */}
-        <div className="flex-1 h-11 bg-white border border-[#cde5d4] rounded-xl px-4 flex items-center gap-3 shadow-xs transition-all focus-within:border-[#2e8b45] focus-within:ring-2 focus-within:ring-[#2e8b45]/15">
-          <MdSearch size={22} className="text-[#2e8b45] shrink-0" />
+        <div className="flex-1 min-w-0 h-10 xl:h-11 bg-white border border-[#cde5d4] rounded-xl px-3.5 xl:px-4 flex items-center gap-2.5 xl:gap-3 shadow-xs transition-all focus-within:border-[#2e8b45] focus-within:ring-2 focus-within:ring-[#2e8b45]/15">
+          <MdSearch size={20} className="text-[#2e8b45] shrink-0" />
           <input
             type="text"
             placeholder={placeholder}
             value={valorBusca}
             onChange={(e) => onChangeBusca?.(e.target.value)}
-            className="bg-transparent placeholder:text-gray-400 text-gray-900 outline-none w-full text-base"
+            className="bg-transparent placeholder:text-gray-400 text-gray-900 outline-none w-full min-w-0 text-sm xl:text-base"
           />
           {valorBusca && valorBusca.length > 0 && (
             <button
@@ -67,10 +67,10 @@ export default function SearchBar({
             <button
               type="button"
               onClick={() => setDropdownAberto(!dropdownAberto)}
-              className="h-11 px-5 flex items-center gap-2 rounded-xl font-semibold text-base transition-all shadow-xs hover:shadow-sm cursor-pointer shrink-0 border border-[#cde5d4] bg-white hover:bg-[#2e8b45] hover:border-[#2e8b45] text-[#1e582d] hover:text-white group active:scale-95"
+              className="h-10 xl:h-11 px-3.5 xl:px-5 flex items-center gap-1.5 xl:gap-2 rounded-xl font-semibold text-sm xl:text-base transition-all shadow-xs hover:shadow-sm cursor-pointer shrink-0 border border-[#cde5d4] bg-white hover:bg-[#2e8b45] hover:border-[#2e8b45] text-[#1e582d] hover:text-white group active:scale-95"
             >
               <MdSort
-                size={20}
+                size={19}
                 className="text-[#2e8b45] group-hover:text-white transition-colors"
               />
               <span>Ordenar</span>

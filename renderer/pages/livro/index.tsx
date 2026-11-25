@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import PageShell from "../../components/PageShell";
 import EstadoLista from "../../components/EstadoLista";
@@ -33,7 +33,13 @@ export default function GerenciarLivros() {
   const [ordenacao, setOrdenacao] = useState<TipoOrdenacao>("alfabetica");
 
   const [paginaAtual, setPaginaAtual] = useState(1);
-  const itensPorPagina = useItensPorPagina();
+  const containerListaRef = useRef<HTMLDivElement>(null);
+  const itensPorPagina = useItensPorPagina({
+    containerRef: containerListaRef,
+    alturaLinha: 54,
+    alturaLinhaCompacta: 55,
+    breakpointCompacto: 1280,
+  });
 
   const [excluindo, setExcluindo] = useState(false);
   const [recarregar, setRecarregar] = useState(0);
@@ -226,7 +232,7 @@ export default function GerenciarLivros() {
       />
 
       {/* Barra de busca e botão de adicionar */}
-      <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4 mb-3.5 w-full">
+      <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 sm:gap-3.5 mb-2.5 xl:mb-3.5 w-full shrink-0">
         <SearchBar
           placeholder="Pesquisar livro por título ou editora..."
           valorBusca={termoBusca}
@@ -237,7 +243,7 @@ export default function GerenciarLivros() {
 
         <Link
           href="/livro/cadastro_livro"
-          className="h-11 px-5 sm:px-6 inline-flex items-center justify-center bg-[#2e8b45] text-white rounded-xl font-semibold text-base hover:bg-[#236c35] transition-all whitespace-nowrap gap-2 shadow-sm cursor-pointer shrink-0 active:scale-95"
+          className="h-10 xl:h-11 px-4 sm:px-5 xl:px-6 inline-flex items-center justify-center bg-[#2e8b45] text-white rounded-xl font-semibold text-sm xl:text-base hover:bg-[#236c35] transition-all whitespace-nowrap gap-2 shadow-sm cursor-pointer shrink-0 active:scale-95"
         >
           <MdAdd size={20} />
           Adicionar livro
@@ -245,20 +251,21 @@ export default function GerenciarLivros() {
       </div>
 
       {/* Lista de livros ou mensagens de estado */}
-      {carregando ? (
-        <EstadoLista mensagem="Carregando livros..." />
-      ) : livrosExibidos.length === 0 ? (
-        <EstadoLista
-          mensagem={
-            termoBusca.trim()
-              ? `Nenhum livro ${abaAtiva === "ATIVO" ? "ativo" : "inativo"} encontrado para "${termoBusca}".`
-              : `Nenhum livro ${abaAtiva === "ATIVO" ? "ativo" : "inativo"} cadastrado.`
-          }
-        />
-      ) : (
+      <div ref={containerListaRef} className="flex-1 min-h-0 flex flex-col">
+        {carregando ? (
+          <EstadoLista mensagem="Carregando livros..." />
+        ) : livrosExibidos.length === 0 ? (
+          <EstadoLista
+            mensagem={
+              termoBusca.trim()
+                ? `Nenhum livro ${abaAtiva === "ATIVO" ? "ativo" : "inativo"} encontrado para "${termoBusca}".`
+                : `Nenhum livro ${abaAtiva === "ATIVO" ? "ativo" : "inativo"} cadastrado.`
+            }
+          />
+        ) : (
           <div
             key={`${abaAtiva}-${ordenacao}-${paginaAtual}`}
-            className="animate-fade-in duration-300"
+            className="animate-fade-in duration-300 flex flex-col min-h-0"
           >
             <ListaLivro
               livros={livrosPaginados}
@@ -279,6 +286,7 @@ export default function GerenciarLivros() {
             />
           </div>
         )}
+      </div>
 
         <ModalExcluir
           aberto={livroParaExcluir !== null}

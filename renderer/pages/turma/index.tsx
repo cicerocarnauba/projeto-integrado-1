@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useRouter } from "next/router";
 
@@ -70,7 +70,13 @@ export default function GerenciarTurmas() {
   }, [router.isReady, router.query.sucesso]);
 
   const [paginaAtual, setPaginaAtual] = useState(1);
-  const itensPorPagina = useItensPorPagina();
+  const containerListaRef = useRef<HTMLDivElement>(null);
+  const itensPorPagina = useItensPorPagina({
+    containerRef: containerListaRef,
+    alturaLinha: 54,
+    alturaLinhaCompacta: 50,
+    breakpointCompacto: 1280,
+  });
 
   useEffect(() => {
     setPaginaAtual(1);
@@ -217,7 +223,7 @@ export default function GerenciarTurmas() {
       />
 
       {/* Barra de busca e botão de adicionar */}
-      <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4 mb-3.5 w-full">
+      <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 sm:gap-3.5 mb-2.5 xl:mb-3.5 w-full shrink-0">
         <SearchBar
           placeholder="Pesquisar turmas por nome..."
           valorBusca={termoBusca}
@@ -228,7 +234,7 @@ export default function GerenciarTurmas() {
 
         <Link
           href="/turma/cadastro_turma"
-          className="h-11 px-5 sm:px-6 inline-flex items-center justify-center bg-[#2e8b45] text-white rounded-xl font-semibold text-base hover:bg-[#236c35] transition-all whitespace-nowrap gap-2 shadow-sm cursor-pointer shrink-0 active:scale-95"
+          className="h-10 xl:h-11 px-4 sm:px-5 xl:px-6 inline-flex items-center justify-center bg-[#2e8b45] text-white rounded-xl font-semibold text-sm xl:text-base hover:bg-[#236c35] transition-all whitespace-nowrap gap-2 shadow-sm cursor-pointer shrink-0 active:scale-95"
         >
           <MdAdd size={20} />
           Adicionar turma
@@ -251,20 +257,21 @@ export default function GerenciarTurmas() {
         />
       )}
 
-      {carregada ? (
-        <EstadoLista mensagem="Carregando turmas..." />
-      ) : turmasExibidas.length === 0 ? (
-        <EstadoLista
-          mensagem={
-            termoBusca.trim()
-              ? `Nenhuma turma ${abaAtiva === "ATIVO" ? "ativa" : "inativa"} encontrada para "${termoBusca}".`
-              : `Nenhuma turma ${abaAtiva === "ATIVO" ? "ativa" : "inativa"} cadastrada.`
-          }
-        />
-      ) : (
+      <div ref={containerListaRef} className="flex-1 min-h-0 flex flex-col">
+        {carregada ? (
+          <EstadoLista mensagem="Carregando turmas..." />
+        ) : turmasExibidas.length === 0 ? (
+          <EstadoLista
+            mensagem={
+              termoBusca.trim()
+                ? `Nenhuma turma ${abaAtiva === "ATIVO" ? "ativa" : "inativa"} encontrada para "${termoBusca}".`
+                : `Nenhuma turma ${abaAtiva === "ATIVO" ? "ativa" : "inativa"} cadastrada.`
+            }
+          />
+        ) : (
           <div
             key={`${abaAtiva}-${ordenacao}-${paginaAtual}`}
-            className="animate-fade-in duration-300"
+            className="animate-fade-in duration-300 flex flex-col min-h-0"
           >
             <ListaTurma
               turmas={turmasPaginadas}
@@ -290,6 +297,7 @@ export default function GerenciarTurmas() {
             />
           </div>
         )}
+      </div>
 
         <ModalExcluir
           aberto={turmaParaExcluir !== null}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import Sidebar from "../../components/Sidebar";
+import PageShell from "../../components/PageShell";
 import FormEditarLivro from "../../components/livro/formEditarLivro";
 import { Livro } from "../../types/livro";
 import { MdArrowBack } from "react-icons/md";
@@ -64,46 +64,38 @@ export default function EditarLivro() {
   const inativo = livro !== null && livro.status !== "ATIVO";
 
   return (
-    <div className="flex min-h-screen bg-[#f8fbf9]">
-      <Sidebar />
-
-      <main className="flex-1 min-w-0 px-8 lg:px-10 py-7 flex flex-col animate-fade-in">
-        <div className="w-full max-w-5xl">
-          <div className="flex items-center justify-between gap-4 mb-6">
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">
-              Editar detalhes do livro
-            </h1>
-
-            <button
-              type="button"
-              onClick={() => router.push("/livro")}
-              className="h-11 px-5 inline-flex items-center justify-center gap-2 bg-[#2e8b45] text-white rounded-xl text-base font-semibold hover:bg-[#236c35] transition-all shadow-sm cursor-pointer shrink-0 active:scale-95"
-            >
-              <MdArrowBack size={19} />
-              Voltar
-            </button>
+    <PageShell
+      titulo="Editar detalhes do livro"
+      maxWidthClass="w-full max-w-5xl"
+      acaoTopo={
+        <button
+          type="button"
+          onClick={() => router.push("/livro")}
+          className="h-10 xl:h-11 px-4 xl:px-5 inline-flex items-center justify-center gap-2 bg-[#2e8b45] text-white rounded-xl text-sm xl:text-base font-semibold hover:bg-[#236c35] transition-all shadow-sm cursor-pointer shrink-0 active:scale-95"
+        >
+          <MdArrowBack size={19} />
+          Voltar
+        </button>
+      }
+    >
+      <div>
+        {carregando ? (
+          <div className="w-full bg-white border border-[#cfe5d4] rounded-2xl p-10 text-center text-[#1e582d] shadow-xs">
+            <p className="text-base font-medium">Carregando livro...</p>
           </div>
-
-          <div>
-            {carregando ? (
-              <div className="w-full bg-white border border-[#cfe5d4] rounded-2xl p-12 text-center text-[#1e582d] shadow-xs">
-                <p className="text-base font-medium">Carregando livro...</p>
-              </div>
-            ) : erro ? (
-              <div className="w-full rounded-xl border border-red-200 bg-red-50 px-4 py-3.5 text-base text-red-700">
-                {erro}
-              </div>
-            ) : inativo ? (
-              <div className="w-full rounded-xl border border-red-200 bg-red-50 px-4 py-3.5 text-base text-red-700">
-                Apenas livros com status &quot;Ativo&quot; podem ser editados. Reative o
-                livro antes de editar.
-              </div>
-            ) : (
-              livro && <FormEditarLivro key={livro.id} livro={livro} />
-            )}
+        ) : erro ? (
+          <div className="w-full rounded-xl border border-red-200 bg-red-50 px-4 py-3.5 text-base text-red-700">
+            {erro}
           </div>
-        </div>
-      </main>
-    </div>
+        ) : inativo ? (
+          <div className="w-full rounded-xl border border-red-200 bg-red-50 px-4 py-3.5 text-base text-red-700">
+            Apenas livros com status &quot;Ativo&quot; podem ser editados. Reative o
+            livro antes de editar.
+          </div>
+        ) : (
+          livro && <FormEditarLivro key={livro.id} livro={livro} />
+        )}
+      </div>
+    </PageShell>
   );
 }
