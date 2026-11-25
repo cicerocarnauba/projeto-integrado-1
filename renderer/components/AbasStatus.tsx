@@ -20,7 +20,7 @@ export default function AbasStatus({
   totalInativos,
 }: AbasStatusProps) {
   const abaClass = (ativa: boolean) =>
-    `pb-2.5 px-1 text-base font-semibold border-b-[3px] transition-colors cursor-pointer inline-flex items-center gap-2 whitespace-nowrap ${
+    `pb-2 xl:pb-2.5 px-1 text-sm xl:text-base font-semibold border-b-[3px] transition-colors cursor-pointer inline-flex items-center gap-2 whitespace-nowrap ${
       ativa
         ? "text-[#1e582d] border-[#2e8b45]"
         : "text-gray-500 border-transparent hover:text-gray-800 hover:border-[#cde5d4]"
@@ -30,7 +30,7 @@ export default function AbasStatus({
     <div
       role="tablist"
       aria-label="Filtrar por status"
-      className="flex flex-wrap gap-8 border-b border-[#D3E8D6] mb-3.5 w-full"
+      className="flex flex-wrap gap-5 sm:gap-7 xl:gap-8 border-b border-[#D3E8D6] mb-2.5 xl:mb-3.5 w-full shrink-0"
     >
       {/* Aba Ativos */}
       <button
