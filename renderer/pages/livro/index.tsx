@@ -253,9 +253,11 @@ export default function GerenciarLivros() {
       {/* Lista de livros ou mensagens de estado */}
       <div ref={containerListaRef} className="flex-1 min-h-0 flex flex-col">
         {carregando ? (
-          <EstadoLista mensagem="Carregando livros..." />
+          <EstadoLista carregando mensagem="Carregando livros..." />
         ) : livrosExibidos.length === 0 ? (
           <EstadoLista
+            termoBusca={termoBusca}
+            onLimparBusca={() => setTermoBusca("")}
             mensagem={
               termoBusca.trim()
                 ? `Nenhum livro ${abaAtiva === "ATIVO" ? "ativo" : "inativo"} encontrado para "${termoBusca}".`

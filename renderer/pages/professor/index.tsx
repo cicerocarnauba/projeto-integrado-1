@@ -316,9 +316,11 @@ export default function GerenciarProfessores() {
 
       <div ref={containerListaRef} className="flex-1 min-h-0 flex flex-col">
         {carregado ? (
-          <EstadoLista mensagem="Carregando professores..." />
+          <EstadoLista carregando mensagem="Carregando professores..." />
         ) : professoresExibidos.length === 0 ? (
           <EstadoLista
+            termoBusca={termoBusca}
+            onLimparBusca={() => setTermoBusca("")}
             mensagem={
               termoBusca.trim()
                 ? `Nenhum professor ${abaAtiva === "ATIVO" ? "ativo" : "inativo"} encontrado para "${termoBusca}".`

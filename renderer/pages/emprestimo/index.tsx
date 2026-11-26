@@ -353,9 +353,11 @@ const filtradosPorAba = emprestimosAgrupados
 
       <div ref={containerListaRef} className="flex-1 min-h-0 flex flex-col">
         {carregando ? (
-          <EstadoLista mensagem="Carregando empréstimos..." />
+          <EstadoLista carregando mensagem="Carregando empréstimos..." />
         ) : emprestimosExibidos.length === 0 ? (
           <EstadoLista
+            termoBusca={termoBusca}
+            onLimparBusca={() => setTermoBusca("")}
             mensagem={
               termoBusca.trim()
                 ? `Nenhum empréstimo ${nomeAba} encontrado para "${termoBusca}".`

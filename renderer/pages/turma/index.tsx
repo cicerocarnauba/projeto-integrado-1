@@ -259,9 +259,11 @@ export default function GerenciarTurmas() {
 
       <div ref={containerListaRef} className="flex-1 min-h-0 flex flex-col">
         {carregada ? (
-          <EstadoLista mensagem="Carregando turmas..." />
+          <EstadoLista carregando mensagem="Carregando turmas..." />
         ) : turmasExibidas.length === 0 ? (
           <EstadoLista
+            termoBusca={termoBusca}
+            onLimparBusca={() => setTermoBusca("")}
             mensagem={
               termoBusca.trim()
                 ? `Nenhuma turma ${abaAtiva === "ATIVO" ? "ativa" : "inativa"} encontrada para "${termoBusca}".`

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import PageShell from "../../components/PageShell";
+import EstadoLista from "../../components/EstadoLista";
 import FormEditarTurma from "../../components/turma/formEditarTurma";
 import { Turma } from "../../types/turma";
 import { MdArrowBack } from "react-icons/md";
@@ -74,9 +75,7 @@ export default function EditarTurma() {
     >
       <div>
         {carregando ? (
-          <div className="w-full bg-white border border-[#cfe5d4] rounded-2xl p-10 text-center text-[#1e582d] shadow-xs">
-            <p className="text-base font-medium">Carregando turma...</p>
-          </div>
+          <EstadoLista carregando mensagem="Carregando turma..." />
         ) : erro ? (
           <div className="w-full rounded-xl border border-red-200 bg-red-50 px-4 py-3.5 text-base text-red-700">
             {erro}

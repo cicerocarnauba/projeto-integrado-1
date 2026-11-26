@@ -433,6 +433,8 @@ export default function DetalhesEmprestimo() {
           <div ref={setContainerListaEl} className="flex-1 min-h-0 flex flex-col">
             {itensExibidos.length === 0 ? (
               <EstadoLista
+                termoBusca={termoBusca}
+                onLimparBusca={() => setTermoBusca("")}
                 mensagem={
                   termoBusca.trim()
                     ? `Nenhum livro encontrado para "${termoBusca}".`
