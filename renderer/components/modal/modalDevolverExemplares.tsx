@@ -22,16 +22,25 @@ export default function ModalDevolverExemplares({
   onConfirmar,
 }: ModalDevolverExemplaresProps) {
   // O campo guarda texto para permitir apagar e digitar livremente
-  const [valor, setValor] = useState("0");
+  const [valor, setValor] = useState("1");
   // Só mostra erro depois que a pessoa mexe no campo
   const [tocou, setTocou] = useState(false);
 
   useEffect(() => {
     if (aberto) {
-      setValor("0");
+      setValor("1");
       setTocou(false);
     }
   }, [aberto, item?.id]);
+
+  useEffect(() => {
+    if (!aberto || salvando) return;
+    function aoPressionarTecla(e: KeyboardEvent) {
+      if (e.key === "Escape") onCancelar();
+    }
+    document.addEventListener("keydown", aoPressionarTecla);
+    return () => document.removeEventListener("keydown", aoPressionarTecla);
+  }, [aberto, salvando, onCancelar]);
 
   if (!aberto || !item) {
     return null;
@@ -74,7 +83,7 @@ export default function ModalDevolverExemplares({
 
   function decrementar() {
     setTocou(true);
-    setValor(String(Math.max(0, baseContador - 1)));
+    setValor(String(Math.max(1, baseContador - 1)));
   }
 
   function confirmar() {
@@ -138,15 +147,31 @@ export default function ModalDevolverExemplares({
           </div>
         </div>
 
-        <label className="block mt-5 mb-2 text-base font-semibold text-[#1e582d]">
-          Quantidade de exemplares que serão devolvidos
-        </label>
+        <div className="flex items-center justify-between gap-2 mt-5 mb-2">
+          <label className="text-sm sm:text-base font-semibold text-[#1e582d]">
+            Quantidade a devolver
+          </label>
+
+          {pendente > 1 && (
+            <button
+              type="button"
+              disabled={salvando || baseContador === pendente}
+              onClick={() => {
+                setTocou(true);
+                setValor(String(pendente));
+              }}
+              className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#eef7f0] text-[#1e582d] border border-[#cde5d4] hover:bg-[#dff0e3] hover:border-[#2e8b45] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-default tabular-nums shrink-0"
+            >
+              Tudo ({pendente})
+            </button>
+          )}
+        </div>
 
         <div className="w-full h-12 bg-white border border-[#cde5d3] rounded-xl p-1 flex items-center justify-between focus-within:border-[#2e8b45] focus-within:ring-2 focus-within:ring-[#2e8b45]/20">
           <button
             type="button"
             onClick={decrementar}
-            disabled={baseContador <= 0 || salvando}
+            disabled={baseContador <= 1 || salvando}
             aria-label="Diminuir quantidade"
             className={btnContador}
           >
@@ -155,11 +180,17 @@ export default function ModalDevolverExemplares({
 
           <input
             type="number"
-            min={0}
+            min={1}
             max={pendente}
             value={valor}
             disabled={salvando}
             onChange={(e) => alterar(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                confirmar();
+              }
+            }}
             className="flex-1 text-center font-bold text-base text-gray-900 tabular-nums outline-none bg-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
           />
 

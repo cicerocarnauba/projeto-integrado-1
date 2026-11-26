@@ -1,5 +1,5 @@
 import { MdDelete, MdClear } from "react-icons/md";
-import React from "react";
+import React, { useEffect } from "react";
 
 interface ModalExcluirProps {
   aberto: boolean;
@@ -16,6 +16,15 @@ export default function ModalExcluir({
   onConfirmar,
   onCancelar,
 }: ModalExcluirProps) {
+  useEffect(() => {
+    if (!aberto) return;
+    function aoPressionarTecla(e: KeyboardEvent) {
+      if (e.key === "Escape") onCancelar();
+    }
+    document.addEventListener("keydown", aoPressionarTecla);
+    return () => document.removeEventListener("keydown", aoPressionarTecla);
+  }, [aberto, onCancelar]);
+
   if (!aberto) {
     return null;
   }

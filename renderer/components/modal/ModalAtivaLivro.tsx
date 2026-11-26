@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MdCheck, MdClear } from "react-icons/md";
 import { Livro } from "../../types/livro";
 
@@ -22,15 +22,31 @@ export default function ModalAtivarLivro({
   onConfirmar,
   onCancelar,
 }: ModalAtivarLivroProps) {
+  const [quantidade, setQuantidade] = useState("");
+  const [erroLocal, setErroLocal] = useState("");
+
+  useEffect(() => {
+    if (livro) {
+      setQuantidade("");
+      setErroLocal("");
+    }
+  }, [livro?.id]);
+
+  useEffect(() => {
+    if (!livro || carregando) return;
+    function aoPressionarTecla(e: KeyboardEvent) {
+      if (e.key === "Escape") onCancelar();
+    }
+    document.addEventListener("keydown", aoPressionarTecla);
+    return () => document.removeEventListener("keydown", aoPressionarTecla);
+  }, [livro, carregando, onCancelar]);
+
   if (!livro) return null;
 
   // A quantidade total não pode ficar abaixo do que já está emprestado
   // e nunca pode ser menor que 1.
   const emprestados = livro.quantidadeEmprestada ?? 0;
   const minimo = Math.max(1, emprestados);
-
-  const [quantidade, setQuantidade] = useState("");
-  const [erroLocal, setErroLocal] = useState("");
 
   function validar(): number | null {
     if (quantidade.trim() === "") {

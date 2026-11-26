@@ -1,5 +1,5 @@
 import { MdRemoveCircleOutline, MdClear, MdWarningAmber } from "react-icons/md";
-import React from "react";
+import React, { useEffect } from "react";
 
 interface ModalDesativarProps {
   aberto: boolean;
@@ -18,6 +18,15 @@ export default function ModalDesativar({
   onConfirmar,
   onCancelar,
 }: ModalDesativarProps) {
+  useEffect(() => {
+    if (!aberto) return;
+    function aoPressionarTecla(e: KeyboardEvent) {
+      if (e.key === "Escape") onCancelar();
+    }
+    document.addEventListener("keydown", aoPressionarTecla);
+    return () => document.removeEventListener("keydown", aoPressionarTecla);
+  }, [aberto, onCancelar]);
+
   if (!aberto) {
     return null;
   }

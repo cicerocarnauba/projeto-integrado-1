@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { MdClear, MdUndo } from "react-icons/md";
 
 interface ModalDevolverTodosProps {
@@ -15,6 +16,15 @@ export default function ModalDevolverTodos({
   onCancelar,
   onConfirmar,
 }: ModalDevolverTodosProps) {
+  useEffect(() => {
+    if (!aberto || salvando) return;
+    function aoPressionarTecla(e: KeyboardEvent) {
+      if (e.key === "Escape") onCancelar();
+    }
+    document.addEventListener("keydown", aoPressionarTecla);
+    return () => document.removeEventListener("keydown", aoPressionarTecla);
+  }, [aberto, salvando, onCancelar]);
+
   if (!aberto) return null;
 
   return (

@@ -1,5 +1,5 @@
 import { MdCheck, MdClear, MdWarningAmber } from "react-icons/md";
-import React from "react";
+import React, { useEffect } from "react";
 
 interface ModalEditarProps {
   aberto: boolean;
@@ -18,6 +18,15 @@ export default function ModalEditar({
   onConfirmar,
   onCancelar,
 }: ModalEditarProps) {
+  useEffect(() => {
+    if (!aberto) return;
+    function aoPressionarTecla(e: KeyboardEvent) {
+      if (e.key === "Escape") onCancelar();
+    }
+    document.addEventListener("keydown", aoPressionarTecla);
+    return () => document.removeEventListener("keydown", aoPressionarTecla);
+  }, [aberto, onCancelar]);
+
   if (!aberto) {
     return null;
   }
