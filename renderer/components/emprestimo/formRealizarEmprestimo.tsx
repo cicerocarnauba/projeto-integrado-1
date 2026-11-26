@@ -261,7 +261,7 @@ export default function FormRealizarEmprestimo() {
     <form
       noValidate
       onSubmit={abrirModalRealizar}
-      className="w-full flex-1 min-h-0 flex flex-col bg-[#eef7f0] border border-[#cfe5d4] rounded-2xl p-4 sm:p-5 xl:p-7 shadow-xs"
+      className="w-full min-h-0 flex flex-col bg-[#eef7f0] border border-[#cfe5d4] rounded-2xl p-4 sm:p-5 xl:p-7 shadow-xs"
     >
       {erro && (
         <div
@@ -440,14 +440,14 @@ export default function FormRealizarEmprestimo() {
       </div>
 
       {/* Livros selecionados */}
-      <div className="mt-3.5 xl:mt-5 flex-1 min-h-[84px] flex flex-col">
+      <div className="mt-3.5 xl:mt-5 min-h-[84px] flex flex-col">
         <p className="text-xs xl:text-sm font-bold text-[#1e582d] mb-1.5 xl:mb-2 shrink-0">
           Livros selecionados ({itens.length})
         </p>
 
-        <div className="w-full flex-1 min-h-0 bg-white border border-[#cde5d3] rounded-xl overflow-y-auto">
+        <div className="w-full min-h-0 bg-white border border-[#cde5d3] rounded-xl overflow-y-auto">
           {itens.length === 0 ? (
-            <div className="h-full min-h-[68px] px-4 py-4 flex items-center justify-center text-center text-sm xl:text-base text-gray-500">
+            <div className="px-4 py-5 xl:py-6 flex items-center justify-center text-center text-sm xl:text-base text-gray-500">
               Nenhum livro adicionado ao empréstimo ainda.
             </div>
           ) : (

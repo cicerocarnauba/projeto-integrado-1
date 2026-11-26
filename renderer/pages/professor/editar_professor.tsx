@@ -52,7 +52,6 @@ export default function EditarProfessor() {
   return (
     <PageShell
       titulo="Editar informações do professor"
-      maxWidthClass="w-full max-w-5xl"
       acaoTopo={
         <button
           type="button"

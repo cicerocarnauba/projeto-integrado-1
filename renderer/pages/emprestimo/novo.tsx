@@ -10,7 +10,6 @@ export default function RealizarEmprestimo() {
   return (
     <PageShell
       titulo="Realizar empréstimo"
-      maxWidthClass="w-full max-w-5xl"
       acaoTopo={
         <button
           type="button"

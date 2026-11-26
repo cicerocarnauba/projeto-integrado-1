@@ -66,7 +66,6 @@ export default function EditarLivro() {
   return (
     <PageShell
       titulo="Editar detalhes do livro"
-      maxWidthClass="w-full max-w-5xl"
       acaoTopo={
         <button
           type="button"

@@ -7,7 +7,6 @@ export default function CadastrarTurmaPage() {
   return (
     <PageShell
       titulo="Adicionar turma"
-      maxWidthClass="w-full max-w-5xl"
       acaoTopo={
         <Link
           href="/turma"

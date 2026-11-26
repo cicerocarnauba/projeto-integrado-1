@@ -7,7 +7,6 @@ export default function CadastrarProfessorPage() {
   return (
     <PageShell
       titulo="Adicionar professor"
-      maxWidthClass="w-full max-w-5xl"
       acaoTopo={
         <Link
           href="/professor"

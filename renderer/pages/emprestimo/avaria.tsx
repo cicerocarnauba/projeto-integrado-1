@@ -24,7 +24,7 @@ function Contador({ rotulo, valor, max, desabilitado, onChange }: ContadorProps)
     "h-9 w-9 xl:h-10 xl:w-10 inline-flex items-center justify-center rounded-lg bg-[#eef7f0] text-[#1e582d] font-bold transition-all cursor-pointer hover:bg-[#d8f3dc] active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#eef7f0]";
 
   return (
-    <div className="flex-1 min-w-[220px] max-w-[420px]">
+    <div className="flex-1 min-w-[220px]">
       <span className="block text-sm xl:text-base font-semibold text-gray-800 mb-1.5 xl:mb-2">
         {rotulo}
       </span>
@@ -218,7 +218,7 @@ export default function RegistrarAvaria() {
       ) : bloqueado ? (
         <EstadoLista mensagem="Não é possível registrar avaria para este item." />
       ) : (
-        <section className="bg-[#eef7f0] border border-[#cfe5d4] rounded-2xl xl:rounded-3xl p-5 sm:p-6 xl:p-8 w-full max-w-5xl">
+        <section className="bg-[#eef7f0] border border-[#cfe5d4] rounded-2xl xl:rounded-3xl p-5 sm:p-6 xl:p-8 w-full">
           <div className="space-y-4 xl:space-y-5">
             <CampoLeitura rotulo="Título do Livro" valor={item.livroTitulo} />
 

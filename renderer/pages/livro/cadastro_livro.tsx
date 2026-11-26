@@ -7,7 +7,6 @@ export default function CadastrarLivroPage() {
   return (
     <PageShell
       titulo="Adicionar livro"
-      maxWidthClass="w-full max-w-5xl"
       acaoTopo={
         <Link
           href="/livro"
