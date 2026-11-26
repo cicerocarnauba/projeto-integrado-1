@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { MdAdd, MdArrowBack, MdCheck, MdClose, MdRemove } from "react-icons/md";
+import { MdArrowBack, MdCheck, MdClear } from "react-icons/md";
 import PageShell from "../../components/PageShell";
 import EstadoLista from "../../components/EstadoLista";
 import ToastFeedback from "../../components/ToastFeedback";
@@ -21,14 +21,14 @@ interface ContadorProps {
 
 function Contador({ rotulo, valor, max, desabilitado, onChange }: ContadorProps) {
   const botao =
-    "h-9 w-9 xl:h-10 xl:w-10 inline-flex items-center justify-center rounded-lg bg-[#eef7f0] text-[#1e582d] font-bold transition-all cursor-pointer hover:bg-[#d8f3dc] active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#eef7f0]";
+    "w-8 h-8 xl:w-10 xl:h-10 rounded-lg bg-[#eef7f0] text-[#1e582d] hover:bg-[#2e8b45] hover:text-white disabled:opacity-30 disabled:hover:bg-[#eef7f0] disabled:hover:text-[#1e582d] disabled:cursor-not-allowed transition-colors flex items-center justify-center font-bold text-base xl:text-lg cursor-pointer select-none";
 
   return (
     <div className="flex-1 min-w-[220px]">
-      <span className="block text-sm xl:text-base font-semibold text-gray-800 mb-1.5 xl:mb-2">
+      <span className="block text-sm xl:text-base font-semibold text-[#1e582d] mb-1.5 xl:mb-2">
         {rotulo}
       </span>
-      <div className="h-11 xl:h-13 px-2 flex items-center justify-between bg-white border border-[#cfe5d4] rounded-xl">
+      <div className="w-full h-10 xl:h-12 p-1 flex items-center justify-between bg-white border border-[#cde5d3] rounded-xl shadow-2xs">
         <button
           type="button"
           aria-label={`Diminuir ${rotulo}`}
@@ -36,9 +36,9 @@ function Contador({ rotulo, valor, max, desabilitado, onChange }: ContadorProps)
           disabled={desabilitado || valor <= 0}
           onClick={() => onChange(valor - 1)}
         >
-          <MdRemove size={19} />
+          −
         </button>
-        <span className="text-sm xl:text-base font-semibold text-gray-900 tabular-nums">
+        <span className="text-sm xl:text-base font-bold text-gray-900 tabular-nums">
           {valor}
         </span>
         <button
@@ -48,7 +48,7 @@ function Contador({ rotulo, valor, max, desabilitado, onChange }: ContadorProps)
           disabled={desabilitado || valor >= max}
           onClick={() => onChange(valor + 1)}
         >
-          <MdAdd size={19} />
+          +
         </button>
       </div>
     </div>
@@ -66,12 +66,12 @@ function CampoLeitura({
 }) {
   return (
     <div className="min-w-0">
-      <span className="block text-sm xl:text-base text-gray-700 mb-1.5 xl:mb-2">
+      <span className="block text-sm xl:text-base font-semibold text-[#1e582d] mb-1.5 xl:mb-2">
         {rotulo}
       </span>
       <div
-        className={`h-11 xl:h-13 px-4 xl:px-5 flex items-center bg-white border border-[#cfe5d4] rounded-xl text-sm xl:text-base text-gray-900 truncate ${
-          centralizado ? "justify-center" : ""
+        className={`h-10 xl:h-12 px-3.5 xl:px-4 flex items-center bg-[#f4faf5] border border-[#cde5d3] rounded-xl text-sm xl:text-base text-gray-700 font-medium truncate ${
+          centralizado ? "justify-center tabular-nums" : ""
         }`}
       >
         <span className="truncate">{valor}</span>
@@ -212,15 +212,15 @@ export default function RegistrarAvaria() {
       <ToastFeedback mensagem={erro} tipo="erro" onClose={fecharErro} />
 
       {carregando ? (
-        <EstadoLista mensagem="Carregando item..." />
+        <EstadoLista carregando mensagem="Carregando item..." />
       ) : !emprestimo || !item ? (
         <EstadoLista mensagem={erro || "Item do empréstimo não encontrado."} />
       ) : bloqueado ? (
         <EstadoLista mensagem="Não é possível registrar avaria para este item." />
       ) : (
-        <section className="bg-[#eef7f0] border border-[#cfe5d4] rounded-2xl xl:rounded-3xl p-5 sm:p-6 xl:p-8 w-full">
+        <section className="w-full bg-[#eef7f0] border border-[#cfe5d4] rounded-2xl p-5 sm:p-6 xl:p-8 shadow-xs">
           <div className="space-y-4 xl:space-y-5">
-            <CampoLeitura rotulo="Título do Livro" valor={item.livroTitulo} />
+            <CampoLeitura rotulo="Título do livro" valor={item.livroTitulo} />
 
             <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 xl:gap-6">
               <div className="sm:col-span-8">
@@ -236,13 +236,13 @@ export default function RegistrarAvaria() {
             </div>
           </div>
 
-          <hr className="my-4 xl:my-6 border-[#cfe5d4]" />
+          <hr className="my-4 xl:my-6 border-[#cde5d3]" />
 
-          <h2 className="text-base xl:text-lg font-bold text-[#1e582d] mb-3 xl:mb-4">
+          <h2 className="text-base xl:text-lg font-bold text-[#1e582d] mb-2.5 xl:mb-3.5">
             Avarias
           </h2>
 
-          <div className="flex flex-wrap gap-4 sm:gap-6 xl:gap-8">
+          <div className="flex flex-wrap gap-4 xl:gap-6">
             <Contador
               rotulo="Exemplares perdidos"
               valor={perdidos}
@@ -259,40 +259,46 @@ export default function RegistrarAvaria() {
             />
           </div>
 
-          <p className="mt-4 xl:mt-5 text-sm xl:text-base text-gray-700">
-            Exemplares emprestados:{" "}
-            <span className="font-bold text-[#1e582d]">{pendente}</span>
+          <p className="mt-3.5 xl:mt-4 text-xs xl:text-sm text-[#245B2F]">
+            Exemplares pendentes neste empréstimo:{" "}
+            <span className="font-bold tabular-nums">{pendente}</span>
+            {soma > 0 && !somaInvalida && (
+              <span className="text-[#2e8b45] font-medium">
+                {" "}
+                ({soma} {soma === 1 ? "selecionado" : "selecionados"} · restam{" "}
+                {pendente - soma})
+              </span>
+            )}
           </p>
 
           {somaInvalida ? (
-            <p role="alert" className="mt-3 text-sm font-medium text-red-600">
+            <div
+              role="alert"
+              className="mt-3 rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700"
+            >
               A soma de perdidos e danificados não pode ser maior que os
               exemplares pendentes ({pendente}).
-            </p>
+            </div>
           ) : null}
 
-          <div className="mt-5 xl:mt-8 flex justify-end gap-3">
+          <div className="mt-6 xl:mt-7 flex justify-end items-center gap-3">
             <button
               type="button"
               onClick={voltar}
               disabled={salvando}
-              className="h-10 xl:h-12 px-6 xl:px-8 inline-flex items-center gap-2 rounded-xl bg-[#d94848] text-white text-sm xl:text-base font-semibold hover:bg-[#b93a3a] transition-all cursor-pointer active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
+              className="h-10 xl:h-11 inline-flex items-center justify-center gap-2 px-5 xl:px-6 rounded-xl text-sm xl:text-base font-semibold text-white bg-[#cf4a4a] hover:bg-[#b83a3a] transition-colors shadow-xs active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <MdClose size={19} />
+              <MdClear size={19} />
               Cancelar
             </button>
             <button
               type="button"
               onClick={() => setModalAberto(true)}
               disabled={registrarDesabilitado}
-              className={`h-10 xl:h-12 px-6 xl:px-8 inline-flex items-center gap-2 rounded-xl text-sm xl:text-base font-semibold transition-all ${
-                registrarDesabilitado
-                  ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                  : "bg-[#2e8b45] text-white hover:bg-[#236c35] cursor-pointer active:scale-95"
-              }`}
+              className="h-10 xl:h-11 inline-flex items-center justify-center gap-2 bg-[#2e8b45] hover:bg-[#236c35] text-white px-6 xl:px-7 rounded-xl text-sm xl:text-base font-semibold transition-all shadow-sm active:scale-95 cursor-pointer disabled:bg-[#9cc9a8] disabled:hover:bg-[#9cc9a8] disabled:active:scale-100 disabled:cursor-not-allowed"
             >
               <MdCheck size={19} />
-              Registrar
+              {salvando ? "Registrando..." : "Registrar"}
             </button>
           </div>
         </section>

@@ -1,5 +1,5 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
-import { MdKeyboardArrowDown } from "react-icons/md";
+import { MdClose, MdKeyboardArrowDown } from "react-icons/md";
 
 export interface OpcaoSelect {
   value: string;
@@ -132,6 +132,23 @@ export default function SelectPesquisavel({
     }
   }
 
+  const mostrarBotaoLimpar =
+    !disabled && Boolean(selecionada || (aberto && termo.length > 0));
+
+  function limpar(e: React.MouseEvent<HTMLButtonElement>) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (aberto && termo.length > 0) {
+      setTermo("");
+      return;
+    }
+
+    onChange("");
+    setTermo("");
+    setAberto(false);
+  }
+
   return (
     <div ref={containerRef} className="relative">
       <input
@@ -144,7 +161,7 @@ export default function SelectPesquisavel({
         disabled={disabled}
         // Fechado: mostra a opção escolhida. Aberto: mostra o que está sendo digitado.
         value={aberto ? termo : selecionada?.label ?? ""}
-        placeholder={placeholder}
+        placeholder={aberto && selecionada ? selecionada.label : placeholder}
         onFocus={abrir}
         onClick={abrir}
         onChange={(e) => {
@@ -152,9 +169,26 @@ export default function SelectPesquisavel({
           setTermo(e.target.value);
         }}
         onKeyDown={aoPressionarTecla}
-        // pr-10 reserva o espaço da seta: o texto nunca passa por baixo dela
-        className="w-full h-10 xl:h-12 bg-white border border-[#cde5d3] rounded-xl pl-3.5 xl:pl-4 pr-10 text-sm xl:text-base text-gray-900 placeholder:text-gray-400 truncate outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20 disabled:opacity-60 disabled:cursor-not-allowed"
+        className={`w-full h-10 xl:h-12 bg-white border border-[#cde5d3] rounded-xl pl-3.5 xl:pl-4 ${
+          mostrarBotaoLimpar ? "pr-16" : "pr-10"
+        } text-sm xl:text-base text-gray-900 ${
+          aberto && selecionada
+            ? "placeholder:text-gray-500"
+            : "placeholder:text-gray-400"
+        } truncate outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20 disabled:opacity-60 disabled:cursor-not-allowed`}
       />
+
+      {mostrarBotaoLimpar && (
+        <button
+          type="button"
+          onMouseDown={limpar}
+          title={aberto && termo.length > 0 ? "Limpar filtro" : "Limpar seleção"}
+          aria-label={aberto && termo.length > 0 ? "Limpar filtro" : "Limpar seleção"}
+          className="absolute right-9 top-1/2 -translate-y-1/2 p-1 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
+        >
+          <MdClose size={17} />
+        </button>
+      )}
 
       {/* Seta sempre à mesma distância da borda direita, em todos os campos */}
       <MdKeyboardArrowDown
@@ -172,7 +206,9 @@ export default function SelectPesquisavel({
           className="absolute z-30 mt-1.5 w-full max-h-64 overflow-auto bg-white border border-[#cde5d3] rounded-xl shadow-xl py-1.5"
         >
           {filtradas.length === 0 ? (
-            <li className="px-4 py-3 text-base text-gray-500">{mensagemVazia}</li>
+            <li className="px-4 py-2.5 text-sm xl:text-base text-gray-500">
+              {mensagemVazia}
+            </li>
           ) : (
             filtradas.map((opcao, indice) => (
               <li
@@ -187,7 +223,7 @@ export default function SelectPesquisavel({
                   escolher(opcao);
                 }}
                 onMouseEnter={() => !opcao.desabilitada && setIndiceAtivo(indice)}
-                className={`flex items-center justify-between gap-3 px-4 py-2.5 text-base ${
+                className={`flex items-center justify-between gap-3 px-3.5 xl:px-4 py-2 xl:py-2.5 text-sm xl:text-base ${
                   opcao.desabilitada
                     ? "text-gray-400 cursor-not-allowed"
                     : "cursor-pointer text-gray-800"

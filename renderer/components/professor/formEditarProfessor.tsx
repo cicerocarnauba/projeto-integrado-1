@@ -115,16 +115,16 @@ export default function FormEditarProfessor({
       {erro && (
         <div
           role="alert"
-          className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3.5 text-base text-red-700"
+          className="mb-4 xl:mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 xl:py-3.5 text-sm xl:text-base text-red-700"
         >
           {erro}
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 xl:gap-6 mb-6 xl:mb-8">
         <div className="md:col-span-5">
-          <label className="text-base font-semibold text-[#1e582d] mb-2 block">
-            Primeiro nome
+          <label className="text-sm xl:text-base font-semibold text-[#1e582d] mb-1.5 xl:mb-2 block">
+            Primeiro nome <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -134,13 +134,13 @@ export default function FormEditarProfessor({
               limparErro();
               setPrimeiroNome(e.target.value);
             }}
-            className="w-full h-12 bg-white border border-[#cde5d3] rounded-xl px-4 text-base text-gray-900 placeholder:text-gray-400 outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20 disabled:bg-gray-100 disabled:cursor-not-allowed"
+            className="w-full h-10 xl:h-12 bg-white border border-[#cde5d3] rounded-xl px-3.5 xl:px-4 text-sm xl:text-base text-gray-900 placeholder:text-gray-400 outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20 disabled:opacity-60 disabled:cursor-not-allowed"
           />
         </div>
 
         <div className="md:col-span-7">
-          <label className="text-base font-semibold text-[#1e582d] mb-2 block">
-            Sobrenome
+          <label className="text-sm xl:text-base font-semibold text-[#1e582d] mb-1.5 xl:mb-2 block">
+            Sobrenome <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -150,13 +150,13 @@ export default function FormEditarProfessor({
               limparErro();
               setSobrenome(e.target.value);
             }}
-            className="w-full h-12 bg-white border border-[#cde5d3] rounded-xl px-4 text-base text-gray-900 placeholder:text-gray-400 outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20 disabled:bg-gray-100 disabled:cursor-not-allowed"
+            className="w-full h-10 xl:h-12 bg-white border border-[#cde5d3] rounded-xl px-3.5 xl:px-4 text-sm xl:text-base text-gray-900 placeholder:text-gray-400 outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20 disabled:opacity-60 disabled:cursor-not-allowed"
           />
         </div>
 
         <div className="md:col-span-12">
-          <label className="text-base font-semibold text-[#1e582d] mb-2 block">
-            E-mail
+          <label className="text-sm xl:text-base font-semibold text-[#1e582d] mb-1.5 xl:mb-2 block">
+            E-mail <span className="text-red-500">*</span>
           </label>
           <input
             type="email"
@@ -166,7 +166,7 @@ export default function FormEditarProfessor({
               limparErro();
               setEmail(e.target.value);
             }}
-            className="w-full h-12 bg-white border border-[#cde5d3] rounded-xl px-4 text-base text-gray-900 placeholder:text-gray-400 outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20 disabled:bg-gray-100 disabled:cursor-not-allowed"
+            className="w-full h-10 xl:h-12 bg-white border border-[#cde5d3] rounded-xl px-3.5 xl:px-4 text-sm xl:text-base text-gray-900 placeholder:text-gray-400 outline-none transition-all focus:border-[#2e8b45] focus:ring-2 focus:ring-[#2e8b45]/20 disabled:opacity-60 disabled:cursor-not-allowed"
           />
         </div>
       </div>
@@ -176,7 +176,7 @@ export default function FormEditarProfessor({
           type="button"
           onClick={cancelar}
           disabled={salvando}
-          className="h-11 inline-flex items-center justify-center gap-2 px-6 rounded-xl text-base font-semibold text-white bg-[#cf4a4a] hover:bg-[#b83a3a] transition-colors shadow-xs active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          className="h-10 xl:h-11 inline-flex items-center justify-center gap-2 px-5 xl:px-6 rounded-xl text-sm xl:text-base font-semibold text-white bg-[#cf4a4a] hover:bg-[#b83a3a] transition-colors shadow-xs active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <MdClear size={19} />
           Cancelar edição
@@ -185,7 +185,7 @@ export default function FormEditarProfessor({
         <button
           type="submit"
           disabled={salvando}
-          className="h-11 inline-flex items-center justify-center gap-2 bg-[#2e8b45] hover:bg-[#236c35] text-white px-7 rounded-xl text-base font-semibold transition-all shadow-sm active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          className="h-10 xl:h-11 inline-flex items-center justify-center gap-2 bg-[#2e8b45] hover:bg-[#236c35] text-white px-6 xl:px-7 rounded-xl text-sm xl:text-base font-semibold transition-all shadow-sm active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <MdCheck size={19} />
           {salvando ? "Salvando..." : "Confirmar edição"}
